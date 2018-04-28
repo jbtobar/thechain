@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <title>Test</title>
-    <link rel="stylesheet" type='text/html' href="/css/style2.css">
+    <!-- <link rel="stylesheet" type='text/html' href="/css/style2.css"> -->
     <link href='https://fonts.googleapis.com/css?family=Open+Sans:300' rel='stylesheet' type='text/css'>
 <script
   src="http://code.jquery.com/jquery-3.3.1.min.js"
@@ -11,80 +11,26 @@
   crossorigin="anonymous"></script>
     <script src="https://d3js.org/d3.v5.min.js"></script>
 <script type='text/javascript' src="/node_modules/waves-api/dist/waves-api.min.js"></script>
-<style>
-body {
-  width: 800px;
-  margin: 0 auto;
-  font-family: 'Open Sans', sans-serif;
-}
-.container {
-  width: 600px;
-  margin: 0 auto;
-}
-fieldset {
-  display: block;
-  -webkit-margin-start: 0px;
-  -webkit-margin-end: 0px;
-  -webkit-padding-before: 0em;
-  -webkit-padding-start: 0em;
-  -webkit-padding-end: 0em;
-  -webkit-padding-after: 0em;
-  border: 0px;
-  border-image-source: initial;
-  border-image-slice: initial;
-  border-image-width: initial;
-  border-image-outset: initial;
-  border-image-repeat: initial;
-  min-width: -webkit-min-content;
-  padding: 30px;
-}
-.ghost-input, p {
-  display: block;
-  font-weight:300;
-  width: 100%;
-  font-size: 25px;
-  border:0px;
-  outline: none;
-  width: 100%;
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
-  color: #4b545f;
-  background: #fff;
-  font-family: Open Sans,Verdana;
-  padding: 10px 15px;
-  margin: 30px 0px;
-  -webkit-transition: all 0.1s ease-in-out;
-  -moz-transition: all 0.1s ease-in-out;
-  -ms-transition: all 0.1s ease-in-out;
-  -o-transition: all 0.1s ease-in-out;
-  transition: all 0.1s ease-in-out;
-}
-.ghost-input:focus {
-  border-bottom:1px solid #ddd;
-}
-.ghost-button {
-  background-color: transparent;
-  border:2px solid #ddd;
-  padding:10px 30px;
-  width: 100%;
-  min-width: 350px;
-  -webkit-transition: all 0.1s ease-in-out;
-  -moz-transition: all 0.1s ease-in-out;
-  -ms-transition: all 0.1s ease-in-out;
-  -o-transition: all 0.1s ease-in-out;
-  transition: all 0.1s ease-in-out;
-}
-.ghost-button:hover {
-  border:2px solid #515151;
-}
-p {
-  color: #E64A19;
-}
-</style>
+<link rel="stylesheet" type='text/css' href='/public/style.css'></link>
   </head>
+
   <body>
-    <div class="container">
+    <div class="container" id='div_form1'>
+        <fieldset>
+          <form action="/wallet" method="post" onsubmit="return openAccount(this);">
+        <!-- <form action="/wallet" method="post"> -->
+          <input name="user" type="text" class="ghost-input" placeholder="Username" required oninput="checkUser(this)" id="user">
+            <input name="password1" class='ghost-input' required="required" type="password" id="password1" placeholder="Enter Password"/>
+
+          <input type="submit" class="ghost-button" value="Log in">
+          <br>
+          <br>
+          <input type="submit" class="ghost-button" value="Log in" onclick="registerForm()">
+        </form>
+        </fieldset>
+    </div>
+
+    <div class="container" id='div_form2' hidden>
         <fieldset>
         <form action="/" method="post" onsubmit="return validate(this);">
           <input name="city" type="text" class="ghost-input" placeholder="Enter a City" required oninput="checkUser(this)">
@@ -94,5 +40,62 @@ p {
         </form>
         </fieldset>
     </div>
+    <div id='walletwindow' hidden>
+      <fieldset id='walletfieldset'>
+        <!-- <button id="myBtn">Open Modal</button> -->
+        <span class="close" id="myBtn">&times;</span>
+        <div id="myModal" class="modal">
+
+          <!-- Modal content -->
+          <div class="modal-content">
+            <span class="close" id="myBtnClose">&times;</span>
+            <p>Some text in the Modal..</p>
+            <form>
+              <label for="conf1" class="ghost-input ghost-label-top">Account Name:</label>
+              <input id="conf1" name="conf1" type="text" class="ghost-input ghost-label-bottom" value="Account name">
+              <label for="conf2" class="ghost-input ghost-label-top">Account Address:</label>
+              <input id="conf2" name="conf2" type="text" class="ghost-input ghost-label-bottom" value="Address">
+              <label for="conf3" class="ghost-input ghost-label-top">Email:</label>
+              <input id="conf3" name="conf2" type="text" class="ghost-input ghost-label-bottom" value="Unconfirmed">
+
+              <label for="conf4" class="ghost-input ghost-label-top">Searchable:</label>
+              <input type="radio" id="contactChoice1" name="contact" value="Yes">
+              <label for="contactChoice1">Yes</label>
+              <input type="radio" id="contactChoice2"name="contact" value="No">
+              <label for="contactChoice2">No</label>
+              <label for="conf5" class="ghost-input ghost-label-top">BTC Address:</label>
+              <input id="conf5" name="conf5" type="text" class="ghost-input ghost-label-bottom" value="Address">
+              <input type="submit" class="ghost-button" value="Update Settings">
+            </form>
+          </div>
+
+        </div>
+        <div id='Page_1'>
+          <form action="/" method="post" onsubmit="return false" id="ContractsMenu">
+          </form>
+          <div id='slide_1'></div>
+          <div id='slide_2'></div>
+          <div id='slide_3'></div>
+          <div id='slide_4'></div>
+        </div>
+        <div id='Page_3'></div>
+      <form action="/" method="post" onsubmit="return openAccount(this);" id="walletwindowform">
+    <!-- <form action="/wallet" method="post"> -->
+      <!-- <label for="name1" class="ghost-input ghost-label-top">Account:</label> -->
+      <input id="name1" name="name1" type="text" class="ghost-input ghost-label-bottom" value="Account name" readonly>
+      <!-- <label for="name1" class="ghost-input ghost-label-top">Balance:</label> -->
+      <!-- <input id="name2" name="name2" type="text" class="ghost-input ghost-label-bottom" value="Account Address" readonly> -->
+
+
+      <!-- <input type="submit" class="ghost-button" value="Log in"> -->
+
+      <!-- <input type="submit" class="ghost-button" value="Log in" onclick="registerForm()"> -->
+    </form>
+    </fieldset>
+
+    </div>
+    <script type='text/javascript' src="/public/functions.js"></script>
+    <script type='text/javascript' src="/public/options_math_new.js"></script>
+    <script type='text/javascript' src="/public/worker_new.js"></script>
   </body>
 </html>
