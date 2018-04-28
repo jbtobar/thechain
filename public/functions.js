@@ -168,6 +168,8 @@ function createUser(form,seed,encrypted) {
 }
 
 
+
+
 function openWalletWindow(data) {
   $('#div_form2').hide()
   $('#div_form1').hide()
@@ -211,8 +213,53 @@ function openWalletWindow(data) {
   })
   buildMenus()
   pageControl('button1')
+  settingsUpdate('load')
 }
 
+// rapo['acccount_config'] = {}
+
+function sendUpdateForm(arg) {
+  window.mario = arg
+  var username = arg.conf1.value
+  var address = arg.conf2[0].value
+
+  return false
+}
+
+function securityconfirm(arg) {
+  window.macha = arg
+  console.log('securityconfirm')
+}
+
+
+
+function settingsUpdate(arg) {
+  if (arg == 'load') {
+    // username
+    d3.select('#conf1').attr('value',rapo.username)
+    // address
+    d3.select('#conf2').attr('value',rapo.balance.address)
+    // email
+    d3.select('#conf3').attr('value','')
+    // searchable
+    d3.select('#contactChoice1').attr('checked','')
+    d3.select('#contactChoice2').attr('checked','')
+  }
+  if (arg == 'push') {
+
+
+  }
+
+}
+// $.post("account_config", {
+//   method:"POST",
+//   username:user,
+//   action:'load',
+//   account_config:configs,
+// }).done(function(data){
+//   window.account_config = data
+//   console.log('account_config')
+// })
 
 // <div class="btn-group">
 //   <button>Apple</button>
@@ -377,7 +424,7 @@ function chainforMe(arg) {
 
 function confetti() {
   var modal = d3.select('#myModal')
-  
+
 }
 
 

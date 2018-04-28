@@ -49,14 +49,24 @@
           <!-- Modal content -->
           <div class="modal-content">
             <span class="close" id="myBtnClose">&times;</span>
-            <p>Some text in the Modal..</p>
-            <form>
+            <p onclick="securityconfirm(this)">Update Settings</p>
+            <div id='securityconfirmwindow'>
+              <form onsubmit="return securityconfirm(this)">
+                <input name="password_for_settings" class='ghost-input' required="required" type="password" id="password_for_settings" placeholder="Enter Password"/>
+                <input type="submit" class="ghost-button" value="Get Weather">
+              </form>
+            </div>
+            <form action="/" method="post" onsubmit="return sendUpdateForm(this)" id="update_settings_form">
               <label for="conf1" class="ghost-input ghost-label-top">Account Name:</label>
-              <input id="conf1" name="conf1" type="text" class="ghost-input ghost-label-bottom" value="Account name">
+              <input id="conf1" name="conf1" type="text" class="ghost-input ghost-label-bottom" value="Account name" readonly>
               <label for="conf2" class="ghost-input ghost-label-top">Account Address:</label>
-              <input id="conf2" name="conf2" type="text" class="ghost-input ghost-label-bottom" value="Address">
+              <input id="conf2" name="conf2" type="text" class="ghost-input ghost-label-bottom" value="Address" readonly>
+              <!-- <div class="popup" onclick="myFunction()">
+
+                <span class="popuptext" id="myPopup">Change Email?</span>
+              </div> -->
               <label for="conf3" class="ghost-input ghost-label-top">Email:</label>
-              <input id="conf3" name="conf2" type="text" class="ghost-input ghost-label-bottom" value="Unconfirmed">
+              <input id="conf3" name="conf3" type="text" class="ghost-input ghost-label-bottom" value="Unconfirmed" readonly>
 
               <label for="conf4" class="ghost-input ghost-label-top">Searchable:</label>
               <input type="radio" id="contactChoice1" name="contact" value="Yes">
@@ -64,7 +74,7 @@
               <input type="radio" id="contactChoice2"name="contact" value="No">
               <label for="contactChoice2">No</label>
               <label for="conf5" class="ghost-input ghost-label-top">BTC Address:</label>
-              <input id="conf5" name="conf5" type="text" class="ghost-input ghost-label-bottom" value="Address">
+              <input id="conf5" name="conf5" type="text" class="ghost-input ghost-label-bottom" value="Address" readonly>
               <input type="submit" class="ghost-button" value="Update Settings">
             </form>
           </div>

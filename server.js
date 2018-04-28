@@ -19,7 +19,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 //var obj = require(__dirname+"/public/jsonusers.json");
 //var obj = require('./public/jsonusers.json');
 var userbase = require('./public/userbase.json');
-
+fs.writeFile('./public/userbase_backup.json', JSON.stringify(userbase), 'utf8',function(err){console.log(err)});
 app.get('/', function (req, res) {
   res.sendFile(__dirname +'/views/index.html')
 })
@@ -213,10 +213,11 @@ app.post('/options',function(req,res) {
 process.stdin.resume();//so the program will not close instantly
 
 function exitHandler(options, err) {
+    fs.writeFileSync('./public/userbase.json', JSON.stringify(userbase), 'utf8',function(err){console.log(err)});
+    console.log('Wrote file at: ./public/userbase.json');
+
     if (options.cleanup) {
       console.log('cleaning up');
-      fs.writeFile('./public/userbase.json', JSON.stringify(userbase), 'utf8',function(err){console.log(err)});
-      console.log('Wrote file at: ./public/userbase.json');
     }
     if (err) console.log(err.stack);
     if (options.exit) process.exit();
