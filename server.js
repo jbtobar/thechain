@@ -49,7 +49,14 @@ app.post('/account_config', function(req,res) {
   }
   if (req.body.action == 'push') {
     // userbase[user_input].account_config[]
+    console.log('pushed')
     console.log(req.body)
+    req.body.updates.forEach(function(d) {
+      console.log(d)
+      userbase[user_input].account_config[d] = req.body.account_config[d]
+      console.log(userbase[user_input])
+    })
+    res.send(JSON.stringify({ updated: userbase[user_input].account_config }));
   }
 })
 
@@ -90,6 +97,7 @@ app.post('/wallet', function (req, res) {
 
     console.log('Loggin in')
     var address = userbase[user_input].seedaddress
+    var account_config = userbase[user_input].account_config
     // Waves.API.Node.v1.addresses.balance(address).then((balance) => {
     //     console.log(balance);
     //     res.send(JSON.stringify({ a: 'wallet', encrypted:encrypted,data:JSON.stringify(balance) }));
@@ -99,7 +107,7 @@ app.post('/wallet', function (req, res) {
        console.log(balancesList);
        Waves.API.Node.v1.addresses.balance(address).then((balance) => {
            console.log(balance);
-           res.send(JSON.stringify({ a: 'wallet', encrypted:encrypted,balance:balance,balances:balancesList,username:user_input }));
+           res.send(JSON.stringify({ a: 'wallet', encrypted:encrypted,balance:balance,balances:balancesList,username:user_input,account_config:account_config }));
        });
        // res.send(JSON.stringify({ a: 'wallet', encrypted:encrypted,balances:JSON.stringify(balancesList) }))
     });

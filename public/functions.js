@@ -211,25 +211,152 @@ function openWalletWindow(data) {
       }
 
   })
+  resetConf()
+  // d3.select('#conf3').attr('value','green')
   buildMenus()
   pageControl('button1')
   settingsUpdate('load')
 }
 
+function resetConf() {
+  var email = rapo.account_config.email
+  $('#conf3').prop('value',email)
+  // var searchable = rapo.account_config.searchable
+  if (rapo.account_config.searchable == 'true') {
+    $('#contactChoice1').prop('checked',true)
+  } else {
+    $('#contactChoice2').prop('checked',true)
+  }
+  $(':radio:not(:checked)').attr('disabled', true);
+}
+// { address: '3MzMwvrenZgDAoCkHqVcvgRZDi8yRYzcQvm', balances: [] }
+// { address: '3MzMwvrenZgDAoCkHqVcvgRZDi8yRYzcQvm',
+
 // rapo['acccount_config'] = {}
 
+
+//
+// $.post("account_config", {
+//   method:"POST",
+//   username:user,
+//   action:'load',
+//   account_config:configs,
+// }).done(function(data){
+//   window.account_config = data
+//   console.log('account_config')
+// })
+
+
 function sendUpdateForm(arg) {
+  if ($('#lock_or_not_input').val() == 'lock') {
+    return false
+  }
   window.mario = arg
   var username = arg.conf1.value
-  var address = arg.conf2[0].value
+  var email = arg.conf3.value
+  if (mario.contactChoice1.checked == true) {
+    var searchable = true
+  } else {
+    var searchable = false
+  }
+  var config = {
+    email:email,
+    searchable:searchable,
+  }
+  if (confirm("You are about to update:\n Email: "+email+"\n Searchable: "+searchable)) {
+    $.post("account_config", {
+      method:"POST",
+      username:rapo.username,
+      action:'push',
+      updates:['email','searchable'],
+      account_config:config,
+    }).done(function(data){
+      window.account_config = JSON.parse(data)
 
-  return false
+
+      var email = account_config.updated.email
+      rapo.account_config.email = email
+      var searchable = account_config.updated.searchable
+      rapo.account_config.searchable = searchable
+
+      $('#conf3').prop('value',email)
+      // var searchable = rapo.account_config.searchable
+      if (account_config.updated.searchable == 'true') {
+        $('#contactChoice1').prop('checked',true)
+      } else {
+        $('#contactChoice2').prop('checked',true)
+      }
+      $(':radio:not(:checked)').attr('disabled', true);
+      securityconfirm({id:'lockagain'})
+      console.log('account_config')
+    })
+    d3.select('#conf4_label').attr('style','')
+    d3.select('#conf3').attr('style','')
+
+    return false
+  } else {
+
+    return false
+  }
+
 }
+
+$('#lockagain').hide()
+$('#securityconfirmwindow').hide()
+
+
 
 function securityconfirm(arg) {
   window.macha = arg
-  console.log('securityconfirm')
+  if (arg.id == 'show_pass_input') {
+    $('#securityconfirmwindow').toggle()
+    console.log('securityconfirm')
+  }
+  else if (arg.id == 'lockagain') {
+    resetConf()
+
+    $(':radio:not(:checked)').attr('disabled', true);
+    // $('#conf1').prop('readonly', true);
+    $('#conf3').prop('readonly', true);
+    // $('#contactChoice2').prop('readonly', true);
+    // $('#contactChoice2').prop('readonly', true);
+    $('#lockagain').hide()
+    d3.select('#lock_or_not').text('  locked')
+    $('#lock_or_not_input').val('lock')
+    d3.select('#conf4_label').attr('style','')
+    d3.select('#conf3').attr('style','')
+  } else {
+    console.log('valid or not')
+    var username = rapo.username
+    const encrypted = rapo.encrypted
+    var topaz = macha.password_for_settings.value
+    try {
+      var restoredPhrase = Waves.Seed.decryptSeedPhrase(encrypted, topaz);
+      window.seed = Waves.Seed.fromExistingPhrase(restoredPhrase);
+      $('#securityconfirmwindow').toggle()
+      $('#lockagain').show()
+      // d3.select('#show_pass_input').text()
+      d3.select('#lock_or_not').text('  unlocked')
+      $('#lock_or_not_input').val('unlock')
+      // $('#conf1').prop('readonly', false);
+      $('#conf3').prop('readonly', false);
+      // $('#contactChoice2').prop('readonly', false);
+      // $('#contactChoice2').prop('readonly', false);
+      $(':radio:not(:checked)').attr('disabled', false);
+      d3.select('#conf4_label').attr('style','border:5px solid red;')
+      d3.select('#conf3').attr('style','border:5px solid red;')
+      console.log('good')
+    } catch(err) {
+      alert(err)
+    }
+
+    // alert(seed)
+    console.log('seed')
+
+    return false
+  }
 }
+// d3.select('#securityconfirmwindow').attr('style','height:0%')
 
 
 
@@ -240,10 +367,10 @@ function settingsUpdate(arg) {
     // address
     d3.select('#conf2').attr('value',rapo.balance.address)
     // email
-    d3.select('#conf3').attr('value','')
+    // d3.select('#conf3').attr('value','')
     // searchable
-    d3.select('#contactChoice1').attr('checked','')
-    d3.select('#contactChoice2').attr('checked','')
+    // d3.select('#contactChoice1').attr('checked','')
+    // d3.select('#contactChoice2').attr('checked','')
   }
   if (arg == 'push') {
 

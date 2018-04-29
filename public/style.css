@@ -158,6 +158,14 @@ input#name1:focus {
     cursor: pointer;
 }
 
+#lock_or_not {
+  font-style: italic;
+  color: #E64A19;
+}
+#contactChoice1 {
+  margin-left: 50px;
+}
+
 
 /* Popup container */
 .popup {

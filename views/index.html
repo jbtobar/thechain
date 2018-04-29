@@ -25,7 +25,7 @@
           <input type="submit" class="ghost-button" value="Log in">
           <br>
           <br>
-          <input type="submit" class="ghost-button" value="Log in" onclick="registerForm()">
+          <input type="submit" class="ghost-button" value="Register" onclick="registerForm()">
         </form>
         </fieldset>
     </div>
@@ -49,16 +49,21 @@
           <!-- Modal content -->
           <div class="modal-content">
             <span class="close" id="myBtnClose">&times;</span>
-            <p onclick="securityconfirm(this)">Update Settings</p>
+            <p id="show_pass_input" onclick="securityconfirm(this)">
+              Update Settings
+              <text id='lock_or_not'>  locked</text>
+              <input id='lock_or_not_input' value='lock' hidden></input>
+            </p>
+            <input id='lockagain' type="submit" class="ghost-button" value="Lock" onclick="securityconfirm(this)">
             <div id='securityconfirmwindow'>
               <form onsubmit="return securityconfirm(this)">
-                <input name="password_for_settings" class='ghost-input' required="required" type="password" id="password_for_settings" placeholder="Enter Password"/>
-                <input type="submit" class="ghost-button" value="Get Weather">
+                <input name="password_for_settings" class='ghost-input' required="required" type="password" id="password_for_settings" placeholder="Enter Password to Update Settings"/>
+                <input type="submit" class="ghost-button" value="Unlock">
               </form>
             </div>
             <form action="/" method="post" onsubmit="return sendUpdateForm(this)" id="update_settings_form">
               <label for="conf1" class="ghost-input ghost-label-top">Account Name:</label>
-              <input id="conf1" name="conf1" type="text" class="ghost-input ghost-label-bottom" value="Account name" readonly>
+              <input id="conf1" name="conf1" type="text" class="ghost-input ghost-label-bottom" value="Account name" readonly=true>
               <label for="conf2" class="ghost-input ghost-label-top">Account Address:</label>
               <input id="conf2" name="conf2" type="text" class="ghost-input ghost-label-bottom" value="Address" readonly>
               <!-- <div class="popup" onclick="myFunction()">
@@ -66,15 +71,17 @@
                 <span class="popuptext" id="myPopup">Change Email?</span>
               </div> -->
               <label for="conf3" class="ghost-input ghost-label-top">Email:</label>
-              <input id="conf3" name="conf3" type="text" class="ghost-input ghost-label-bottom" value="Unconfirmed" readonly>
+              <input id="conf3" name="conf3" type="email" class="ghost-input ghost-label-bottom" value="Unconfirmed" readonly=true>
 
-              <label for="conf4" class="ghost-input ghost-label-top">Searchable:</label>
-              <input type="radio" id="contactChoice1" name="contact" value="Yes">
+              <label id="conf4_label" for="conf4" class="ghost-input ghost-label-top">Searchable:<input type="radio" id="contactChoice1" name="contact" value="Yes">
               <label for="contactChoice1">Yes</label>
               <input type="radio" id="contactChoice2"name="contact" value="No">
-              <label for="contactChoice2">No</label>
-              <label for="conf5" class="ghost-input ghost-label-top">BTC Address:</label>
-              <input id="conf5" name="conf5" type="text" class="ghost-input ghost-label-bottom" value="Address" readonly>
+              <label for="contactChoice2">No</label></label>
+              <br>
+              <br>
+              <!-- <label for="conf5" class="ghost-input ghost-label-top">BTC Address:</label> -->
+              <!-- <div class='btn-group'><button class='ghost-button' onclick="btcAddress(this)">Import Address</button><button class='ghost-button' onclick="btcAddress(this)">Generate Address</button></div> -->
+              <!-- <input id="conf5" name="conf5" type="text" class="ghost-input ghost-label-bottom" value="Address" readonly> -->
               <input type="submit" class="ghost-button" value="Update Settings">
             </form>
           </div>
