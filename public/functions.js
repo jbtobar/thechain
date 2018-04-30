@@ -220,7 +220,9 @@ function openWalletWindow(data) {
 
 function resetConf() {
   var email = rapo.account_config.email
+  var account_name = rapo.account_config.account_name
   $('#conf3').prop('value',email)
+  $('#conf5').prop('value',account_name)
   // var searchable = rapo.account_config.searchable
   if (rapo.account_config.searchable == 'true') {
     $('#contactChoice1').prop('checked',true)
@@ -254,6 +256,7 @@ function sendUpdateForm(arg) {
   window.mario = arg
   var username = arg.conf1.value
   var email = arg.conf3.value
+  var account_name = arg.conf5.value
   if (mario.contactChoice1.checked == true) {
     var searchable = true
   } else {
@@ -262,13 +265,14 @@ function sendUpdateForm(arg) {
   var config = {
     email:email,
     searchable:searchable,
+    account_name:account_name,
   }
   if (confirm("You are about to update:\n Email: "+email+"\n Searchable: "+searchable)) {
     $.post("account_config", {
       method:"POST",
       username:rapo.username,
       action:'push',
-      updates:['email','searchable'],
+      updates:['email','searchable','account_name'],
       account_config:config,
     }).done(function(data){
       window.account_config = JSON.parse(data)
@@ -278,8 +282,10 @@ function sendUpdateForm(arg) {
       rapo.account_config.email = email
       var searchable = account_config.updated.searchable
       rapo.account_config.searchable = searchable
-
+      var account_name = account_config.updated.account_name
+      rapo.account_config.account_name = account_name
       $('#conf3').prop('value',email)
+      $('#conf5').prop('value',account_name)
       // var searchable = rapo.account_config.searchable
       if (account_config.updated.searchable == 'true') {
         $('#contactChoice1').prop('checked',true)
@@ -292,6 +298,7 @@ function sendUpdateForm(arg) {
     })
     d3.select('#conf4_label').attr('style','')
     d3.select('#conf3').attr('style','')
+    d3.select('#conf5').attr('style','')
 
     return false
   } else {
@@ -318,6 +325,7 @@ function securityconfirm(arg) {
     $(':radio:not(:checked)').attr('disabled', true);
     // $('#conf1').prop('readonly', true);
     $('#conf3').prop('readonly', true);
+    $('#conf5').prop('readonly', true);
     // $('#contactChoice2').prop('readonly', true);
     // $('#contactChoice2').prop('readonly', true);
     $('#lockagain').hide()
@@ -325,6 +333,7 @@ function securityconfirm(arg) {
     $('#lock_or_not_input').val('lock')
     d3.select('#conf4_label').attr('style','')
     d3.select('#conf3').attr('style','')
+    d3.select('#conf5').attr('style','')
   } else {
     console.log('valid or not')
     var username = rapo.username
@@ -340,11 +349,13 @@ function securityconfirm(arg) {
       $('#lock_or_not_input').val('unlock')
       // $('#conf1').prop('readonly', false);
       $('#conf3').prop('readonly', false);
+      $('#conf5').prop('readonly', false);
       // $('#contactChoice2').prop('readonly', false);
       // $('#contactChoice2').prop('readonly', false);
       $(':radio:not(:checked)').attr('disabled', false);
       d3.select('#conf4_label').attr('style','border:5px solid red;')
       d3.select('#conf3').attr('style','border:5px solid red;')
+      d3.select('#conf5').attr('style','border:5px solid red;')
       console.log('good')
     } catch(err) {
       alert(err)
@@ -366,6 +377,7 @@ function settingsUpdate(arg) {
     d3.select('#conf1').attr('value',rapo.username)
     // address
     d3.select('#conf2').attr('value',rapo.balance.address)
+    d3.select('#conf2').attr('value',rapo.balance.account_name)
     // email
     // d3.select('#conf3').attr('value','')
     // searchable
@@ -457,10 +469,12 @@ function showMyData(arg) {
   if (arg == 'button3') {showTransactions()}
 }
 
+
+
 transaction_cols = ['DATE','TYPE','NAME','SENDER','RECIPIENT','FEE','UNITS','txID']
 
 function showTransactions() {
-  var tabla = d3.select('#Page_3').append('table').attr('id','transactionTable')
+  // var tabla = d3.select('#Page_3').append('table').attr('id','transactionTable')
   var tabla_head = tabla.append('thead').append('tr')
   var tabla_body = tabla.append('tbody')
   transaction_cols.forEach(function(d){tabla_head.append('th').text(d)})

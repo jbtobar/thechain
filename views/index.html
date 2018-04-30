@@ -35,7 +35,7 @@
     <div class="container" id='div_form2' hidden>
         <fieldset>
         <form action="/" method="post" onsubmit="return validate(this);">
-          <input name="city" type="text" class="ghost-input" placeholder="Enter a City" required oninput="checkUser(this)">
+          <input name="city" type="text" class="ghost-input" placeholder="Username" required oninput="checkUser(this)">
             <input name="password" class='ghost-input' required="required" type="password" id="password" placeholder="Enter Password"/>
             <input name="password_confirm" class='ghost-input' required="required" type="password" id="password_confirm" oninput="check(this)" placeholder="Confirm password" />
           <input type="submit" class="ghost-button" value="Get Weather">
@@ -45,7 +45,7 @@
     <div id='walletwindow' hidden>
       <fieldset id='walletfieldset'>
         <!-- <button id="myBtn">Open Modal</button> -->
-        <span class="close" id="myBtn">&times;</span>
+
         <div id="myModal" class="modal">
 
           <!-- Modal content -->
@@ -64,8 +64,13 @@
               </form>
             </div>
             <form action="/" method="post" onsubmit="return sendUpdateForm(this)" id="update_settings_form">
-              <label for="conf1" class="ghost-input ghost-label-top">Account Name:</label>
-              <input id="conf1" name="conf1" type="text" class="ghost-input ghost-label-bottom" value="Account name" readonly=true>
+
+              <label for="conf5" class="ghost-input ghost-label-top">Account Name:</label>
+              <input id="conf5" name="conf5" type="text" class="ghost-input ghost-label-bottom" placeholder="Account name" readonly=true>
+
+
+              <label for="conf1" class="ghost-input ghost-label-top">Username:</label>
+              <input id="conf1" name="conf1" type="text" class="ghost-input ghost-label-bottom" value="username" readonly=true>
               <label for="conf2" class="ghost-input ghost-label-top">Account Address:</label>
               <input id="conf2" name="conf2" type="text" class="ghost-input ghost-label-bottom" value="Address" readonly>
               <!-- <div class="popup" onclick="myFunction()">
@@ -99,6 +104,7 @@
         </div>
         <div id='Page_3'></div>
       <form action="/" method="post" onsubmit="return openAccount(this);" id="walletwindowform">
+        <span class="close" id="myBtn">&times;</span>
     <!-- <form action="/wallet" method="post"> -->
       <!-- <label for="name1" class="ghost-input ghost-label-top">Account:</label> -->
       <input id="name1" name="name1" type="text" class="ghost-input ghost-label-bottom" value="Account name" readonly>
