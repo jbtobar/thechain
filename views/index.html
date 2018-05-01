@@ -14,9 +14,11 @@
     <script src="https://d3js.org/d3.v5.min.js"></script>
 <script type='text/javascript' src="/node_modules/waves-api/dist/waves-api.min.js"></script>
 <link rel="stylesheet" type='text/css' href='/public/style.css'></link>
+<!-- <script src="https://www.paypalobjects.com/api/checkout.js"></script> -->
   </head>
 
   <body>
+     <!-- <div id="paypal-button"></div> -->
     <div class="container" id='div_form1'>
         <fieldset>
           <form action="/wallet" method="post" onsubmit="return openAccount(this);">
@@ -27,7 +29,7 @@
           <input type="submit" class="ghost-button" value="Log in">
           <br>
           <br>
-          <input type="submit" class="ghost-button" value="Register" onclick="registerForm()">
+          <input type='button' class="ghost-button" value="Register" onclick="registerForm()">
         </form>
         </fieldset>
     </div>
@@ -45,6 +47,12 @@
     <div id='walletwindow' hidden>
       <fieldset id='walletfieldset'>
         <!-- <button id="myBtn">Open Modal</button> -->
+        <div id="GeneralModal" class="modal">
+          <div class="modal-content">
+            <span class="close" id="GeneralModalClose">&times;</span>
+            <div id="GeneralModalDiv"></div>
+          </div>
+        </div>
 
         <div id="myModal" class="modal">
 
@@ -94,16 +102,25 @@
           </div>
 
         </div>
-        <div id='Page_1'>
+        <div id='Page_1' class='main_page'>
           <form action="/" method="post" onsubmit="return false" id="ContractsMenu">
           </form>
           <div id='slide_1'></div>
           <div id='slide_2'></div>
           <div id='slide_3'></div>
-          <div id='slide_4'></div>
+          <div id='slide_4'>
+            <form>
+              <p>Contract Creation</p>
+              <input type='button'></input>
+              <input type='button'></input>
+              <input type='button'></input>
+            </form>
+          </div>
         </div>
-        <div id='Page_3'></div>
-      <form action="/" method="post" onsubmit="return openAccount(this);" id="walletwindowform">
+        <div id='Page_3' class='main_page'>
+          <span class="close" onclick="refreshTransactions(this)">Refresh<span>
+        </div>
+      <form action="/" method="post" onsubmit="return openAccount(this);" id="walletwindowform" class='main_page'>
         <span class="close" id="myBtn">&times;</span>
     <!-- <form action="/wallet" method="post"> -->
       <!-- <label for="name1" class="ghost-input ghost-label-top">Account:</label> -->
@@ -122,5 +139,6 @@
     <script type='text/javascript' src="/public/functions.js"></script>
     <script type='text/javascript' src="/public/options_math_new.js"></script>
     <script type='text/javascript' src="/public/worker_new.js"></script>
+    <!-- <script type='text/javascript' src="/public/paypal/ppconf.js"></script> -->
   </body>
 </html>

@@ -31,47 +31,72 @@ function checkBalance() {
 }
 
 
-
-
-
-function openAccount(arg) {
-  var user = arg.children.user.value
-  window.accounter = arg
-  console.log('openaccount')
-  $.post( "wallet", {
+function createUser(form,seed,encrypted) {
+	var user = forma.children[0].value
+  // window.rapo = seed
+	$.post( "usercreation", {
       method:"POST",
       username:user,
+      seedaddress:seed.address,
+      seedphrase:encrypted,
     })
   .done(function( data ) {
-    var data = JSON.parse(data)
-    // var data['data'] = JSON.parse(data['data'])
     window.rapo = data
-    // window.rapo.data =  JSON.parse(rapo['data'])
-    console.log(data)
-    var topaz = arg.children.password1.value
-    console.log(topaz)
-    // const password = '0123456789';
-    // const encrypted = seed.encrypt(topaz);
-    const encrypted = data.encrypted
-    console.log(encrypted)
-    try {
-        window.restoredPhrase = Waves.Seed.decryptSeedPhrase(encrypted, topaz);
-        window.seed = Waves.Seed.fromExistingPhrase(restoredPhrase);
-        window.rapo['unlocked'] = true
-        // window.rapo['data'] =  JSON.parse(rapo['data'])
-        // console.lod()
-        // console.log('oi')
-        openWalletWindow(seed)
-    }
-    catch(err) {
-        alert(err.message);
-    }
-
-
-
-
+    openWalletWindow(data)
+    // openNewWallet(data)
   })
-  return false
+
+}
+
+
+
+
+var open_account_sent = 0
+
+function openAccount(arg) {
+  if (open_account_sent == 1) {
+    console.log('you already tried to open')
+    return false
+  } else {
+    window.open_account_sent = 1
+    var user = arg.children.user.value
+    window.accounter = arg
+    console.log('openaccount')
+    $.post( "wallet", {
+        method:"POST",
+        username:user,
+      })
+    .done(function( data ) {
+      var data = JSON.parse(data)
+      // var data['data'] = JSON.parse(data['data'])
+      window.rapo = data
+      // window.rapo.data =  JSON.parse(rapo['data'])
+      console.log(data)
+      var topaz = arg.children.password1.value
+      console.log(topaz)
+      // const password = '0123456789';
+      // const encrypted = seed.encrypt(topaz);
+      const encrypted = data.encrypted
+      console.log(encrypted)
+      try {
+          window.restoredPhrase = Waves.Seed.decryptSeedPhrase(encrypted, topaz);
+          window.seed = Waves.Seed.fromExistingPhrase(restoredPhrase);
+          window.rapo['unlocked'] = true
+          // window.rapo['data'] =  JSON.parse(rapo['data'])
+          // console.lod()
+          // console.log('oi')
+          openWalletWindow(seed)
+      }
+      catch(err) {
+          alert(err.message);
+      }
+
+
+
+
+    })
+    return false
+  }
 }
 
 
@@ -154,73 +179,175 @@ function validate(form) {
 
 }
 
-
-function createUser(form,seed,encrypted) {
-	var user = forma.children[0].value
-	$.post( "usercreation", {
-      method:"POST",
-      username:user,
-      seedaddress:seed.address,
-      seedphrase:encrypted,
-    })
-  .done(function( data ) {openWalletWindow(data)})
-
-}
-
-
+// function openNewWallet(data) {
+//   $('#div_form2').hide()
+//   $('#div_form1').hide()
+//   $('#walletwindow').show()
+//   var address = rapo.address
+//   window.duta = data
+//   // window.rapo = {}
+//   console.log('new')
+//   console.log(data)
+//   try {
+//     Waves.API.Node.v1.assets.balances(address).then((balancesList) => {
+//       console.log('fluubber')
+//        console.log(balancesList);
+//        rapo.balances = balancesList
+//     });
+//   } catch(err) {
+//     alert(err)
+//   }
+//   try {
+//     Waves.API.Node.v1.addresses.balance(address).then((balance) => {
+//         console.log(balance);
+//         rapo.balance = balance
+//     });
+//   } catch(err) {
+//     alert(err)
+//   }
+//
+//
+//
+//   d3.select('#name1').attr('value','@'+rapo.username)
+//   rapo.balances.balances.forEach(function(d){
+//       var name = d.issueTransaction.name
+//       var peg_or_not = name.split('_')[1]
+//       if (peg_or_not == 'Pegger'){
+//         var name = name.split('_')[0]
+//         d3.select('#walletwindowform')
+//             .append('label')
+//             .attr("class","ghost-input ghost-label-top")
+//             .text(name+' Balance')
+//         d3.select('#walletwindowform')
+//             .append('input')
+//             .attr("class","ghost-input ghost-label-bottom")
+//             .attr('value',d.balance)
+//             .attr('readonly',true)
+//       }
+//
+//   })
+//
+//   resetConf()
+//   // d3.select('#conf3').attr('value','green')
+//   buildMenus()
+//   pageControl('button1')
+//   settingsUpdate('load')
+// }
 
 
 function openWalletWindow(data) {
   $('#div_form2').hide()
   $('#div_form1').hide()
   $('#walletwindow').show()
+  console.log('open wallet window data')
   console.log(data)
   try {
-    myad = data.balance.address
-    // Waves.API.Node.v1.addresses.balance(myad).then((balance) => {
-    //     console.log(balance);
-    // });
-    Waves.API.Node.v1.assets.balances(address).then((balancesList) => {
-      console.log('fluubber')
-       console.log(balancesList);
-    });
+    var myad = rapo.insert_body.seedaddress
   } catch(err) {
-    myad = rapo.balance.address
-    console.log(rapo)
-    // Waves.API.Node.v1.addresses.balance(myad).then((balance) => {
-    //     console.log(balance);
-    // });
+    var myad = rapo.balance.address
   }
+
+    // myad = data.balance.address
+
+  Waves.API.Node.v1.addresses.balance(myad).then((balance) => {
+      console.log(balance);
+      window.rapo.balance = balance
+  }).catch(function(err){console.log(err)});
+  Waves.API.Node.v1.assets.balances(myad).then((balancesList) => {
+    console.log('fluubber')
+     console.log(balancesList);
+     window.rapo.balances = balancesList
+     rapo.balances.balances.forEach(function(d){
+         var name = d.issueTransaction.name
+         var peg_or_not = name.split('_')[1]
+         if (peg_or_not == 'Pegger'){
+           var name = name.split('_')[0]
+
+           d3.select('#walletwindowform')
+               .append('label')
+               .attr("class","ghost-input ghost-label-top")
+               .text(name+' Balance')
+           var irow = d3.select('#walletwindowform').append('tr')
+           // d3.select('#walletwindowform')
+               irow.append('input')
+               .attr('id',name+'_balance_input')
+               .attr("class","ghost-input ghost-label-bottom bwd_l")
+               .attr('value',d.balance)
+               .attr('readonly',true)
+           // d3.select('#walletwindowform')
+               irow.append('input')
+               .attr('id',name+'_deposit_input')
+               .attr("class","ghost-input ghost-label-bottom bwd_r")
+               .attr('value','Deposit')
+               .attr('onclick','DepositWithdraw(this)')
+               .attr('readonly',true)
+           // d3.select('#walletwindowform')
+               irow.append('input')
+               .attr('id',name+'_withdraw_input')
+               .attr("class","ghost-input ghost-label-bottom bwd_r")
+               .attr('value','Withdraw')
+               .attr('onclick','DepositWithdraw(this)')
+               .attr('readonly',true)
+         }
+     })
+     settingsUpdate('load')
+  }).catch(function(err){console.log(err)});
+
+
   d3.select('#name1').attr('value','@'+rapo.username)
   // var balance = rapo.balance.balance/100000000
   // d3.select('#name2').attr('value',balance)
-  rapo.balances.balances.forEach(function(d){
-      var name = d.issueTransaction.name
-      var peg_or_not = name.split('_')[1]
-      if (peg_or_not == 'Pegger'){
-        var name = name.split('_')[0]
-        d3.select('#walletwindowform')
-            .append('label')
-            .attr("class","ghost-input ghost-label-top")
-            .text(name+' Balance')
-        d3.select('#walletwindowform')
-            .append('input')
-            .attr("class","ghost-input ghost-label-bottom")
-            .attr('value',d.balance)
-            .attr('readonly',true)
-      }
-
-  })
+  // try {
+  //
+  // } catch(err) {
+  //   console.log('0 balances')
+  //   // var
+  //   d3.select('#walletwindowform')
+  //       .append('label')
+  //       .attr("class","ghost-input ghost-label-top")
+  //       .text(' Balance')
+  //   d3.select('#walletwindowform')
+  //       .append('input')
+  //       .attr("class","ghost-input ghost-label-bottom")
+  //       .attr('value',0)
+  //       .attr('readonly',true)
+  //
+  // }
   resetConf()
   // d3.select('#conf3').attr('value','green')
   buildMenus()
   pageControl('button1')
-  settingsUpdate('load')
+  // settingsUpdate('load')
 }
 
+function DepositWithdraw(action) {
+  window.acta = action
+  console.log(action)
+  openModal()
+  // d3.select('#GeneralModalDiv').empty()
+  // $('#GeneralModalDiv').empty()
+  var gmdiv = d3.select('#GeneralModalDiv')
+  console.log(gmdiv)
+  gmdiv.append('p').text('Hello there')
+}
+
+
+
+
 function resetConf() {
-  var email = rapo.account_config.email
-  var account_name = rapo.account_config.account_name
+  try {
+    var email = rapo.account_config.email
+    var account_name = rapo.account_config.account_name
+  } catch(err) {
+    console.log(err)
+    var gmdiv = d3.select('#GeneralModalDiv')
+    gmdiv.append('p').text("Please update your Email and Account Name under Account Settings")
+    openModal()
+    rapo.account_config = rapo.insert_body.account_config
+    // var email = rapo.insert_body.account_config.email
+    // var account_name = rapo.insert_body.account_config.account_name
+  }
+
   $('#conf3').prop('value',email)
   $('#conf5').prop('value',account_name)
   // var searchable = rapo.account_config.searchable
@@ -461,7 +588,7 @@ function contractSlider(arg) {
 }
 
 function showMyData(arg) {
-  d3.select('#'+arg).text(arg)
+  // d3.select('#'+arg).text(arg)
   if (arg == 'slide_1') {showMyOptionData(arg)}
   if (arg == 'slide_2') {console.log('no function yet')}
   if (arg == 'slide_3') {console.log('no function yet')}
@@ -473,27 +600,39 @@ function showMyData(arg) {
 
 transaction_cols = ['DATE','TYPE','NAME','SENDER','RECIPIENT','FEE','UNITS','txID']
 
+function refreshTransactions ()  {
+    window.transactions_recieved = 0
+    showTransactions()
+}
+var transactions_recieved = 0
 function showTransactions() {
-  // var tabla = d3.select('#Page_3').append('table').attr('id','transactionTable')
-  var tabla_head = tabla.append('thead').append('tr')
-  var tabla_body = tabla.append('tbody')
-  transaction_cols.forEach(function(d){tabla_head.append('th').text(d)})
-  Waves.API.Node.v1.transactions.getList(rapo.balance.address).then((txList) => {
-    console.log(txList);
-    window.txList = txList
-    txList.forEach(function(d){
-      var trow = tabla_body.append('tr')
-      trow.append('td').text(Date(d.timestamp))
-      trow.append('td').text(d.type)
-      trow.append('td').text(d.name)
-      trow.append('td').text(d.sender)
-      trow.append('td').text(d.recipient)
-      trow.append('td').text(d.fee)
-      trow.append('td').text(d.amount)
-      trow.append('td').text(d.id)
-    })
-    // d3.select('#Page_3').text(txList)
-  })
+    if (transactions_recieved == 1) {
+      console.log('you already have transactions')
+      return false
+    } else {
+      $('#transactionTable').empty()
+      var tabla = d3.select('#Page_3').append('table').attr('id','transactionTable')
+      var tabla_head = tabla.append('thead').append('tr')
+      var tabla_body = tabla.append('tbody')
+      transaction_cols.forEach(function(d){tabla_head.append('th').text(d)})
+      Waves.API.Node.v1.transactions.getList(rapo.balance.address).then((txList) => {
+        console.log(txList);
+        window.txList = txList
+        txList.forEach(function(d){
+          var trow = tabla_body.append('tr')
+          trow.append('td').text(Date(d.timestamp))
+          trow.append('td').text(d.type)
+          trow.append('td').text(d.name)
+          trow.append('td').text(d.sender)
+          trow.append('td').text(d.recipient)
+          trow.append('td').text(d.fee)
+          trow.append('td').text(d.amount)
+          trow.append('td').text(d.id)
+        })
+        window.transactions_recieved = 1
+        // d3.select('#Page_3').text(txList)
+      })
+    }
 }
 
 
@@ -576,29 +715,55 @@ function confetti() {
 
 // Get the modal
 var modal = document.getElementById('myModal');
-
 // Get the button that opens the modal
 var btn = document.getElementById("myBtn");
-
 // Get the <span> element that closes the modal
 var span = document.getElementById("myBtnClose");
-
 // When the user clicks on the button, open the modal
 btn.onclick = function() {
     modal.style.display = "block";
 }
-
 // When the user clicks on <span> (x), close the modal
 span.onclick = function() {
     modal.style.display = "none";
 }
-
 // When the user clicks anywhere outside of the modal, close it
 window.onclick = function(event) {
     if (event.target == modal) {
         modal.style.display = "none";
     }
 }
+
+
+// Get the modal
+var modalG = document.getElementById('GeneralModal');
+// Get the button that opens the modal
+// var btn = document.getElementById("myBtn");
+// Get the <span> element that closes the modal
+var spanG = document.getElementById("GeneralModalClose");
+// When the user clicks on the button, open the modal
+// btn.onclick = function() {
+//
+// }
+function openModal() {
+  modalG.style.display = "block";
+}
+// When the user clicks on <span> (x), close the modal
+spanG.onclick = function() {
+    modalG.style.display = "none";
+    $('#GeneralModalDiv').empty()
+}
+// When the user clicks anywhere outside of the modal, close it
+window.onclick = function(event) {
+    if (event.target == modal) {
+        modalG.style.display = "none";
+    }
+}
+
+
+
+
+
 
 //
 // mena_pre = chaina.result.rows

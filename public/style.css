@@ -116,8 +116,18 @@ input#name1:focus {
   right:0px;
   width:100px;
 }
-
-
+.bwd_l {
+  float:left;
+  width:60%;
+}
+.bwd_r {
+  float:right;
+  width:20%;
+}
+.main_page {
+  height: 500px;
+  overflow-x: scroll;
+}
 
 
 /* The Modal (background) */
