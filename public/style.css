@@ -100,6 +100,16 @@ p {
 .ghost-label-bottom {
   margin-top: 0px;
 }
+.ghost-label-left {
+  float:left;
+  padding-left: 10%;
+  width: 30%;
+}
+.ghost-label-right {
+  float: left;
+  width: 70%;
+  color: #E64A19;
+}
 input#name1 {
   border-bottom:1px solid #ddd;
 }
@@ -118,11 +128,17 @@ input#name1:focus {
 }
 .bwd_l {
   float:left;
-  width:60%;
+  width:45%;
 }
 .bwd_r {
+  text-align: center;
   float:right;
   width:20%;
+}
+.bwd_rs {
+  text-align: center;
+  float:right;
+  width:15%;
 }
 .main_page {
   height: 500px;

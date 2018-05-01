@@ -89,13 +89,53 @@ app.post('/', function (req, res) {
   console.log(req.body);
 })
 
+app.post('/sendtransaction', function(req,res) {
+  console.log('sendtransaction')
+  console.log(req.body)
+  console.log(req.body.username)
+  var recipient = req.body.formdata.recipient
+  var qm = 'SELECT * FROM userbase WHERE username = \''+recipient+'\''
+  console.log(qm)
+  var query = pg_client.query(qm)
+  query.then(function(result) {
+    console.log(result.rows)
+    if (result.rows.length != 0) {
+      var recipient_conf = result.rows[0].body
+      var searchable = recipient_conf.searchable
+      var account_name = recipient_conf.account_name
+      var recipient_address = result.rows[0].address
+      console.log('RECIPIENT')
+      console.log(result.rows[0].body)
+      res.send(JSON.stringify({ account_name:account_name,recipient_address:recipient_address}));
+    } else {
+      res.send(JSON.stringify({ account_name:0}));
+    }
+  }).catch(function(err){console.log(err)})
+
+  // res.send(JSON.stringify({ what:'transaction'}));
+})
+
+
+
+
+app.post('/confirm_ua', function(req,res){
+  var address = req.body.address
+  var qm = 'SELECT username FROM userbase WHERE address = \'' + address + '\''
+  var query = pg_client.query(qm)
+  query.then(function(result){
+      console.log(result.rows)
+      res.send(JSON.stringify({ recipient:result.rows}))
+  })
+
+})
+
 
 app.post('/account_config', function(req,res) {
   var user_input = req.body.username
   var query_message = "SELECT * FROM userbase WHERE username = '"+user_input+"'";
   var query = pg_client.query(query_message)
   query.then(function(result) {
-    var configs = result.rows[0].body.account_config
+    var configs = result.rows[0].body
     console.log('config1')
     console.log(configs)
     if (req.body.action == 'load') {
@@ -226,62 +266,75 @@ app.post('/wallet', function (req, res) {
   // if (req.body.unlock == true) {}
   var user_input = req.body.username
   // if (userbase[user_input]) {
-  if (users.includes(user_input) ) {
-    // var query_message = "SELECT * FROM userbase WHERE username = 'testuser'";
-    var query_message = "SELECT * FROM userbase WHERE username = '"+user_input+"'";
-    var query = pg_client.query(query_message)
-    query.then(function(result) {
-       console.log(user_input)
-       console.log(result.rows)
+  var qm = 'SELECT username FROM userbase'
+  var query = pg_client.query(qm)
+  var users = []
+  query.then(function(result) {
+     result.rows.forEach(function(d){users.push(d.username)})
+     if (users.includes(user_input) ) {
+       // var query_message = "SELECT * FROM userbase WHERE username = 'testuser'";
+       var query_message = "SELECT * FROM userbase WHERE username = '"+user_input+"'";
+       var query = pg_client.query(query_message)
+       query.then(function(result) {
+          console.log(user_input)
+          console.log(result.rows)
 
-       var encrypted = result.rows[0].passphrase
-       console.log(result.rows[0])
-       console.log(encrypted)
-       // fundAccount(user_input)
+          var encrypted = result.rows[0].passphrase
+          console.log(result.rows[0])
+          console.log(encrypted)
+          // fundAccount(user_input)
 
-       console.log('Loggin in')
-       var address = result.rows[0].address
-       var account_config = result.rows[0].body
-       // Waves.API.Node.v1.addresses.balance(address).then((balance) => {
-       //     console.log(balance);
-       //     res.send(JSON.stringify({ a: 'wallet', encrypted:encrypted,data:JSON.stringify(balance) }));
-       // });
-       Waves.API.Node.v1.assets.balances(address).then((balancesList) => {
-         console.log('fluubber')
-          console.log(balancesList);
-          Waves.API.Node.v1.addresses.balance(address).then((balance) => {
-              console.log(balance);
-              console.log(account_config)
-              res.send(JSON.stringify({ a: 'wallet', encrypted:encrypted,balance:balance,balances:balancesList,username:user_input,account_config:account_config }));
+          console.log('Loggin in')
+          var address = result.rows[0].address
+          var account_config = result.rows[0].body
+          // Waves.API.Node.v1.addresses.balance(address).then((balance) => {
+          //     console.log(balance);
+          //     res.send(JSON.stringify({ a: 'wallet', encrypted:encrypted,data:JSON.stringify(balance) }));
+          // });
+          Waves.API.Node.v1.assets.balances(address).then((balancesList) => {
+            console.log('fluubber')
+             console.log(balancesList);
+             Waves.API.Node.v1.addresses.balance(address).then((balance) => {
+                 console.log(balance);
+                 console.log(account_config)
+                 res.send(JSON.stringify({ a: 'wallet', encrypted:encrypted,balance:balance,balances:balancesList,username:user_input,account_config:account_config }));
+             }).catch(function(err){console.log(err)});
+             // res.send(JSON.stringify({ a: 'wallet', encrypted:encrypted,balances:JSON.stringify(balancesList) }))
           }).catch(function(err){console.log(err)});
-          // res.send(JSON.stringify({ a: 'wallet', encrypted:encrypted,balances:JSON.stringify(balancesList) }))
-       }).catch(function(err){console.log(err)});
-    }).catch(function(err){console.log(err)})
+       }).catch(function(err){console.log(err)})
 
-    // res.send(JSON.stringify({ a: 'wallet', encrypted:encrypted }));
-  } else {
-    res.send(JSON.stringify({ a: false }));
-  }
+       // res.send(JSON.stringify({ a: 'wallet', encrypted:encrypted }));
+     } else {
+       res.send(JSON.stringify({ a: false }));
+     }
 
+   })
 })
 
 app.post('/usercheck', function (req, res) {
   console.log(req.body.username)
   var user_input = req.body.username
   res.setHeader('Content-Type', 'application/json');
-  if (users.includes(user_input) ) {
-  // if (userbase[user_input]) {
-        console.log('Username taken')
-        res.send(JSON.stringify({ a: false }));
-  } else {
-    console.log(user_input)
-    console.log('logging in')
-//  console.log(req.body);
-//    obj[user_input] = true
-//    fs.writeFile('./public/jsonusers.json', JSON.stringify(obj), 'utf8',function(err){console.log(obj)});
-//  res.setHeader('Content-Type', 'application/json');
-    res.send(JSON.stringify({ a: true }));
-  }
+  var qm = 'SELECT username FROM userbase'
+  var query = pg_client.query(qm)
+  var users = []
+  query.then(function(result) {
+     result.rows.forEach(function(d){users.push(d.username)})
+     console.log(result.rows)
+     if (users.includes(user_input) ) {
+     // if (userbase[user_input]) {
+           console.log('Username taken')
+           res.send(JSON.stringify({ a: false }));
+     } else {
+       console.log(user_input)
+       console.log('logging in')
+   //  console.log(req.body);
+   //    obj[user_input] = true
+   //    fs.writeFile('./public/jsonusers.json', JSON.stringify(obj), 'utf8',function(err){console.log(obj)});
+   //  res.setHeader('Content-Type', 'application/json');
+       res.send(JSON.stringify({ a: true }));
+     }
+  }).catch(function(err){console.log(err)})
 })
 
 

@@ -268,26 +268,33 @@ function openWalletWindow(data) {
                .attr("class","ghost-input ghost-label-top")
                .text(name+' Balance')
            var irow = d3.select('#walletwindowform').append('tr')
+           irow.append('input')
+               .attr('id',name+'_send_input')
+               .attr("class","ghost-input ghost-label-bottom bwd_rs")
+               .attr('value','Send')
+               .attr('onclick','DepositWithdrawSend(this)')
+               .attr('readonly',true)
            // d3.select('#walletwindowform')
-               irow.append('input')
+           irow.append('input')
                .attr('id',name+'_balance_input')
                .attr("class","ghost-input ghost-label-bottom bwd_l")
                .attr('value',d.balance)
                .attr('readonly',true)
            // d3.select('#walletwindowform')
-               irow.append('input')
+           irow.append('input')
                .attr('id',name+'_deposit_input')
                .attr("class","ghost-input ghost-label-bottom bwd_r")
                .attr('value','Deposit')
-               .attr('onclick','DepositWithdraw(this)')
+               .attr('onclick','DepositWithdrawSend(this)')
                .attr('readonly',true)
            // d3.select('#walletwindowform')
-               irow.append('input')
+           irow.append('input')
                .attr('id',name+'_withdraw_input')
                .attr("class","ghost-input ghost-label-bottom bwd_r")
                .attr('value','Withdraw')
-               .attr('onclick','DepositWithdraw(this)')
+               .attr('onclick','DepositWithdrawSend(this)')
                .attr('readonly',true)
+
          }
      })
      settingsUpdate('load')
@@ -319,8 +326,13 @@ function openWalletWindow(data) {
   pageControl('button1')
   // settingsUpdate('load')
 }
+// mapo = rapo.balances.balances
+// mapo
+// rapo.balances.balances.find(funcit)
 
-function DepositWithdraw(action) {
+
+
+function DepositWithdrawSend(action) {
   window.acta = action
   console.log(action)
   openModal()
@@ -328,9 +340,135 @@ function DepositWithdraw(action) {
   // $('#GeneralModalDiv').empty()
   var gmdiv = d3.select('#GeneralModalDiv')
   console.log(gmdiv)
-  gmdiv.append('p').text('Hello there')
+  if (action.value == 'Send') {
+    var curr = acta.id.split('_')[0]
+    var curr_name = curr+'_Pegger'
+    var curr_account = rapo.balances.balances.find(function(x){if (x.issueTransaction.name == curr_name){return x}})
+    var curr_balance = curr_account.balance
+    gmdiv.append('p').text('Hello there')
+    gmdiv.append('p').text('Send Transaction')
+    // gmdiv.append('p').text('Your '+curr+' Balance is: '+curr_balance.toString())
+    var forma = gmdiv.append('form').attr('action','/').attr('onsubmit','return SendTransaction(this)').attr('method','post').attr('id',curr+'_transaction_form')
+    forma.append('label').attr('class','ghost-input ghost-label-left').text('From')
+    forma.append('input').attr('name','account').attr('type','text').attr('class','ghost-input ghost-label-right').attr('value',curr+' Account').attr('readonly','true')
+
+    forma.append('label').attr('class','ghost-input ghost-label-left').text('Amount')
+    forma.append('input').attr('name','amount').attr('type','number').attr('class','ghost-input ghost-label-right').attr('placeholder',0.00).attr('required','required')
+
+    forma.append('label').attr('class','ghost-input ghost-label-left').text('To')
+    forma.append('input').attr('name','recipient').attr('type','text').attr('class','ghost-input ghost-label-right').attr('placeholder','Search for User').attr('required','required')
+    forma.append('div').attr('id','TxResponse')
+
+    forma.append('label').attr('class','ghost-input ghost-label-left').text('Message')
+    forma.append('input').attr('name','attachment').attr('type','text').attr('class','ghost-input ghost-label-right').attr('placeholder','Enter up to 140 characters')
+
+    forma.append('input').attr('type','submit').attr('class','ghost-button').attr('value','Send Transaction')
+  } else {
+    gmdiv.append('p').text('Hello there')
+    gmdiv.append('p').text(action.value+' functionality is coming soon.')
+  }
 }
 
+
+
+function SendTransaction(arg) {
+  // window.parg = arg
+  var curr = arg.id.split('_')[0]
+  var curr_name = curr+'_Pegger'
+  var curr_account = rapo.balances.balances.find(function(x){if (x.issueTransaction.name == curr_name){return x}})
+  var formdata = $(arg).serializeArray()
+  var fd_dict = {}
+  formdata.forEach(function(d){
+    a = d.name,
+    b = d.value,
+    fd_dict[a] = b
+  })
+  // formdata = d3.entries()
+  console.log('send transaction')
+  $.post("sendtransaction", {
+    method:'POST',
+    username:rapo.username,
+    formdata:fd_dict,
+    curr_account:curr_account,
+  }).done(function(data) {
+    console.log(data)
+    var daters = JSON.parse(data)
+    window.fata = daters
+    var input = arg.recipient
+    if (daters.account_name == 0) {
+      $('#TxResponse').empty()
+      d3.select('#TxResponse').append('p').text('Username not found')
+    } else {
+      $('#TxResponse').empty()
+      d3.select('#TxResponse').append('p').text('')
+      TxSend(curr_account,input,daters,fd_dict)
+    }
+    return false
+  })
+  return false
+}
+
+function TxSend(curr_account,input,daters,fd_dict) {
+  window.gorki = [curr_account,input,daters,fd_dict]
+  console.log('gorki')
+  // var form_id = formdata.account.split('_')[0]
+  // var form = d3.select('#'+curr+'_transaction_form')
+  // form.hide()
+  $('#GeneralModalDiv').empty()
+  d3.select('#modal_content').transition().style('width','50%').style('height','50%')
+  // d3.select('#modal_content').transition().style('height','100%')
+
+  var gmdiv = d3.select('#GeneralModalDiv')
+  const transferData = {
+      // An arbitrary address; mine, in this example
+      recipient: daters.recipient_address,
+      // ID of a token, or WAVES
+      assetId: curr_account.assetId,
+      // The real amount is the given number divided by 10^(precision of the token)
+      amount: Number(fd_dict.amount),
+      // The same rules for these two fields
+      feeAssetId: 'WAVES',
+      fee: 100000,
+      // 140 bytes of data (it's allowed to use Uint8Array here)
+      attachment: '',
+      timestamp: Date.now()
+  };
+  window.transferData = transferData
+  gmdiv.append('p').text(transferData.amount)
+  gmdiv.append('p').text(curr_account.issueTransaction.name.split('_')[0])
+  gmdiv.append('p').text('to')
+  gmdiv.append('p').text(transferData.amount)
+  console.log(transferData)
+  // Waves.API.Node.v1.assets.transfer(transferData, seed.keyPair).then((responseData) => {
+  //     console.log(responseData);
+  //     window.responseData = responseData
+  //     var gmdiv = d3.select('#GeneralModalDiv').text(responseData)
+  // });
+}
+// $.post("va")
+
+
+function notyetfinished(){
+  var address = '3MqWgNDKeJhA8poSfAgXvhEhKTSzYVwkqx9'
+  $.post('confirm_ua',{
+    method:'POST',
+    address:address,
+  }).then(function(data){
+    window.blala = data
+    console.log('blala')
+  })
+
+}
+
+// $.post("account_config", {
+//   method:"POST",
+//   username:user,
+//   action:'load',
+//   account_config:configs,
+// }).done(function(data){
+//   window.account_config = data
+//   console.log('account_config')
+// })
 
 
 
@@ -504,7 +642,10 @@ function settingsUpdate(arg) {
     d3.select('#conf1').attr('value',rapo.username)
     // address
     d3.select('#conf2').attr('value',rapo.balance.address)
-    d3.select('#conf2').attr('value',rapo.balance.account_name)
+    // d3.select('#conf2').attr('value',rapo.balance.account_name)
+    console.log('settingsupdate')
+    console.log(rapo.balance.address)
+    // d3.select('#conf2').attr('value',rapo.balance.account_name)
     // email
     // d3.select('#conf3').attr('value','')
     // searchable
@@ -610,7 +751,8 @@ function showTransactions() {
       console.log('you already have transactions')
       return false
     } else {
-      $('#transactionTable').empty()
+      // $('#transactionTable').empty()
+      d3.select('#transactionTable').remove()
       var tabla = d3.select('#Page_3').append('table').attr('id','transactionTable')
       var tabla_head = tabla.append('thead').append('tr')
       var tabla_body = tabla.append('tbody')
@@ -734,7 +876,7 @@ window.onclick = function(event) {
     }
 }
 
-
+console.log('did I reach the end?')
 // Get the modal
 var modalG = document.getElementById('GeneralModal');
 // Get the button that opens the modal
@@ -746,12 +888,16 @@ var spanG = document.getElementById("GeneralModalClose");
 //
 // }
 function openModal() {
+  // Get the modal
+  var modalG = document.getElementById('GeneralModal');
   modalG.style.display = "block";
 }
 // When the user clicks on <span> (x), close the modal
 spanG.onclick = function() {
+    var spanG = document.getElementById("GeneralModalClose");
     modalG.style.display = "none";
     $('#GeneralModalDiv').empty()
+    d3.select('#modal_content').attr('style','')
 }
 // When the user clicks anywhere outside of the modal, close it
 window.onclick = function(event) {
