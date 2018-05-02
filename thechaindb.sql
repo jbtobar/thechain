@@ -17,6 +17,29 @@ create table userbase (
   organization jsonb
 );
 
+
+
+
+CREATE TABLE txbase (
+  id serial primary key,
+  transactionid varchar(200),
+  body jsonb,
+  creation_date timestamp
+);
+
+CREATE TABLE organizationbase (
+  id serial primary key,
+  name varchar(200) not null,
+  username varchar(40),
+  owners jsonb,
+  members jsonb,
+  body jsonb,
+  creation_date timestamp
+);
+
+INSERT INTO organizationbase(name,owners,members,body,creation_date)
+VALUES (  )
+
 INSERT INTO userbase(username,passphrase,address,creation_date,body)
 VALUES ('testuser',
   'U2FsdGVkX1+wkQMWy7VKFsOzMmv2by7yZa1+TFaPklgb/uXPQBL1VcnZ1guxlDdH1WoLVYacUd/I4F1qfyM7+Ges86olA0yTg1roffLXQLg/vnHfdQ6qPvETCDsXGnYIO8o3iNPqwYBmpJJs1kM6UzRqNgmdMpoDrMs1frs4vU0=',

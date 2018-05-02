@@ -121,14 +121,28 @@
         </div>
         <div id='Page_3' class='main_page'>
           <div>
-          <span class="close" style="float:none" onclick="refreshTransactions(this)">Refresh<span>
+          <span class="close" style="float:none" onclick="refreshTransactions(this)">Refresh</span>
           </div>
         </div>
         <div id='org_main_page' class='main_page' style='display:none'>
           Yep, in Org Account
-          <form id='organization_form'>
-          </form>
           <span class="org_toggle" onclick="orgToggle()">&Omega;</span>
+          <div id='your_organizations_page'></div>
+          <form action="/" method='post' onsubmit='return MakeOrganization(this)' id='organization_form'>
+            <label class='ghost-input ghosty'>Organization Name</label>
+            <input name='organization_name' class='ghost-input ghosty' type='text' placeholder="Your Organization's Name" required='required'></input>
+            <label class='ghost-input'>Description</label>
+            <input name='organization_description' class='ghost-input ghosty' type='text' placeholder="A Short Description"></input>
+            <div id='members_list_form'>
+              <label class='ghost-input'>Members</label>
+              <span class='close' onclick="addMemberToList(this)">+</span>
+              <!-- <input name='member_1' class='ghost-input ghosty' type='text' placeholder="Member 1" oninput="checkUser(this)"></input> -->
+            </div>
+
+            <!-- <label>Members</label> -->
+            <input type='submit' class='ghost-input ghosty' value='Create Organization'></input>
+          </form>
+
         </div>
       <form action="/" method="post" onsubmit="return openAccount(this);" id="walletwindowform" class='main_page'>
         <span class="close" id="myBtn">&times;</span>

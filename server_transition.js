@@ -182,6 +182,25 @@ app.post('/log_tx',function(req,res){
 
 })
 
+app.post('/make_org', function(req,res) {
+  console.log('MAKE ORG')
+  console.log(req.body)
+  var qm = 'INSERT INTO organizationbase(name,owners,members,body,creation_date) VALUES ('
+  qm = qm+'\''+req.body.form_dict.organization_name+'\','
+  qm = qm +'\''+JSON.stringify({owner:req.body.user})+'\','
+  qm = qm +'\''+JSON.stringify(req.body.members)+'\','
+  var description = {organization_description:req.body.form_dict.organization_description}
+  qm = qm +'\''+JSON.stringify(description)+'\','
+  qm = qm+'current_timestamp)'
+  console.log(qm)
+  var query = pg_client.query(qm)
+  query.then(function(result){
+    console.log('MAKE ORG RESULT FROM QUERY')
+    console.log(result)
+    res.send(JSON.stringify({sup:result.command}))
+  }).catch(function(err){console.log(err)})
+})
+
 app.post('/confirm_ua', function(req,res){
   console.log('function by Ena')
   var address = req.body.address

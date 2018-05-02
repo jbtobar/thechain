@@ -118,6 +118,20 @@ function checkUser(input) {
     })
   .done(function( data ) {
 
+    if (input.name.slice(0,6) == 'member') {
+      console.log('member')
+       // var element = $("#"+input.id)[0];
+      if (data['a'] == true) {
+        inni.setCustomValidity('Username not Found');
+        console.log('member true')
+        return
+      } else {
+        inni.setCustomValidity('');
+        console.log('member false')
+        return
+      }
+    }
+// console.log('shouldnt')
   	window.data = data;
     // alert( "Data Loaded: " + data );
     if (data['a'] == true) {
@@ -130,10 +144,17 @@ function checkUser(input) {
     } else {
         // input is valid -- reset the error message
         if (input.name == 'user') {
-          input.setCustomValidity('');
+
+            input.setCustomValidity('');
+
+
           // console.log('User found')
         } else {
-          input.setCustomValidity('Username already taken');
+          if (inni.name.slice(0,6) == 'member') {
+            input.setCustomValidity('');
+          } else {
+            input.setCustomValidity('Username already taken');
+          }
         }
 
     }
@@ -780,6 +801,66 @@ function buildMenus() {
   cmdiv.append('button').attr('class','ghost-button4').attr('id','button_4').attr('onclick','contractSlider(this)').text('Tokens')
 
 }
+var member_counter = 0
+function addMemberToList(arg) {
+  member_counter = member_counter + 1
+  d3.select('#members_list_form')
+      .append('span')
+        .attr('class','close')
+        .attr('id','member_'+member_counter+'_remover')
+        .attr('onclick','removeMe(this)')
+        .attr('style','float:left')
+        .text('X')
+  d3.select('#members_list_form')
+      .append('input')
+        .attr('name','member_'+member_counter)
+        .attr('id','member_'+member_counter)
+        .attr('class','ghost-input ghosty')
+        .attr('style','width:50%')
+        .attr('type','text')
+        .attr('placeholder','Member '+member_counter)
+        .attr('oninput','checkUser(this)')
+        .attr('required','required')
+  // member_counter = member_counter + 1
+}
+function removeMe(arg) {
+  console.log('removing')
+  window.sarg = arg
+  var id1 = arg.id.slice(0,8)
+  var id2 = arg.id
+  d3.select('#'+id1).remove()
+  d3.select('#'+id2).remove()
+  member_counter = member_counter - 1
+}
+
+
+function MakeOrganization(arg) {
+  window.marg = arg
+  var blu = $(arg).serializeArray()
+  var membah = blu.filter(function(d){if (d.name.slice(0,6) == 'member'){return d}})
+  var membah_dict = {}
+  membah.forEach(function(d){
+    membah_dict[d.name] = d.value
+  })
+  var form_dict = {}
+  blu.forEach(function(d){
+    form_dict[d.name] = d.value
+  })
+  $.post('make_org',{
+    user:rapo.username,
+    members:membah_dict,
+    form_dict:form_dict,
+  }).then(function(result){
+    window.bult = result
+    console.log('Made Org!')
+    return false
+  }).catch(function(err){
+    console.log(err)
+    return false
+  })
+  return false
+}
+
 
 function orgToggle() {
   $('#walletwindowform').toggle()

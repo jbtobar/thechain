@@ -110,6 +110,9 @@ p {
   width: 70%;
   color: #E64A19;
 }
+.ghosty {
+  /* width:20%; */
+}
 input#name1 {
   border-bottom:1px solid #ddd;
 }
