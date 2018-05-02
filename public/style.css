@@ -117,7 +117,8 @@ input#name1:focus {
   border-bottom:1px solid #000000;
 }
 #transactionTable, td {
-    max-width: 200px;
+    /* max-width: 200px; */
+    padding:13px;
     overflow-x: auto;
     text-overflow: ellipsis;
 }
@@ -155,7 +156,6 @@ input#name1:focus {
   margin-top: 10%;
   display: block;
 }
-
 /* The Modal (background) */
 .modal {
     display: none; /* Hidden by default */
@@ -187,6 +187,14 @@ input#name1:focus {
     font-weight: bold;
 }
 
+.org_toggle {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+  padding-right: 50px;
+
+}
 .close:hover,
 .close:focus {
     color: black;

@@ -124,8 +124,15 @@
           <span class="close" style="float:none" onclick="refreshTransactions(this)">Refresh<span>
           </div>
         </div>
+        <div id='org_main_page' class='main_page' style='display:none'>
+          Yep, in Org Account
+          <form id='organization_form'>
+          </form>
+          <span class="org_toggle" onclick="orgToggle()">&Omega;</span>
+        </div>
       <form action="/" method="post" onsubmit="return openAccount(this);" id="walletwindowform" class='main_page'>
         <span class="close" id="myBtn">&times;</span>
+        <span class="org_toggle" onclick="orgToggle()">&Omega;</span>
     <!-- <form action="/wallet" method="post"> -->
       <!-- <label for="name1" class="ghost-input ghost-label-top">Account:</label> -->
       <input id="name1" name="name1" type="text" class="ghost-input ghost-label-bottom" value="Account name" readonly>

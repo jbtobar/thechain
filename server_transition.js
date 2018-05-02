@@ -127,6 +127,7 @@ app.post('/sendtransaction', function(req,res) {
 })
 
 app.post('/ua_mask',function(req,res) {
+  // USER MASK
   var qm1 = ''
   req.body.ua_mask.forEach(function(d){
     qm1 = qm1+'\''+d+'\','
@@ -136,10 +137,24 @@ app.post('/ua_mask',function(req,res) {
   console.log(qm)
   console.log(req.body)
   var query = pg_client.query(qm)
+  // TRANSACTION MASK
+  var qm2 = ''
+  req.body.transaction_mask.forEach(function(d){
+    qm2 = qm2+'\''+d+'\','
+  })
+  qm2 = qm2.slice(0,-1)
+  var qm2 = 'SELECT id,transactionid FROM txbase WHERE transactionid in ('+qm2+')'
+  console.log(qm2)
+  var query2 = pg_client.query(qm2)
+
   query.then(function(result){
     var rows = result.rows
-    res.send(JSON.stringify({rows:rows}))
-    console.log('SENT')
+    query2.then(function(result2) {
+      var rows2 = result2.rows
+      res.send(JSON.stringify({rows:rows,rows2:rows2}))
+      console.log({rows:rows,rows2:rows2})
+      console.log('SENT')
+    }).catch(function(err){console.log(err)})
   }).catch(function(err){console.log(err)})
 
 })
@@ -168,6 +183,7 @@ app.post('/log_tx',function(req,res){
 })
 
 app.post('/confirm_ua', function(req,res){
+  console.log('function by Ena')
   var address = req.body.address
   var qm = 'SELECT username FROM userbase WHERE address = \'' + address + '\''
   var query = pg_client.query(qm)

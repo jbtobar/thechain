@@ -491,7 +491,7 @@ function confirmTx(arg) {
           $('#GeneralModalClose2').show()
           var gmdiv = d3.select('#GeneralModalDiv')
                         // .transition(10000)
-          gmdiv.append('p').text('Transaction Send!')
+          gmdiv.append('p').text('Transaction Sent!')
           gmdiv.append('p').text('Transaction ID').attr('style','color: #4b545f;width:600px')
           gmdiv.append('p')
                 .text(parsed_data.id)
@@ -781,6 +781,12 @@ function buildMenus() {
 
 }
 
+function orgToggle() {
+  $('#walletwindowform').toggle()
+  $('#org_main_page').toggle()
+}
+var org_form = d3.select('#organization_form')
+
 function pageControl(arg) {
   if (arg.id) {var id = arg.id}
   else {var id = arg}
@@ -809,9 +815,9 @@ function contractSlider(arg) {
   console.log(slide)
   var slides = ['slide_1','slide_2','slide_3','slide_4']
   slides.forEach(function(d) {
-    d3.select('#'+d).text('')
+    // d3.select('#'+d).text('')
     if (d == slide) {$('#'+d).show();showMyData(d)}
-    else {$('#'+d).show()}
+    else {$('#'+d).hide()}
   })
 }
 
@@ -854,16 +860,21 @@ function showTransactions() {
         console.log(txList);
         window.txList = txList
         var user_address_mask = []
+        var transaction_mask = []
         txList.forEach(function(d){
             user_address_mask.push(d.sender)
 		        user_address_mask.push(d.recipient)
+            transaction_mask.push(d.id)
         })
         var ua_mask = $.unique(user_address_mask)
-        $.post('ua_mask',{ua_mask:ua_mask}).done(function(data){
+        $.post('ua_mask',{ua_mask:ua_mask,transaction_mask:transaction_mask}).done(function(data){
           window.mask_base = {}
           window.mask = JSON.parse(data)
           mask.rows.forEach(function(d){
             mask_base[d.address] = d.username
+          })
+          mask.rows2.forEach(function(d){
+            mask_base[d.transactionid] = d.id
           })
           console.log('masked')
           txList.forEach(function(d){
@@ -882,7 +893,7 @@ function showTransactions() {
               trow.append('td').text(coin_mask[d.assetId])
             }
             trow.append('td').text(d.amount)
-            trow.append('td').text(d.id)
+            trow.append('td').text(mask_base[d.id])
             trow.append('td').text(d.fee)
           })
           window.transactions_recieved = 1
