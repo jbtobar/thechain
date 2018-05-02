@@ -418,7 +418,7 @@ function TxSend(curr_account,input,daters,fd_dict) {
   d3.select('#modal_content').transition().style('width','50%').style('height','50%')
   // d3.select('#modal_content').transition().style('height','100%')
 
-  var gmdiv = d3.select('#GeneralModalDiv')
+  var gmdiv = d3.select('#GeneralModalDiv').append('div').attr('class','txconfclass')
   const transferData = {
       // An arbitrary address; mine, in this example
       recipient: daters.recipient_address,
@@ -434,11 +434,31 @@ function TxSend(curr_account,input,daters,fd_dict) {
       timestamp: Date.now()
   };
   window.transferData = transferData
-  gmdiv.append('p').text(transferData.amount)
-  gmdiv.append('p').text(curr_account.issueTransaction.name.split('_')[0])
+
+  gmdiv.append('p').text('You are about to send:')
+  var asset = curr_account.issueTransaction.name.split('_')[0]
+  gmdiv.append('p').text(transferData.amount +' '+asset)
   gmdiv.append('p').text('to')
-  gmdiv.append('p').text(transferData.amount)
-  console.log(transferData)
+  var address = '3MqWgNDKeJhA8poSfAgXvhEhKTSzYVwkqx9'
+  $.post('confirm_ua',{
+    method:'POST',
+    address:address,
+  }).then(function(data){
+    window.blala = JSON.parse(data)
+    console.log('blala')
+    var reciever = blala.recipient[0].username
+    gmdiv.append('p').text(reciever)
+    window.transferDataSummary = {
+      reciever:reciever,
+      asset:asset,
+    }
+    var triv = gmdiv.append('form').append('tr')
+    triv.append('input').attr('type','button').attr('value','Cancel').attr('onclick','confirmTx(this)').attr('class','ghost-button')
+    triv.append('input').attr('type','button').attr('value','Confirm').attr('onclick','confirmTx(this)').attr('class','ghost-button')
+    d3.select('#modal_content').transition().style('width','min-content').style('height','min-content')
+  }).catch(function(err){console.log(err)})
+
+  // console.log(transferData)
   // Waves.API.Node.v1.assets.transfer(transferData, seed.keyPair).then((responseData) => {
   //     console.log(responseData);
   //     window.responseData = responseData
@@ -447,6 +467,59 @@ function TxSend(curr_account,input,daters,fd_dict) {
 }
 // $.post("va")
 
+
+function confirmTx(arg) {
+  // transferData
+  window.miss = arg
+  if (miss.value == 'Cancel') {closeModal()}
+  if (miss.value == 'Confirm'){
+    $('#GeneralModalDiv').empty()
+    $('#GeneralModalClose').hide()
+    var loader_svg = d3.select('#GeneralModalDiv').append('img').attr('id','loading_svg').attr('src',"/public/assets/Rolling-1s-200px.svg").attr('alt',"embedded SVG")
+    console.log(transferData)
+    Waves.API.Node.v1.assets.transfer(transferData, seed.keyPair).then((responseData) => {
+        console.log(responseData);
+        window.responseData = responseData
+        var rd_id = responseData.id
+        var rd_date = new Date(responseData.timestamp)
+        var rd_amount = responseData.amount
+        loader_svg.remove()
+        $('#GeneralModalClose2').show()
+        var gmdiv = d3.select('#GeneralModalDiv')
+                      // .transition(10000)
+        gmdiv.append('p').text('Transaction Send!')
+        gmdiv.append('p').text('Transaction ID').attr('style','color: #4b545f;')
+        gmdiv.append('p')
+              .text(rd_id)
+        gmdiv.append('p').text('Date').attr('style','color: #4b545f;')
+        gmdiv.append('p')
+              .text(rd_date)
+        gmdiv.append('p').text('Amount').attr('style','color: #4b545f;')
+        gmdiv.append('p')
+              .text(rd_amount+' '+transferDataSummary.asset)
+        gmdiv.append('p').text('To').attr('style','color: #4b545f;')
+        gmdiv.append('p')
+              .text(transferDataSummary.reciever)
+    }).catch(function(err){console.log(err)});
+  }
+}
+
+
+function reloadBalances(arg){
+  var myad = rapo.balance.address
+  Waves.API.Node.v1.assets.balances(myad).then((balancesList) => {
+    window.rapo.balances = balancesList
+    rapo.balances.balances.forEach(function(d){
+    var name = d.issueTransaction.name.split('_')[0]
+    if (arg == name) {
+      d3.select('#'+name+'_balance_input').attr('value',d.balance)
+      console.log('updated: '+name)
+    }
+    })
+  }).catch(function(err){console.log(err)})
+}
+
+// var mok = d3.select('body').append('img').attr('src',"/public/assets/Rolling-1s-200px.svg").attr('alt',"embedded SVG")
 
 function notyetfinished(){
   var address = '3MqWgNDKeJhA8poSfAgXvhEhKTSzYVwkqx9'
@@ -898,6 +971,22 @@ spanG.onclick = function() {
     modalG.style.display = "none";
     $('#GeneralModalDiv').empty()
     d3.select('#modal_content').attr('style','')
+}
+function closeModal() {
+  modalG.style.display = "none";
+  $('#GeneralModalDiv').empty()
+  d3.select('#modal_content').attr('style','')
+
+}
+function closeModal2(arg) {
+  console.log('close modal 2')
+  window.sarg = arg
+  modalG.style.display = "none";
+  $('#GeneralModalDiv').empty()
+  d3.select('#modal_content').attr('style','')
+  $('#GeneralModalClose2').hide()
+  $('#GeneralModalClose').show()
+  reloadBalances(transferDataSummary.asset)
 }
 // When the user clicks anywhere outside of the modal, close it
 window.onclick = function(event) {
