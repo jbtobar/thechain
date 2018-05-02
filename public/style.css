@@ -117,8 +117,9 @@ input#name1:focus {
   border-bottom:1px solid #000000;
 }
 #transactionTable, td {
-    max-width: 100px;
+    max-width: 200px;
     overflow-x: auto;
+    text-overflow: ellipsis;
 }
 #confetti_button {
   position:fixed;

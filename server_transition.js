@@ -7,6 +7,7 @@ const seed_1 = Waves.Seed.fromExistingPhrase(seed_phrase_1);
 const express = require('express')
 const bodyParser = require('body-parser');
 const app = express()
+console.log(seed_1)
 
 var con_string = 'tcp://juanbernardotobar:@0.0.0.0:5432/thechain'
 var pg_client = new pg.Client(con_string);
@@ -26,6 +27,16 @@ intro_query.then(function(result) {
    result.rows.forEach(function(d){users.push(d.username)})
    console.log(users)
 }).catch(function(err){console.log(err)})
+
+var intro_query_message = 'SELECT COUNT(*) FROM txbase;'
+var intro_query = pg_client.query(intro_query_message)
+var transaction_count
+intro_query.then(function(result) {
+  console.log('TX BASE')
+  transaction_count = Number(result.rows[0].count)
+   console.log(transaction_count)
+}).catch(function(err){console.log(err)})
+// var transaction_count = ''
 // console.log('crypsario')
 // var user_input = 'pulanga'
 // var encrypted = 'cryptsaio'
@@ -115,8 +126,46 @@ app.post('/sendtransaction', function(req,res) {
   // res.send(JSON.stringify({ what:'transaction'}));
 })
 
+app.post('/ua_mask',function(req,res) {
+  var qm1 = ''
+  req.body.ua_mask.forEach(function(d){
+    qm1 = qm1+'\''+d+'\','
+  })
+  qm1 = qm1.slice(0,-1)
+  var qm = 'SELECT username,address FROM userbase WHERE address in ('+qm1+')'
+  console.log(qm)
+  console.log(req.body)
+  var query = pg_client.query(qm)
+  query.then(function(result){
+    var rows = result.rows
+    res.send(JSON.stringify({rows:rows}))
+    console.log('SENT')
+  }).catch(function(err){console.log(err)})
+
+})
 
 
+app.post('/log_tx',function(req,res){
+  var txData = req.body.txData
+  var transactionid = txData.id
+  console.log(txData)
+  var transactionid = txData.id
+  var qm1 = "INSERT INTO txbase(transactionid,body,creation_date) "
+  var qm2 = "VALUES (\'"+transactionid+"\',\'"+JSON.stringify(txData)+"\',current_timestamp);"
+  var query_message = qm1+qm2
+  // var query_message = 'SELECT current_database();'
+  // toDB(query_message)
+  var query = pg_client.query(query_message)
+  console.log(query_message)
+  query.then(function(result){
+    console.log(result)
+    transaction_count = transaction_count+1
+    res.send(JSON.stringify({id:transaction_count}))
+    console.log('transaction COUNT')
+    console.log(transaction_count)
+  }).catch(function(err){console.log(err)})
+
+})
 
 app.post('/confirm_ua', function(req,res){
   var address = req.body.address
@@ -230,7 +279,7 @@ function fundAccount(insert_body,user_input,res) {
 
       // The real amount is the given number divided by 10^(precision of the token)
       // am 1000000000 <- this amount is 10 WAVES
-      amount: 100000,
+      amount: 1000000,
 
       // The same rules for these two fields
       feeAssetId: 'WAVES',
@@ -298,9 +347,15 @@ app.post('/wallet', function (req, res) {
                  console.log(balance);
                  console.log(account_config)
                  res.send(JSON.stringify({ a: 'wallet', encrypted:encrypted,balance:balance,balances:balancesList,username:user_input,account_config:account_config }));
-             }).catch(function(err){console.log(err)});
+             }).catch(function(err){
+               console.log(err)
+               res.send(JSON.stringify({ a: err }));
+             });
              // res.send(JSON.stringify({ a: 'wallet', encrypted:encrypted,balances:JSON.stringify(balancesList) }))
-          }).catch(function(err){console.log(err)});
+          }).catch(function(err){
+            console.log(err)
+            res.send(JSON.stringify({ a: err }));
+          });
        }).catch(function(err){console.log(err)})
 
        // res.send(JSON.stringify({ a: 'wallet', encrypted:encrypted }));

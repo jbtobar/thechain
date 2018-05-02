@@ -419,9 +419,10 @@ function TxSend(curr_account,input,daters,fd_dict) {
   // d3.select('#modal_content').transition().style('height','100%')
 
   var gmdiv = d3.select('#GeneralModalDiv').append('div').attr('class','txconfclass')
+  var recipient = daters.recipient_address
   const transferData = {
       // An arbitrary address; mine, in this example
-      recipient: daters.recipient_address,
+      recipient: recipient,
       // ID of a token, or WAVES
       assetId: curr_account.assetId,
       // The real amount is the given number divided by 10^(precision of the token)
@@ -439,15 +440,15 @@ function TxSend(curr_account,input,daters,fd_dict) {
   var asset = curr_account.issueTransaction.name.split('_')[0]
   gmdiv.append('p').text(transferData.amount +' '+asset)
   gmdiv.append('p').text('to')
-  var address = '3MqWgNDKeJhA8poSfAgXvhEhKTSzYVwkqx9'
+  // var address = '3MqWgNDKeJhA8poSfAgXvhEhKTSzYVwkqx9'
   $.post('confirm_ua',{
     method:'POST',
-    address:address,
+    address:recipient,
   }).then(function(data){
     window.blala = JSON.parse(data)
     console.log('blala')
     var reciever = blala.recipient[0].username
-    gmdiv.append('p').text(reciever)
+    gmdiv.append('p').text('@'+reciever)
     window.transferDataSummary = {
       reciever:reciever,
       asset:asset,
@@ -483,40 +484,53 @@ function confirmTx(arg) {
         var rd_id = responseData.id
         var rd_date = new Date(responseData.timestamp)
         var rd_amount = responseData.amount
-        loader_svg.remove()
-        $('#GeneralModalClose2').show()
-        var gmdiv = d3.select('#GeneralModalDiv')
-                      // .transition(10000)
-        gmdiv.append('p').text('Transaction Send!')
-        gmdiv.append('p').text('Transaction ID').attr('style','color: #4b545f;')
-        gmdiv.append('p')
-              .text(rd_id)
-        gmdiv.append('p').text('Date').attr('style','color: #4b545f;')
-        gmdiv.append('p')
-              .text(rd_date)
-        gmdiv.append('p').text('Amount').attr('style','color: #4b545f;')
-        gmdiv.append('p')
-              .text(rd_amount+' '+transferDataSummary.asset)
-        gmdiv.append('p').text('To').attr('style','color: #4b545f;')
-        gmdiv.append('p')
-              .text(transferDataSummary.reciever)
+        $.post('log_tx',{txData:responseData}).then(function(data){
+          var parsed_data = JSON.parse(data)
+          console.log(data)
+          loader_svg.remove()
+          $('#GeneralModalClose2').show()
+          var gmdiv = d3.select('#GeneralModalDiv')
+                        // .transition(10000)
+          gmdiv.append('p').text('Transaction Send!')
+          gmdiv.append('p').text('Transaction ID').attr('style','color: #4b545f;width:600px')
+          gmdiv.append('p')
+                .text(parsed_data.id)
+          gmdiv.append('p').text('Date').attr('style','color: #4b545f;')
+          gmdiv.append('p')
+                .text(rd_date.toLocaleString())
+          gmdiv.append('p').text('Amount').attr('style','color: #4b545f;')
+          gmdiv.append('p')
+                .text(rd_amount+' '+transferDataSummary.asset)
+          gmdiv.append('p').text('To').attr('style','color: #4b545f;')
+          gmdiv.append('p')
+                .text(transferDataSummary.reciever)
+        }).catch(function(err){console.log(err)})
+
     }).catch(function(err){console.log(err)});
   }
 }
 
 
 function reloadBalances(arg){
-  var myad = rapo.balance.address
-  Waves.API.Node.v1.assets.balances(myad).then((balancesList) => {
-    window.rapo.balances = balancesList
-    rapo.balances.balances.forEach(function(d){
-    var name = d.issueTransaction.name.split('_')[0]
-    if (arg == name) {
-      d3.select('#'+name+'_balance_input').attr('value',d.balance)
-      console.log('updated: '+name)
-    }
-    })
-  }).catch(function(err){console.log(err)})
+  if (arg == 'tx') {
+    var name = transferDataSummary.asset
+    var prev_bal = Number($('#'+name+'_balance_input').val())
+    var transfer_amount = responseData.amount
+    var new_bal = prev_bal - transfer_amount
+    d3.select('#'+name+'_balance_input').attr('value',new_bal)
+  } else {
+    var myad = rapo.balance.address
+    Waves.API.Node.v1.assets.balances(myad).then((balancesList) => {
+      window.rapo.balances = balancesList
+      rapo.balances.balances.forEach(function(d){
+      var name = d.issueTransaction.name.split('_')[0]
+      if (arg == name) {
+        d3.select('#'+name+'_balance_input').attr('value',d.balance)
+        console.log('updated: '+name)
+      }
+      })
+    }).catch(function(err){console.log(err)})
+  }
 }
 
 // var mok = d3.select('body').append('img').attr('src',"/public/assets/Rolling-1s-200px.svg").attr('alt',"embedded SVG")
@@ -810,15 +824,20 @@ function showMyData(arg) {
   if (arg == 'button3') {showTransactions()}
 }
 
+var coin_mask = {
+  FPGVxbpCePWaRXYy6CEuygM3rQaAR3WN51Xy7q978qZK:'USD_Pegger',
+  HNfBr9j2QfEgDQR6mE2LVLeQUy4aHRPGHscpZqtzbCzd:'RUB_Pegger'
+}
+var fee_mask = {}
 
-
-transaction_cols = ['DATE','TYPE','NAME','SENDER','RECIPIENT','FEE','UNITS','txID']
+transaction_cols = ['DATE','TYPE','FROM','TO','ASSET','UNITS','txID','FEE']
 
 function refreshTransactions ()  {
     window.transactions_recieved = 0
     showTransactions()
 }
 var transactions_recieved = 0
+
 function showTransactions() {
     if (transactions_recieved == 1) {
       console.log('you already have transactions')
@@ -831,20 +850,43 @@ function showTransactions() {
       var tabla_body = tabla.append('tbody')
       transaction_cols.forEach(function(d){tabla_head.append('th').text(d)})
       Waves.API.Node.v1.transactions.getList(rapo.balance.address).then((txList) => {
+        //
         console.log(txList);
         window.txList = txList
+        var user_address_mask = []
         txList.forEach(function(d){
-          var trow = tabla_body.append('tr')
-          trow.append('td').text(Date(d.timestamp))
-          trow.append('td').text(d.type)
-          trow.append('td').text(d.name)
-          trow.append('td').text(d.sender)
-          trow.append('td').text(d.recipient)
-          trow.append('td').text(d.fee)
-          trow.append('td').text(d.amount)
-          trow.append('td').text(d.id)
+            user_address_mask.push(d.sender)
+		        user_address_mask.push(d.recipient)
         })
-        window.transactions_recieved = 1
+        var ua_mask = $.unique(user_address_mask)
+        $.post('ua_mask',{ua_mask:ua_mask}).done(function(data){
+          window.mask_base = {}
+          window.mask = JSON.parse(data)
+          mask.rows.forEach(function(d){
+            mask_base[d.address] = d.username
+          })
+          console.log('masked')
+          txList.forEach(function(d){
+            var trow = tabla_body.append('tr')
+            var date = new Date(d.timestamp)
+            date = date.toLocaleString()
+            trow.append('td').text(date)
+            // trow.append('td').text(d.type)
+            trow.append('td').text()
+            trow.append('td').text(mask_base[d.sender])
+            trow.append('td').text(mask_base[d.recipient])
+            try {
+              coin_mask[d.assetId].split('_')[0]
+              trow.append('td').text(coin_mask[d.assetId].split('_')[0])
+            } catch(err) {
+              trow.append('td').text(coin_mask[d.assetId])
+            }
+            trow.append('td').text(d.amount)
+            trow.append('td').text(d.id)
+            trow.append('td').text(d.fee)
+          })
+          window.transactions_recieved = 1
+        })
         // d3.select('#Page_3').text(txList)
       })
     }
@@ -986,7 +1028,7 @@ function closeModal2(arg) {
   d3.select('#modal_content').attr('style','')
   $('#GeneralModalClose2').hide()
   $('#GeneralModalClose').show()
-  reloadBalances(transferDataSummary.asset)
+  reloadBalances('tx')
 }
 // When the user clicks anywhere outside of the modal, close it
 window.onclick = function(event) {
