@@ -29,15 +29,72 @@ CREATE TABLE txbase (
 
 CREATE TABLE organizationbase (
   id serial primary key,
-  name varchar(200) not null,
-  username varchar(40),
+  username varchar(40) unique not null,
+  name varchar(200),
   owners jsonb,
   members jsonb,
   body jsonb,
   creation_date timestamp
 );
 
-INSERT INTO organizationbase(name,owners,members,body,creation_date)
+CREATE TABLE contractbase (
+  id serial primary key,
+  creator varchar(40),
+  organization varchar(40),
+  parties jsonb,
+  body jsonb,
+  creation_date timestamp
+);
+
+
+
+CREATE TABLE realtime(
+  id serial not null primary key,
+  sender varchar(40),
+  reciever varchar(40),
+  title varchar(200),
+  message text,
+  actions jsonb,
+  confirmations jsonb,
+  creation_date timestamp
+);
+
+CREATE FUNCTION notify_realtime() RETURNS trigger
+  LANGUAGE plpgsql
+    AS $$
+BEGIN
+    PERFORM pg_notify('addedrecord', TG_TABLE_NAME || ',id,' || NEW.id||',' || NEW.sender||',' || NEW.reciever||',' || NEW.title||',' || NEW.message ||',' || NEW.actions ||',' || NEW.confirmations );
+    RETURN NULL;
+END;
+$$;
+
+CREATE trigger updated_realtime_trigger AFTER INSERT ON realtime
+FOR EACH ROW EXECUTE PROCEDURE notify_realtime()
+
+-------------------------------------------------------------------------
+CREATE TABLE realtime(
+    id SERIAL NOT NULL PRIMARY KEY,
+    title character varying(128)
+);
+
+CREATE FUNCTION notify_realtime() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+    PERFORM pg_notify('addedrecord', NEW.title);
+    RETURN NULL;
+END;
+$$;
+
+CREATE TRIGGER updated_realtime_trigger AFTER INSERT ON realtime
+FOR EACH ROW EXECUTE PROCEDURE notify_realtime();
+-------------------------------------------------------------------------
+
+INSERT INTO contractbase(creator,organization,parties,body,creation_date)
+VALUES ('test')
+
+
+INSERT INTO organizationbase(name,username,owners,members,body,creation_date)
 VALUES (  )
 
 INSERT INTO userbase(username,passphrase,address,creation_date,body)
@@ -49,6 +106,8 @@ VALUES ('testuser',
 );
 
 
+
+SELECT members->>''
 -- INSERT INTO userbase(username,passphrase,creation_date,body)
 -- VALUES (username,encrypted,current_timestamp,  fdfds);
 SELECT data->>'name' AS name FROM cards
@@ -63,6 +122,59 @@ UPDATE userbase
 SET body = jsonb_set(body, '{email}', '"Mora@mi"', true),
 body = jsonb_set(body, '{username}', '"fu"', true)
 WHERE username='testuser';
+
+
+-- ---------------------------------------------------------
+To add the value use the JSON array append opperator (||)
+
+UPDATE jsontesting
+SET jsondata = jsondata || '["newString"]'::jsonb
+WHERE id = 7;
+Removing the value looks like this
+
+UPDATE jsontesting
+SET jsondata = jsondata - "newString"
+WHERE id = 7;
+Concatenating to a nested field looks like this
+
+UPDATE jsontesting
+SET jsondata = jsonb_set(
+  jsondata::jsonb,
+  array['nestedfield'],
+  (jsondata->'nestedfield')::jsonb || '["newString"]'::jsonb)
+WHERE id = 7;
+-- ---------------------------------------------------------
+UPDATE jsontesting SET jsondata = (
+    CASE
+        WHEN jsondata IS NULL THEN '[]'::JSONB
+        ELSE jsondata
+    END
+) || '["newString"]'::JSONB WHERE id = 7;
+
+
+UPDATE userbase SET organization = (
+    CASE
+        WHEN organization IS NULL THEN '[]'::JSONB
+        ELSE organization
+    END
+) || '["newString"]'::JSONB WHERE username = 'dalio';
+
+UPDATE userbase SET organization = (CASE WHEN organization IS NULL THEN '[]'::JSONB ELSE organization END) || '["newString"]'::JSONB WHERE username = 'dalio';
+
+
+
+UPDATE userbase
+SET organization = organization - 'newString2'
+WHERE username = 'dalio';
+
+
+
+
+
+
+
+
+
 
 update userbase set
   body = body || '{"city": "ottawa", "phone": "phonenum", "prefix": "prefixedName"}'

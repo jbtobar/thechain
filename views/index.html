@@ -41,7 +41,7 @@
           <input name="city" type="text" class="ghost-input" placeholder="Username" required oninput="checkUser(this)">
             <input name="password" class='ghost-input' required="required" type="password" id="password" placeholder="Enter Password"/>
             <input name="password_confirm" class='ghost-input' required="required" type="password" id="password_confirm" oninput="check(this)" placeholder="Confirm password" />
-          <input type="submit" class="ghost-button" value="Get Weather">
+          <input type="submit" class="ghost-button" value="Register">
         </form>
         </fieldset>
     </div>
@@ -127,7 +127,7 @@
         <div id='org_main_page' class='main_page' style='display:none'>
           Yep, in Org Account
           <span class="org_toggle" onclick="orgToggle()">&Omega;</span>
-          <div id='your_organizations_page'></div>
+          <div id='my_organizations_page'></div>
           <form action="/" method='post' onsubmit='return MakeOrganization(this)' id='organization_form'>
             <label class='ghost-input ghosty'>Organization Name</label>
             <input name='organization_name' class='ghost-input ghosty' type='text' placeholder="Your Organization's Name" required='required'></input>

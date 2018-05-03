@@ -361,7 +361,181 @@ function openWalletWindow(data) {
 // mapo = rapo.balances.balances
 // mapo
 // rapo.balances.balances.find(funcit)
+// organization_form
+// function revealActions(arg) {
+//   window.parg = arg
+//   console.log('revealActions')
+//   var myorgs = d3.select('#my_organizations_page')
+//   var myorgs_children = myorgs.selectAll('div')
+//   // $('#'+arg.parentElement.id+'_contracts').hide()
+//   myorgs_children["_groups"][0].forEach(function(d){
+//     // console.log(d)
+//     if (arg.parentElement == d){
+//       // $(d).show()
+//       d3.select(d).transition().style('height','')
+//
+//     } else {
+//       $(d).show()
+//     }
+//   })
+//   $('#'+arg.parentElement.id+'_contracts').hide()
+// }
+//
 
+
+function closeOrg(arg) {
+  // var myorgs_divs = d3.select('#my_organizations_page').selectAll('div')["_groups"][0]
+  var myorgs_divs = $('#my_organizations_page').children()
+  myorgs_divs.each(function(a,d){
+    $(d).show()
+    if (arg.parentElement == d) {
+      var id = '#'+d.id+'_contracts'
+      $(id).hide()
+      d3.select(d).transition().style('height','')
+    }
+  })
+  window.sarg = arg
+  console.log('closeOrg')
+}
+
+function openOrg(arg) {
+  // var myorgs_divs = d3.select('#my_organizations_page').selectAll('div')["_groups"][0]
+  var myorgs_divs = $('#my_organizations_page').children()
+  myorgs_divs.each(function(a,d){
+    if (arg.parentElement == d) {
+      var id = '#'+d.id+'_contracts'
+      console.log(id)
+      $(id).show()
+      // console.log('Open This')
+      $(d).show()
+      d3.select(d).transition().style('height','500px')
+      // console.log(arg.parentElement)
+    } else {
+      // console.log('hide these')
+      $(d).hide()
+      // console.log(arg.parentElement)
+    }
+  })
+
+  window.sarg = arg
+  console.log('openOrg')
+}
+
+// function openOrg(arg) {
+//   window.arg = arg
+//   console.log('openOrg')
+//   var myorgs = d3.select('#my_organizations_page')
+//   var myorgs_children = myorgs.selectAll('div')
+//   myorgs_children["_groups"][0].forEach(function(d){
+//     // console.log(d)
+//     if (arg.parentElement == d){
+//       $(d).show()
+//       d3.select(d).transition().style('height','500px')
+//       if (d3.select('#'+arg.parentElement.id+'_contracts')["_groups"][0][0] == null) {
+//         var divo = d3.select(d).append('div').attr('id',arg.parentElement.id+'_contracts')
+//         var tr = divo.append('form').append('tr')
+//         tr.append('td').text('Bongo')
+//       } else {
+//         $('#'+arg.parentElement.id+'_contracts').show()
+//         console.log('showing')
+//       }
+//
+//     } else {
+//       $(d).hide()
+//     }
+//   })
+// }
+function createContract(arg) {
+  var id = '#'+arg.id.split('_')[0]+'_contracts_creation'
+  console.log(id)
+  console.log('createContract')
+  var cc = d3.select(id)
+  // console.log(cc)
+  var form = cc.append('form')
+  var tr = form.append('tr')
+  tr.append('td').append('label').attr('class','').text('Contract Name')
+  tr.append('td').append('input')
+  tr.append('')
+}
+
+
+function MyOrgs(arg) {
+  // window.datums
+  $.post('myorgs',{
+    method:'POST',
+    action:'load',
+    username:rapo.username,
+  }).then(function(data){
+    window.datums = JSON.parse(data)
+    if (datums.result.length != 0) {
+      $('#organization_form').hide()
+      console.log('Here comes your org')
+      var myorgs = d3.select('#my_organizations_page')
+
+      datums.result2.forEach(function(d){
+
+        var orgcell = myorgs.append('div')
+                .attr('id',d.username)
+                .attr('class','org-cell')
+
+        orgcell.append('span')
+            .attr('class','close')
+            .attr('style','margin-right: 10%;margin-top: 5%;')
+            .attr('onclick','closeOrg(this)')
+            .text('X')
+
+        orgcell.append('span')
+            .attr('class','close')
+            .attr('style','margin-right: 10%;margin-top: 5%;')
+            .attr('onclick','openOrg(this)')
+            .text('O')
+
+        var tr = orgcell.append('tr')
+        tr.append('td').text('Username').attr('style','color:white')
+        tr.append('td').text(d.username).attr('style','color: #E64A19')
+
+        var tr = orgcell.append('tr')
+        tr.append('td').text('Name:').attr('style','color:white')
+        tr.append('td').text(d.name).attr('style','color: #E64A19')
+
+        var tr = orgcell.append('tr')
+        var members = d.members
+        tr.append('td').text('Members').attr('style','color:white')
+        Object.keys(members).forEach(function(o){
+          tr.append('td').text(members[o]).attr('style','color: #E64A19')
+        })
+
+        var tr = orgcell.append('tr')
+        var owners = d.owners
+        tr.append('td').text('Owners').attr('style','color:white')
+        Object.keys(owners).forEach(function(o){
+          tr.append('td').text(owners[o]).attr('style','color: #E64A19')
+        })
+
+        var div = orgcell.append('div')
+                          .attr('id',d.username+'_contracts')
+                          .attr('style','display:none')
+
+        div.append('div').attr('id',d.username+'_contracts_creation')
+
+        div.append('div')
+              .append('button')
+                .attr('class','ghost-button')
+                .attr('onclick','createContract(this)')
+                .attr('id',d.username+'_create_contract')
+                .text('Create Contract')
+
+        div.append('div').attr('id',d.username+'_contracts_existing')
+
+                // .attr('id',d.username+' contracts')
+      })
+
+    } else {
+      console.log('No Orgs')
+    }
+    console.log('oh yeah datums')
+  }).catch(function(err){console.log(err)})
+}
 
 
 function DepositWithdrawSend(action) {
@@ -859,11 +1033,14 @@ function MakeOrganization(arg) {
   })
   $.post('make_org',{
     user:rapo.username,
-    members:membah_dict,
+    members:membah,
     form_dict:form_dict,
   }).then(function(result){
     window.bult = result
     console.log('Made Org!')
+    $('#GeneralModalDiv').empty()
+    openModal()
+    var sarg = $(arg).serializeArray()
     return false
   }).catch(function(err){
     console.log(err)

@@ -182,7 +182,20 @@ app.post('/log_tx',function(req,res){
 
 })
 
+function sendInvitations(arg) {
+  // var members = req.body.members
+  var members = []
+  arg.forEach(function(d){
+    members.push(d.value)
+  })
+  console.log(members)
+  // console.
+
+}
+
+
 app.post('/make_org', function(req,res) {
+  var user_input = req.body.user
   console.log('MAKE ORG')
   console.log(req.body)
   var qm = 'INSERT INTO organizationbase(username,name,owners,members,body,creation_date) VALUES ('
@@ -192,8 +205,9 @@ app.post('/make_org', function(req,res) {
   try {
     console.log(req.body.members.length+' Members')
     qm = qm +'\''+JSON.stringify(req.body.members)+'\','
+    sendInvitations(req.body.members)
   } catch(err) {
-    qm = qm +'\''+JSON.stringify({'member_1':req.body.user})+'\','
+    qm = qm +'\''+JSON.stringify({'member_1':user_input})+'\','
   }
   var description = {organization_description:req.body.form_dict.organization_description}
   qm = qm +'\''+JSON.stringify(description)+'\','
@@ -203,8 +217,26 @@ app.post('/make_org', function(req,res) {
   query.then(function(result){
     console.log('MAKE ORG RESULT FROM QUERY')
     console.log(result)
-    res.send(JSON.stringify({sup:result.command}))
+    // res.send(JSON.stringify({sup:result.command}))
+    var neworg = req.body.form_dict.organization_username
+    var qm = 'UPDATE userbase SET organization = (CASE WHEN organization IS NULL THEN \'[]\'::JSONB ELSE organization END) || \'["'+neworg+'"]\'::JSONB WHERE username = \''+user_input+'\';'
+    console.log(qm)
+    var query = pg_client.query(qm)
+    query.then(function(result2){
+      console.log(result2)
+      res.send(JSON.stringify({sup:result.command,dup:result2.command}))
+    }).catch(function(err){console.log(err)})
   }).catch(function(err){console.log(err)})
+
+  // var user_input = 'dalio'
+  // var neworg = req.body.form_dict.organization_username
+  // var qm = 'UPDATE userbase SET organization = (CASE WHEN organization IS NULL THEN \'[]\'::JSONB ELSE organization END) || \'["'+neworg+'"]\'::JSONB WHERE username = \''+user_input+'\';'
+  // console.log(qm)
+  // var query = pg_client(qm)
+  // query.then(function(result2){
+  //   //
+  // }).catch(function(err){console.log(err)})
+
 })
 
 app.post('/confirm_ua', function(req,res){
@@ -493,6 +525,33 @@ app.post('/options',function(req,res) {
        res.send(JSON.stringify({ result }));
        // console.log(result.rows) //will log results.
     })
+  }
+})
+
+
+
+app.post('/myorgs',function(req,res){
+  var user_input = req.body.username
+  console.log(user_input)
+  if (req.body.action == 'load') {
+    // var qm = 'SELECT * FROM organizationbase WHERE username = \''+user_input+'\''
+    var qm = 'SELECT organization FROM userbase WHERE username=\''+user_input+'\';'
+    var query = pg_client.query(qm)
+    query.then(function(result) {
+      var orgs = result.rows[0].organization
+      console.log(orgs)
+      var qm1 = ''
+      orgs.forEach(function(d){
+        qm1 = qm1+'\''+d+'\','
+      })
+      qm1 = qm1.slice(0,-1)
+      var qm = 'SELECT * FROM organizationbase WHERE username in ('+qm1+')'
+      var query = pg_client.query(qm)
+      query.then(function(result2){
+        console.log(result2.rows)
+        res.send(JSON.stringify({result:result.rows,result2:result2.rows}))
+      }).catch(function(err){console.log(err)})
+    }).catch(function(err){console.log(err)})
   }
 })
 
