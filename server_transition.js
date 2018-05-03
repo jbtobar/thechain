@@ -7,7 +7,7 @@ const seed_1 = Waves.Seed.fromExistingPhrase(seed_phrase_1);
 const express = require('express')
 const bodyParser = require('body-parser');
 const app = express()
-console.log(seed_1)
+// console.log(seed_1)
 
 var con_string = 'tcp://juanbernardotobar:@0.0.0.0:5432/thechain'
 var pg_client = new pg.Client(con_string);
@@ -185,10 +185,16 @@ app.post('/log_tx',function(req,res){
 app.post('/make_org', function(req,res) {
   console.log('MAKE ORG')
   console.log(req.body)
-  var qm = 'INSERT INTO organizationbase(name,owners,members,body,creation_date) VALUES ('
+  var qm = 'INSERT INTO organizationbase(username,name,owners,members,body,creation_date) VALUES ('
+  qm = qm+'\''+req.body.form_dict.organization_username+'\','
   qm = qm+'\''+req.body.form_dict.organization_name+'\','
   qm = qm +'\''+JSON.stringify({owner:req.body.user})+'\','
-  qm = qm +'\''+JSON.stringify(req.body.members)+'\','
+  try {
+    console.log(req.body.members.length+' Members')
+    qm = qm +'\''+JSON.stringify(req.body.members)+'\','
+  } catch(err) {
+    qm = qm +'\''+JSON.stringify({'member_1':req.body.user})+'\','
+  }
   var description = {organization_description:req.body.form_dict.organization_description}
   qm = qm +'\''+JSON.stringify(description)+'\','
   qm = qm+'current_timestamp)'
@@ -405,30 +411,50 @@ app.post('/usercheck', function (req, res) {
   console.log(req.body.username)
   var user_input = req.body.username
   res.setHeader('Content-Type', 'application/json');
-  var qm = 'SELECT username FROM userbase'
+  var qm1 = 'SELECT userbase.username,organizationbase.username FROM userbase,organizationbase '
+  var qm = qm1 +'WHERE userbase.username=\''+user_input+'\' OR organizationbase.username = \''+user_input+'\';'
+  console.log(qm)
+  // var qm = 'SELECT username FROM userbase'
   var query = pg_client.query(qm)
-  var users = []
   query.then(function(result) {
-     result.rows.forEach(function(d){users.push(d.username)})
-     console.log(result.rows)
-     if (users.includes(user_input) ) {
-     // if (userbase[user_input]) {
-           console.log('Username taken')
-           res.send(JSON.stringify({ a: false }));
-     } else {
-       console.log(user_input)
-       console.log('logging in')
-   //  console.log(req.body);
-   //    obj[user_input] = true
-   //    fs.writeFile('./public/jsonusers.json', JSON.stringify(obj), 'utf8',function(err){console.log(obj)});
-   //  res.setHeader('Content-Type', 'application/json');
-       res.send(JSON.stringify({ a: true }));
-     }
+    if (result.rows.length != 0) {
+      console.log('Username taken')
+      res.send(JSON.stringify({ a: false }));
+    } else {
+      res.send(JSON.stringify({ a: true }));
+    }
   }).catch(function(err){console.log(err)})
+  // var users = []
+  // query.then(function(result) {
+  //    result.rows.forEach(function(d){users.push(d.username)})
+  //    console.log(result.rows)
+  //    if (users.includes(user_input) ) {
+  //    // if (userbase[user_input]) {
+  //          console.log('Username taken')
+  //          res.send(JSON.stringify({ a: false }));
+  //    } else {
+  //      console.log(user_input)
+  //      console.log('logging in')
+  //      res.send(JSON.stringify({ a: true }));
+  //    }
+  // }).catch(function(err){console.log(err)})
 })
 
 
-
+// app.post('/orgcheck',function(req,res){
+//   console.log(req.body.username)
+//   var user_input = req.body.username
+//   var qm = 'SELECT username FROM userbase'
+//   var query = pg_client.query(qm)
+//   var users = []
+//   query.then(function(result){
+//     result.rows.forEach(function(d){users.push(d.username)})
+//     if (users.includes(user_input)) {
+//       console.log('Organization Username taken')
+//       res.send(JSON.stringify({ a: false }));
+//     }
+//   }).catch(function(err){console.log(err)})
+// })
 
 
 

@@ -131,6 +131,8 @@
           <form action="/" method='post' onsubmit='return MakeOrganization(this)' id='organization_form'>
             <label class='ghost-input ghosty'>Organization Name</label>
             <input name='organization_name' class='ghost-input ghosty' type='text' placeholder="Your Organization's Name" required='required'></input>
+            <label class='ghost-input ghosty'>Organization UserName</label>
+            <input name='organization_username' class='ghost-input ghosty' type='text' placeholder="Your Organization's UserName" required='required' oninput='checkUser(this)'></input>
             <label class='ghost-input'>Description</label>
             <input name='organization_description' class='ghost-input ghosty' type='text' placeholder="A Short Description"></input>
             <div id='members_list_form'>

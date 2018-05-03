@@ -107,7 +107,18 @@ function registerForm() {
 }
 
 
-
+function checkOrganization(arg) {
+  $.post('orgcheck',{
+    method:"POST",
+    username:input.value,
+  }).done(function(data){
+    if (data['a'] == true) {
+      input.setCustomValidity('Username taken')
+    } else {
+      input.setCustomValidity('')
+    }
+  }).catch(function(err){console.log(err)})
+}
 
 function checkUser(input) {
   // console.log(input)
