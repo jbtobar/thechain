@@ -7,6 +7,45 @@ const Waves = WavesAPI.create(WavesAPI.TESTNET_CONFIG);
 // const restoredPhrase,
 
 
+
+
+
+//var socket = io.connect({transports: ['websocket']});
+// var socket = io.connect("http://0.0.0.0:3000/",{transports: ['websocket']});
+// var socket = io('http://0.0.0.0:8080/');
+// socket.on('fixa', function(msg){
+//   console.log('on')
+// window.msg = msg
+// console.log('on')
+//
+// });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 function checkBalance() {
   var myad_2 = address
   console.log(myad_2)
@@ -458,8 +497,21 @@ function createContract(arg) {
   tr.append('')
 }
 
+function showCreateForm() {
+  $('#organization_form').show()
+  console.log('Here comes your org')
+  $('#my_organizations_page').hide()
+  $('#organization_activity_page').hide()
+  // var myorgs = d3.select('#my_organizations_page')
+}
+function organizationActivity() {
+  $('#my_organizations_page').hide()
+  $('#organization_form').hide()
+  $('#organization_activity_page').show()
+}
 
-function MyOrgs(arg) {
+
+function MyOrgs() {
   // window.datums
   $.post('myorgs',{
     method:'POST',
@@ -469,7 +521,10 @@ function MyOrgs(arg) {
     window.datums = JSON.parse(data)
     if (datums.result.length != 0) {
       $('#organization_form').hide()
+      $('#organization_activity_page').hide()
       console.log('Here comes your org')
+      $('#my_organizations_page').empty()
+      $('#my_organizations_page').show()
       var myorgs = d3.select('#my_organizations_page')
 
       datums.result2.forEach(function(d){
@@ -1038,9 +1093,23 @@ function MakeOrganization(arg) {
   }).then(function(result){
     window.bult = result
     console.log('Made Org!')
-    $('#GeneralModalDiv').empty()
-    openModal()
-    var sarg = $(arg).serializeArray()
+    // $('#GeneralModalDiv').empty()
+    // openModal()
+
+    var members = []
+    membah.forEach(function(d){
+      members.push(d.value)
+    })
+    var inviteData = {
+      sender:'testuser',
+      title:'invitation',
+      message:'invitation mantarayacorp',
+      members:members
+    }
+    sendInvitation(inviteData)
+    // $('#GeneralModalDiv').empty()
+    // openModal()
+    // var sarg = $(arg).serializeArray()
     return false
   }).catch(function(err){
     console.log(err)

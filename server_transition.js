@@ -1,5 +1,6 @@
 var fs = require('fs');
 var pg = require ('pg');
+// var io = require('socket.io')
 const WavesAPI = require('waves-api');
 const Waves = WavesAPI.create(WavesAPI.TESTNET_CONFIG);
 const seed_phrase_1 = 'type intact dish action paddle rigid soap happy airport review message donor october unable pulp'
@@ -7,7 +8,108 @@ const seed_1 = Waves.Seed.fromExistingPhrase(seed_phrase_1);
 const express = require('express')
 const bodyParser = require('body-parser');
 const app = express()
+// var http = require('http').Server(app);
+// var io = require('socket.io')(http);
 // console.log(seed_1)
+
+
+// var app = require('express')();
+// var http = require('http').Server(app);
+// var io = require('socket.io')(http);
+// var port = process.env.PORT || 3000;
+//
+//
+// io.on('connection', (socket) => {
+//   console.log('a user connected');
+//
+//   socket.on('disconnect', () => {
+//    console.log('user disconnected');
+//   });
+// });
+
+// var socket = require('socket.io-client')('http://localhost');
+// socket.on('connect', function(){});
+// socket.on('event', function(data){});
+// socket.on('disconnect', function(){});
+const server = require('http').createServer()
+const io = require('socket.io')(server)
+
+io.on('connection', function (client) {
+  client.on('register',function(){
+    console.log('register')
+  })
+  //
+  // client.on('join', handleJoin)
+  //
+  // client.on('leave', handleLeave)
+  //
+  // client.on('message', handleMessage)
+  //
+  // client.on('chatrooms', handleGetChatrooms)
+  //
+  client.on('invitation', function(a,data){
+    console.log(data)
+    var sender = data.sender
+    // var reciever = data.reciever
+    var title = data.title
+    var message = data.message
+    var qm1 = 'INSERT INTO realtime(sender,reciever,title,message,creation_date) VALUES '
+    // var qm2 = 'VALUES (\''+sender+'\',\''+reciever+'\',\''+title+'\',\''+message+'\',current_timestamp)'
+    console.log(data.members)
+    data.members.forEach(function(d){
+      console.log(d)
+      var qm2 = '(\''+sender+'\',\''+d+'\',\''+title+'\',\''+message+'\',current_timestamp),'
+      qm1 = qm1 + qm2
+    })
+    qm1 = qm1.slice(0,-1)
+    console.log(qm1)
+    // io.emit('invitation','pixa');
+
+    var query = pg_client.query(qm1)
+    query.then(function(result){
+      console.log(result)
+      io.emit('invitation',data.members);
+    }).catch(function(err){console.log(err)})
+  })
+
+  client.on('getinvites',function(data) {
+    var user_input = data
+    console.log(data + 'getinvites')
+    var qm = 'SELECT * FROM realtime WHERE reciever = \''+user_input+'\' OR sender = \''+user_input+'\';'
+    var query = pg_client.query(qm)
+    query.then(function(result) {
+      var datums = result.rows
+      io.emit('getinvites',datums)
+      console.log(result.rows)
+    }).catch(function(err){console.log(err)})
+  })
+
+
+
+  client.on('disconnect', function () {
+    console.log('client disconnect...', client.id)
+    // handleDisconnect()
+  })
+
+  client.on('error', function (err) {
+    console.log('received error from client:', client.id)
+    console.log(err)
+  })
+})
+
+server.listen(3000, function (err) {
+  if (err) throw err
+  console.log('listening on port 3000')
+})
+
+
+
+
+
+
+
+
+
 
 var con_string = 'tcp://juanbernardotobar:@0.0.0.0:5432/thechain'
 var pg_client = new pg.Client(con_string);
@@ -36,6 +138,32 @@ intro_query.then(function(result) {
   transaction_count = Number(result.rows[0].count)
    console.log(transaction_count)
 }).catch(function(err){console.log(err)})
+
+
+
+
+
+
+// var pg_client = new pg.Client(con_string);
+// pg_client.connect();
+
+
+// var query = pg_client.query('LISTEN addedrecord');
+//
+// io.sockets.on('connection', function (socket) {
+//     socket.emit('connected', { connected: true });
+//     console.log('connected')
+//     socket.on('ready for data', function (data) {
+//       console.log('ready for data')
+//         pg_client.on('notification', function(title) {
+//           console.log('notification')
+//             socket.emit('update', { message: title });
+//         });
+//     });
+// });
+
+
+
 // var transaction_count = ''
 // console.log('crypsario')
 // var user_input = 'pulanga'

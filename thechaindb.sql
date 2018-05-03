@@ -59,6 +59,9 @@ CREATE TABLE realtime(
   creation_date timestamp
 );
 
+INSERT INTO realtime(sender,reciever,title,message,creation_date)
+VALUES ('testuser','dalio','invitation','invitation testorg',current_timestamp)
+
 CREATE FUNCTION notify_realtime() RETURNS trigger
   LANGUAGE plpgsql
     AS $$

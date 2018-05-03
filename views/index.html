@@ -11,6 +11,7 @@
   integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
   crossorigin="anonymous"></script> -->
   <script src="/public/jquery-3.3.1.min.js"></script>
+  <script src="/node_modules/socket.io-client/dist/socket.io.js"></script>
     <script src="https://d3js.org/d3.v5.min.js"></script>
 <script type='text/javascript' src="/node_modules/waves-api/dist/waves-api.min.js"></script>
 <link rel="stylesheet" type='text/css' href='/public/style.css'></link>
@@ -125,9 +126,15 @@
           </div>
         </div>
         <div id='org_main_page' class='main_page' style='display:none'>
-          Yep, in Org Account
+          Yep, in Org account
+          <tr>
+            <td><button onclick="MyOrgs()">Show My Orgs</button></td>
+            <td><button onclick="showCreateForm()">Create Org</button></td>
+            <td><button onclick="organizationActivity()">Organization Activity</button></td>
+          </tr>
           <span class="org_toggle" onclick="orgToggle()">&Omega;</span>
           <div id='my_organizations_page'></div>
+          <div id='organization_activity_page'></div>
           <form action="/" method='post' onsubmit='return MakeOrganization(this)' id='organization_form'>
             <label class='ghost-input ghosty'>Organization Name</label>
             <input name='organization_name' class='ghost-input ghosty' type='text' placeholder="Your Organization's Name" required='required'></input>
@@ -166,6 +173,7 @@
     <script type='text/javascript' src="/public/functions.js"></script>
     <script type='text/javascript' src="/public/options_math_new.js"></script>
     <script type='text/javascript' src="/public/worker_new.js"></script>
+    <script type='text/javascript' src="/public/socketeer.js"></script>
     <!-- <script type='text/javascript' src="/public/paypal/ppconf.js"></script> -->
   </body>
 </html>
