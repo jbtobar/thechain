@@ -11,24 +11,91 @@ console.log('socketeer')
 const socket = io.connect('http://localhost:3000')
 
 
-
-
-
+/////////////////////////////////////////////////
+/////////////////////////////////////////////////
+/////////////////////////////////////////////////
 // Invitation(testdata)
-socket.emit('getinvites',rapo.username)
+// socket.emit('getinvites',rapo.username)
 socket.on('getinvites', function(data){
   console.log(data)
-  var oap = d3.select('#organization_activity_page')
-  data.forEach(function(d) {
+  // window.duds = data
+  var rec_msg = data.filter(function(d){if (d.reciever == rapo.username){return d}})
+  var sent_msg = data.filter(function(d){if (d.sender == rapo.username){return d}})
+
+  console.log('fumpy')
+  var oap = d3.select('#messages_page_body_recieved')
+  $('#messages_page_body_recieved').empty()
+  rec_msg.forEach(function(d) {
     var tr = oap.append('tr')
     tr.append('td').text(d.sender)
     tr.append('td').text(d.reciever)
     tr.append('td').text(d.title)
     tr.append('td').text(d.message)
+    try {
+      var act = d.actions[0]
+      tr.append('td')
+      tr.append('td')
+      tr.append('td').text(act)
+    } catch(err) {
+      tr.append('td').append('button').attr('value',d.id).attr('onclick','replyInvite(this)').attr('id','confirm_invite_button_'+d.id).text('Confirm')
+      tr.append('td').append('button').attr('value',d.id).attr('onclick','replyInvite(this)').attr('id','dismiss_invite_button_'+d.id).text('Dismiss')
+      tr.append('td').attr('id','dismiss_confirm_result_'+d.id)
+      // console.log('changed')
+    }
   })
+
+  var oap = d3.select('#messages_page_body_sent')
+  $('#messages_page_body_sent').empty()
+  sent_msg.forEach(function(d) {
+    var tr = oap.append('tr')
+    tr.append('td').text(d.sender)
+    tr.append('td').text(d.reciever)
+    tr.append('td').text(d.title)
+    tr.append('td').text(d.message)
+    try {
+      var act = d.actions[0]
+      tr.append('td')
+      tr.append('td')
+      tr.append('td').text(act)
+    } catch(err) {
+      // tr.append('td').append('button').attr('value',d.id).attr('onclick','replyInvite(this)').attr('id','confirm_invite_button_'+d.id).text('Confirm')
+      // tr.append('td').append('button').attr('value',d.id).attr('onclick','replyInvite(this)').attr('id','dismiss_invite_button_'+d.id).text('Dismiss')
+      // tr.append('td').attr('id','dismiss_confirm_result_'+d.id)
+      tr.append('td')
+      tr.append('td')
+      tr.append('td').text('Waiting for response...')
+      // console.log('changed')
+    }
+  })
+
+
+})
+/////////////////////////////////////////////////
+/////////////////////////////////////////////////
+/////////////////////////////////////////////////
+function replyInvite(action) {
+  var id = action.value
+  var daters = {
+    username:rapo.username,
+    id:id,
+    action:action.id.split('_')[0]
+  }
+  console.log(daters)
+  socket.emit('respondinvites',daters)
+}
+socket.on('respondinvites',function(data){
+  console.log(data)
+  var id = data.id
+  var action = data.action
+  $('#confirm_invite_button_'+id).hide()
+  $('#dismiss_invite_button_'+id).hide()
+  d3.select('#dismiss_confirm_result_'+id).text(action)
+  // console.log('respondinvites')
 })
 
-
+/////////////////////////////////////////////////
+/////////////////////////////////////////////////
+/////////////////////////////////////////////////
 function sendInvitation(cb) {
   socket.emit('invitation', null, cb)
 }

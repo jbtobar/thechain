@@ -122,7 +122,21 @@
         </div>
         <div id='Page_3' class='main_page'>
           <div>
-          <span class="close" style="float:none" onclick="refreshTransactions(this)">Refresh</span>
+          <span class="close" style="float:right" onclick="refreshTransactions(this)">Refresh</span>
+          <span id='messages_toggle_button' class="close" style="float:none" onclick="toggleMessagesTransactions(this)">Messages</span>
+          <span id='transactions_toggle_button' class="close" style="float:none" onclick="toggleMessagesTransactions(this)">Transactions</span>
+          </div>
+          <div id='messages_page' class="main_page" style="display:none">
+            <div>
+              <span id='recieved_toggle_button' class="close" style="float:none" onclick="MessageActions(this)">Recieved</span>
+              <span id='sent_toggle_button' class="close" style="float:none" onclick="MessageActions(this)">Sent</span>
+              <span id='new_toggle_button' class="close" style="float:none" onclick="MessageActions(this)">New</span>
+            </div>
+            <div id='messages_page_body'>
+              <div id='messages_page_body_sent' style='display:none'></div>
+              <div id='messages_page_body_recieved'></div>
+              <div id='messages_page_body_new' style='display:none'></div>
+            </div>
           </div>
         </div>
         <div id='org_main_page' class='main_page' style='display:none'>

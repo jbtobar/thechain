@@ -1021,13 +1021,51 @@ function settingsUpdate(arg) {
 //   <button>Samsung</button>
 //   <button>Sony</button>
 // </div>
+
+
+function MessageActions(action) {
+  var pre_id = action.id.split('_')[0]
+  if (pre_id == 'sent') {
+    $('#messages_page_body_new').hide()
+    $('#messages_page_body_recieved').hide()
+    $('#messages_page_body_sent').show()
+  }
+  if (pre_id == 'recieved') {
+    $('#messages_page_body_new').hide()
+    $('#messages_page_body_recieved').show()
+    $('#messages_page_body_sent').hide()
+  }
+  if (pre_id == 'new') {
+    $('#messages_page_body_new').show()
+    $('#messages_page_body_recieved').hide()
+    $('#messages_page_body_sent').hide()
+  }
+}
+
+window.transaction_message_toggle = 'transactions'
+function toggleMessagesTransactions(span) {
+
+  if (span.id == 'transactions_toggle_button') {
+    $('#transactionTable').show()
+    $('#messages_page').hide()
+    window.transaction_message_toggle = 'transactions'
+  } else {
+    $('#transactionTable').hide()
+    $('#messages_page').show()
+    window.transaction_message_toggle = 'messages'
+  }
+
+  window.pinto = span
+  console.log('luga')
+}
+
 function buildMenus() {
   ww = d3.select('#walletfieldset')
 
   wwdiv = ww.append('div').attr('class','btn-group')
   wwdiv.append('button').attr('class','ghost-button3').attr('id','button1').attr('onclick','pageControl(this)').text('Main')
   wwdiv.append('button').attr('class','ghost-button3').attr('id','button2').attr('onclick','pageControl(this)').text('Contracts')
-  wwdiv.append('button').attr('class','ghost-button3').attr('id','button3').attr('onclick','pageControl(this)').text('Transactions')
+  wwdiv.append('button').attr('class','ghost-button3').attr('id','button3').attr('onclick','pageControl(this)').text('Activity')
 
 
   // $('#walletwindowform').hide()
@@ -1177,10 +1215,21 @@ var fee_mask = {}
 transaction_cols = ['DATE','TYPE','FROM','TO','ASSET','UNITS','txID','FEE']
 
 function refreshTransactions ()  {
-    window.transactions_recieved = 0
-    showTransactions()
+    if (window.transaction_message_toggle == 'transactions') {
+      window.transactions_recieved = 0
+      showTransactions()
+      console.log('refreshing tx')
+    }
+    if (window.transaction_message_toggle == 'messages') {
+      showMessages()
+      console.log('refreshing msg')
+    }
 }
 var transactions_recieved = 0
+
+function showMessages() {
+  socket.emit('getinvites',rapo.username)
+}
 
 function showTransactions() {
     if (transactions_recieved == 1) {

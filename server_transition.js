@@ -72,6 +72,22 @@ io.on('connection', function (client) {
     }).catch(function(err){console.log(err)})
   })
 
+  client.on('respondinvites',function(data){
+    var id = data.id
+    var action = data.action
+    var qm = 'UPDATE realtime SET actions = \'["'+action+'"]\'::jsonb WHERE id='+id+';'
+    console.log('respondinvites')
+    console.log(qm)
+    var query = pg_client.query(qm)
+    query.then(function(result) {
+      console.log(result)
+      io.emit('respondinvites',{id:id,action:action,success:true})
+    }).catch(function(err) {
+      console.log(err)
+      io.emit('respondinvites','error...')
+    })
+  })
+
   client.on('getinvites',function(data) {
     var user_input = data
     console.log(data + 'getinvites')
