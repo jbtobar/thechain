@@ -91,6 +91,15 @@ function createUser(form,seed,encrypted) {
       ethaddress: provider.addresses[0]
     })
   .done(function( data ) {
+    window.wallet = {
+      address: {
+        eth:provider.addresses[0],
+        wav:seed.address
+      },
+      balance: {
+
+      }
+    }
     window.rapo = data
     openWalletWindow(data)
     // openNewWallet(data)
@@ -132,10 +141,22 @@ function openAccount(arg) {
           window.restoredPhrase = Waves.Seed.decryptSeedPhrase(encrypted, topaz);
           window.seed = Waves.Seed.fromExistingPhrase(restoredPhrase);
           window.rapo['unlocked'] = true
+          const mnemonia = seed.phrase
+          window.provider = new HDWalletProvider(mnemonia, "https://ropsten.infura.io/gvaDaupFKbFfrBVZ9cyE");
+          window.web3 = new Web3(provider)
+          window.wallet = {
+            address: {
+              eth:provider.addresses[0],
+              wav:seed.address
+            },
+            balance: {
+
+            }
+          }
           // window.rapo['data'] =  JSON.parse(rapo['data'])
           // console.lod()
           // console.log('oi')
-          openWalletWindow(seed)
+          openWalletWindow(wallet)
       }
       catch(err) {
           alert(err.message);
@@ -171,6 +192,26 @@ function checkOrganization(arg) {
   }).catch(function(err){console.log(err)})
 }
 
+function usernameChecker(input) {
+  $.post('usercheckwaddress',{
+    method:"POST",
+    username:input.value,
+    what:input.parentElement.id.split('_')[0]
+  }).done(function(data){
+    window.reciever_info = data
+    console.log(data)
+    console.log('usercheckwaddress')
+    if (data['a'] == true) {
+      input.setCustomValidity('Username not found')
+    } else {
+      input.setCustomValidity('')
+      input.parentElement.recipient_address.value = data.data.address
+      // console.log()
+    }
+  }).catch(function(err){console.log(err)})
+}
+
+
 function checkUser(input) {
   // console.log(input)
   window.inni = input
@@ -179,6 +220,7 @@ function checkUser(input) {
       username:input.value,
     })
   .done(function( data ) {
+
 
     if (input.name.slice(0,6) == 'member') {
       console.log('member')
@@ -317,24 +359,66 @@ function validate(form) {
 //   settingsUpdate('load')
 // }
 
+function accountPod(curr) {
+  var name = curr
+  // var balance = Number(rapo.usercreated.amount)
+  var balance = wallet.balance[curr]
+  console.log(balance)
+  console.log('acount pod')
+  d3.select('#walletwindowform')
+      .append('label')
+      .attr("class","ghost-input ghost-label-top")
+      .text(name+' Balance')
+  var irow = d3.select('#walletwindowform').append('tr')
+  irow.append('input')
+      .attr('id',name+'_send_input')
+      .attr("class","ghost-input ghost-label-bottom bwd_rs")
+      .attr('value','Send')
+      .attr('onclick','DepositWithdrawSend(this)')
+      .attr('readonly',true)
+  // d3.select('#walletwindowform')
+  irow.append('input')
+      .attr('id',name+'_balance_input')
+      .attr("class","ghost-input ghost-label-bottom bwd_l")
+      .attr('value',balance)
+      .attr('readonly',true)
+  // d3.select('#walletwindowform')
+  irow.append('input')
+      .attr('id',name+'_deposit_input')
+      .attr("class","ghost-input ghost-label-bottom bwd_r")
+      .attr('value','Deposit')
+      .attr('onclick','DepositWithdrawSend(this)')
+      .attr('readonly',true)
+  // d3.select('#walletwindowform')
+  irow.append('input')
+      .attr('id',name+'_withdraw_input')
+      .attr("class","ghost-input ghost-label-bottom bwd_r")
+      .attr('value','Withdraw')
+      .attr('onclick','DepositWithdrawSend(this)')
+      .attr('readonly',true)
+}
 
-function openWalletWindow(data) {
+
+function openWalletWindow(wallet) {
   $('#div_form2').hide()
   $('#div_form1').hide()
   $('#walletwindow').show()
   console.log('open wallet window data')
-  console.log(data)
-  try {
-    var myad = rapo.insert_body.seedaddress
-  } catch(err) {
-    var myad = rapo.balance.address
-  }
+  console.log(wallet)
+  // try {
+  //   var myad = rapo.insert_body.seedaddress
+  // } catch(err) {
+  //   var myad = rapo.balance.address
+  // }
+  var myad = wallet.address.wav
 
     // myad = data.balance.address
 
   Waves.API.Node.v1.addresses.balance(myad).then((balance) => {
       console.log(balance);
       window.rapo.balance = balance
+      wallet.balance['WAV'] = balance.balance
+      accountPod('WAV')
   }).catch(function(err){console.log(err)});
   Waves.API.Node.v1.assets.balances(myad).then((balancesList) => {
     console.log('fluubber')
@@ -345,43 +429,23 @@ function openWalletWindow(data) {
          var peg_or_not = name.split('_')[1]
          if (peg_or_not == 'Pegger'){
            var name = name.split('_')[0]
-
-           d3.select('#walletwindowform')
-               .append('label')
-               .attr("class","ghost-input ghost-label-top")
-               .text(name+' Balance')
-           var irow = d3.select('#walletwindowform').append('tr')
-           irow.append('input')
-               .attr('id',name+'_send_input')
-               .attr("class","ghost-input ghost-label-bottom bwd_rs")
-               .attr('value','Send')
-               .attr('onclick','DepositWithdrawSend(this)')
-               .attr('readonly',true)
-           // d3.select('#walletwindowform')
-           irow.append('input')
-               .attr('id',name+'_balance_input')
-               .attr("class","ghost-input ghost-label-bottom bwd_l")
-               .attr('value',d.balance)
-               .attr('readonly',true)
-           // d3.select('#walletwindowform')
-           irow.append('input')
-               .attr('id',name+'_deposit_input')
-               .attr("class","ghost-input ghost-label-bottom bwd_r")
-               .attr('value','Deposit')
-               .attr('onclick','DepositWithdrawSend(this)')
-               .attr('readonly',true)
-           // d3.select('#walletwindowform')
-           irow.append('input')
-               .attr('id',name+'_withdraw_input')
-               .attr("class","ghost-input ghost-label-bottom bwd_r")
-               .attr('value','Withdraw')
-               .attr('onclick','DepositWithdrawSend(this)')
-               .attr('readonly',true)
-
+           wallet.balance[name] = d.balance
+           accountPod(name)
+         } else {
+           wallet.balance[name] = d.balance
+           accountPod(name)
          }
+
      })
      settingsUpdate('load')
   }).catch(function(err){console.log('should be a normal error below');console.log(err)});
+
+  var ad1 = wallet.address.eth
+  web3.eth.getBalance(ad1).then(function(d){
+    // rapo.eth = {address:ad1,balance:Number(d)}
+    wallet.balance['ETH'] = Number(d)
+    accountPod('ETH')
+  }).catch(function(err){console.log(err)})
 
 
   d3.select('#name1').attr('value','@'+rapo.username)
@@ -663,9 +727,68 @@ function MyOrgs() {
   }).catch(function(err){console.log(err)})
 }
 
+function togTo(arg) {
+  window.sapo = arg
+  if (arg.id == 'togto_user') {
+    arg.parentElement.recipient_address.required = false
+    // arg.parentElement.recipient_address.value = ''
+    arg.parentElement.recipient_username.required = true
+    $(arg.parentElement.recipient_username).show()
+    $(arg.parentElement.recipient_address).hide()
+  }
+  if (arg.id == 'togto_address') {
+    arg.parentElement.recipient_address.required = true
+    arg.parentElement.recipient_username.required = false
+    arg.parentElement.recipient_username.value = ''
+    $(arg.parentElement.recipient_username).hide()
+    $(arg.parentElement.recipient_address).show()
+  }
+
+  console.log(arg)
+}
+
+
+function DWS(action) {
+  var curr = action.id.split('_')[0]
+  if (curr != 'WAV') {if (curr != 'ETH') {return}}
+  console.log('DWS')
+  openModal()
+  var gmdiv = d3.select('#GeneralModalDiv')
+  if (action.value == 'Send') {
+    console.log(curr)
+    // var curr_account = rapo.balances.balances.find(function(x){if (x.issueTransaction.name == curr_name){return x}})
+    var curr_balance = wallet.balance[curr]
+    gmdiv.append('p').text('Hello there')
+    gmdiv.append('p').text('Send Transaction')
+    // gmdiv.append('p').text('Your '+curr+' Balance is: '+curr_balance.toString())
+    var forma = gmdiv.append('form').attr('action','/').attr('onsubmit','return SendTransaction2(this)').attr('method','post').attr('id',curr+'_transaction_form')
+    forma.append('label').attr('class','ghost-input ghost-label-left').text('From')
+    forma.append('input').attr('name','account').attr('type','text').attr('class','ghost-input ghost-label-right').attr('value',curr+' Account').attr('readonly','true')
+
+    forma.append('label').attr('class','ghost-input ghost-label-left').text('Amount')
+    forma.append('input').attr('name','amount').attr('type','number').attr('class','ghost-input ghost-label-right').attr('placeholder',0.00).attr('required','required')
+
+    forma.append('label').attr('class','ghost-input ghost-label-left').text('To')
+    forma.append('p').attr('id','togto_address').attr('onclick','togTo(this)').text('Address')
+    forma.append('p').attr('id','togto_user').attr('onclick','togTo(this)').text('Username')
+    forma.append('input').attr('name','recipient_username').attr('type','text').attr('class','ghost-input ghost-label-right').attr('placeholder','Search for User').attr('required','required').attr('oninput','usernameChecker(this)')
+    forma.append('input').attr('name','recipient_address').attr('type','text').attr('class','ghost-input ghost-label-right').attr('placeholder','Type '+curr+' address').attr('required','required')
+    forma.append('div').attr('id','TxResponse')
+
+    // forma.append('label').attr('class','ghost-input ghost-label-left').text('Message')
+    // forma.append('input').attr('name','attachment').attr('type','text').attr('class','ghost-input ghost-label-right').attr('placeholder','Enter up to 140 characters')
+
+    forma.append('input').attr('type','submit').attr('class','ghost-button').attr('value','Send Transaction')
+  } else {
+    gmdiv.append('p').text('Hello there')
+    gmdiv.append('p').text(action.value+' functionality is coming soon.')
+  }
+}
 
 function DepositWithdrawSend(action) {
   window.acta = action
+  var curr = acta.id.split('_')[0]
+  if (curr != 'RUB') {if (curr != 'USD') {DWS(action);return}}
   console.log(action)
   openModal()
   // d3.select('#GeneralModalDiv').empty()
@@ -673,8 +796,9 @@ function DepositWithdrawSend(action) {
   var gmdiv = d3.select('#GeneralModalDiv')
   console.log(gmdiv)
   if (action.value == 'Send') {
-    var curr = acta.id.split('_')[0]
+
     var curr_name = curr+'_Pegger'
+    console.log(curr)
     var curr_account = rapo.balances.balances.find(function(x){if (x.issueTransaction.name == curr_name){return x}})
     var curr_balance = curr_account.balance
     gmdiv.append('p').text('Hello there')
@@ -701,6 +825,95 @@ function DepositWithdrawSend(action) {
   }
 }
 
+function SendTransaction2(arg) {
+  var curr = arg.id.split('_')[0]
+  if (curr = 'WAV') {
+    var ad2 = arg.recipient_address.value
+    const transferData = {
+        // An arbitrary address; mine, in this example
+        recipient: ad2,
+        // ID of a token, or WAVES
+        assetId: 'WAVES',
+        // The real amount is the given number divided by 10^(precision of the token)
+        amount: Number(arg.amount.value),
+        // The same rules for these two fields
+        feeAssetId: 'WAVES',
+        fee: 100000,
+        // 140 bytes of data (it's allowed to use Uint8Array here)
+        attachment: '',
+        timestamp: Date.now()
+    };
+    window.transferData = transferData
+
+    $('#GeneralModalDiv').empty()
+    d3.select('#modal_content').transition().style('width','50%').style('height','50%')
+    var gmdiv = d3.select('#GeneralModalDiv').append('div').attr('class','txconfclass')
+    gmdiv.append('p').text('You are about to send:')
+    // var asset = curr_account.issueTransaction.name.split('_')[0]
+    gmdiv.append('p').text(transferData.amount +' '+curr)
+    gmdiv.append('p').text('to')
+    gmdiv.append('p').text('@'+arg.recipient_username.value)
+    gmdiv.append('p').text(arg.recipient_address.value)
+    var triv = gmdiv.append('form').append('tr')
+    triv.append('input').attr('type','button').attr('value','Cancel').attr('onclick','confirmTx2(this)').attr('class','ghost-button')
+    triv.append('input').attr('type','button').attr('value','Confirm').attr('onclick','confirmTx2(this)').attr('class','ghost-button')
+    d3.select('#modal_content').transition().style('width','min-content').style('height','min-content')
+
+
+  }
+
+
+
+
+  window.starg = arg
+  console.log('starg')
+  return false
+}
+
+function confirmTx2(arg) {
+  // transferData
+  window.miss = arg
+  if (miss.value == 'Cancel') {closeModal()}
+  if (miss.value == 'Confirm'){
+    $('#GeneralModalDiv').empty()
+    $('#GeneralModalClose').hide()
+    var loader_svg = d3.select('#GeneralModalDiv').append('img').attr('id','loading_svg').attr('src',"/public/assets/Rolling-1s-200px.svg").attr('alt',"embedded SVG")
+    console.log(transferData)
+    Waves.API.Node.v1.assets.transfer(transferData, seed.keyPair).then((responseData) => {
+        console.log(responseData);
+        window.responseData = responseData
+        var rd_id = responseData.id
+        var rd_date = new Date(responseData.timestamp)
+        var rd_amount = responseData.amount
+        $.post('log_tx',{txData:responseData}).then(function(data){
+          var parsed_data = JSON.parse(data)
+          console.log(data)
+          loader_svg.remove()
+          $('#GeneralModalClose2').show()
+          var gmdiv = d3.select('#GeneralModalDiv')
+                        // .transition(10000)
+          gmdiv.append('p').text('Transaction Sent!')
+          gmdiv.append('p').text('Transaction ID').attr('style','color: #4b545f;width:600px')
+          gmdiv.append('p')
+                .text(parsed_data.id)
+          gmdiv.append('p')
+                .text(responseData.id)
+          gmdiv.append('p').text('Date').attr('style','color: #4b545f;')
+          gmdiv.append('p')
+                .text(rd_date.toLocaleString())
+          gmdiv.append('p').text('Amount').attr('style','color: #4b545f;')
+          gmdiv.append('p')
+                .text(responseData.amount+' '+transferData.assetId)
+          gmdiv.append('p').text('To').attr('style','color: #4b545f;')
+          gmdiv.append('p')
+                .text(reciever_info.data.address)
+          gmdiv.append('p')
+                .text(reciever_info.username)
+        }).catch(function(err){console.log(err)})
+
+    }).catch(function(err){console.log(err)});
+  }
+}
 
 
 function SendTransaction(arg) {
@@ -845,7 +1058,7 @@ function confirmTx(arg) {
 
 function reloadBalances(arg){
   if (arg == 'tx') {
-    var name = transferDataSummary.asset
+    var name = transferData.assetId.slice(0,3)
     var prev_bal = Number($('#'+name+'_balance_input').val())
     var transfer_amount = responseData.amount
     var new_bal = prev_bal - transfer_amount

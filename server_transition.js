@@ -686,6 +686,34 @@ app.post('/wallet', function (req, res) {
    })
 })
 
+app.post('/usercheckwaddress', function (req, res) {
+  console.log(req.body.username)
+  console.log('usercheckwaddress')
+  console.log(req.body)
+  var user_input = req.body.username
+  res.setHeader('Content-Type', 'application/json');
+  if (req.body.what == 'WAV') {
+    var qm = 'SELECT address from userbase a where username = \''+user_input+'\';'
+  }
+  if (req.body.what == 'ETH') {
+    var qm = 'SELECT ethaddress from userbase a where username = \''+user_input+'\';'
+  }
+  // console.log(qm)
+  // var qm = 'SELECT username FROM userbase'
+  var query = pg_client.query(qm)
+  query.then(function(result) {
+    console.log(result)
+    if (result.rows.length != 0) {
+      console.log('Username taken')
+      res.send(JSON.stringify({ a: false,data:result.rows[0],username:user_input}));
+    } else {
+      res.send(JSON.stringify({ a: true }));
+    }
+  }).catch(function(err){console.log(err)})
+})
+
+
+
 app.post('/usercheck', function (req, res) {
   console.log(req.body.username)
   var user_input = req.body.username
