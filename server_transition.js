@@ -86,6 +86,45 @@ io.on('connection', function (client) {
       console.log(err)
       io.emit('respondinvites','error...')
     })
+    if (action == 'confirm') {
+      var user_input = data.username
+      var neworg = data.organization
+      var qm = 'UPDATE userbase SET organization = (CASE WHEN organization IS NULL THEN \'[]\'::JSONB ELSE organization END) || \'["'+neworg+'"]\'::JSONB WHERE username = \''+user_input+'\';'
+      var query = pg_client.query(qm)
+      query.then(function(result) {
+        console.log(qm)
+        console.log(result)
+        io.emit('notifications','added '+user_input+' to '+neworg)
+      }).catch(function(err){console.log(err)})
+
+      var qm = 'UPDATE organizationbase SET members = jsonb_set(members::jsonb,array[\'joined\'],(members->\'joined\')::jsonb ||\'["'+user_input+'"]\'::jsonb) WHERE username = \''+neworg+'\';'
+      var query = pg_client.query(qm)
+      query.then(function(result) {
+        console.log(result)
+        console.log(qm)
+      }).catch(function(err){console.log(err)})
+    }
+    if (action == 'dismiss') {
+      var user_input = data.username
+      var neworg = data.organization
+      // var qm = 'UPDATE userbase SET organization = (CASE WHEN organization IS NULL THEN \'[]\'::JSONB ELSE organization END) || \'["'+neworg+'"]\'::JSONB WHERE username = \''+user_input+'\';'
+      // var query = pg_client.query(qm)
+      // query.then(function(result) {
+        // console.log(qm)
+        // console.log(result)
+        // io.emit('notifications','added '+user_input+' to '+neworg)
+      // }).catch(function(err){console.log(err)})
+
+      var qm = 'UPDATE organizationbase SET members = jsonb_set(members::jsonb,array[\'declined\'],(members->\'declined\')::jsonb ||\'["'+user_input+'"]\'::jsonb) WHERE username = \''+neworg+'\';'
+      var query = pg_client.query(qm)
+      query.then(function(result) {
+        console.log(result)
+        console.log(qm)
+      }).catch(function(err){console.log(err)})
+    }
+
+
+
   })
 
   client.on('getinvites',function(data) {
@@ -348,7 +387,7 @@ app.post('/make_org', function(req,res) {
   qm = qm +'\''+JSON.stringify({owner:req.body.user})+'\','
   try {
     console.log(req.body.members.length+' Members')
-    qm = qm +'\''+JSON.stringify(req.body.members)+'\','
+    qm = qm +'\''+JSON.stringify({invited:req.body.members,joined:['testuser'],declined:[]})+'\','
     sendInvitations(req.body.members)
   } catch(err) {
     qm = qm +'\''+JSON.stringify({'member_1':user_input})+'\','
@@ -587,12 +626,14 @@ app.post('/usercheck', function (req, res) {
   console.log(req.body.username)
   var user_input = req.body.username
   res.setHeader('Content-Type', 'application/json');
-  var qm1 = 'SELECT userbase.username,organizationbase.username FROM userbase,organizationbase '
-  var qm = qm1 +'WHERE userbase.username=\''+user_input+'\' OR organizationbase.username = \''+user_input+'\';'
-  console.log(qm)
+  // var qm1 = 'SELECT userbase.username,organizationbase.username FROM userbase,organizationbase '
+  // var qm = qm1 +'WHERE userbase.username=\''+user_input+'\' OR organizationbase.username = \''+user_input+'\';'
+  var qm = 'select 1 from (select username as username from userbase union all select username from organizationbase ) a where username = \''+user_input+'\';'
+  // console.log(qm)
   // var qm = 'SELECT username FROM userbase'
   var query = pg_client.query(qm)
   query.then(function(result) {
+    console.log(result)
     if (result.rows.length != 0) {
       console.log('Username taken')
       res.send(JSON.stringify({ a: false }));

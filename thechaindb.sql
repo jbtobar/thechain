@@ -228,3 +228,13 @@ CREATE TABLE pups (
 
 INSERT INTO pups (name, breed, age, sex)
   VALUES ('Tyler', 'Retrieved', 3, 'M');
+
+
+
+
+
+
+
+
+
+  'select 1 from (select username as username from userbase union all select username from organizationbase ) a where username = \''+user_input+'\';'

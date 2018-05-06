@@ -18,7 +18,7 @@ const socket = io.connect('http://localhost:3000')
 // socket.emit('getinvites',rapo.username)
 socket.on('getinvites', function(data){
   console.log(data)
-  // window.duds = data
+  window.duds = data
   var rec_msg = data.filter(function(d){if (d.reciever == rapo.username){return d}})
   var sent_msg = data.filter(function(d){if (d.sender == rapo.username){return d}})
 
@@ -75,10 +75,13 @@ socket.on('getinvites', function(data){
 /////////////////////////////////////////////////
 function replyInvite(action) {
   var id = action.value
+  var notification = duds.filter(function(d){if (d.id == id){return d}})[0]
+  var organization = notification.message.split(' ')[1]
   var daters = {
     username:rapo.username,
     id:id,
-    action:action.id.split('_')[0]
+    action:action.id.split('_')[0],
+    organization:organization
   }
   console.log(daters)
   socket.emit('respondinvites',daters)
@@ -91,6 +94,14 @@ socket.on('respondinvites',function(data){
   $('#dismiss_invite_button_'+id).hide()
   d3.select('#dismiss_confirm_result_'+id).text(action)
   // console.log('respondinvites')
+})
+socket.on('notifications',function(data){
+  console.log('You have a notification:')
+  console.log(data)
+  $('#GeneralModalDiv').empty()
+  $('#GeneralModalClose').attr('onclick','closeModal()')
+  d3.select('#GeneralModalDiv').append('p').text(data)
+  openModal()
 })
 
 /////////////////////////////////////////////////

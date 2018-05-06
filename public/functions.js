@@ -1,4 +1,9 @@
 const Waves = WavesAPI.create(WavesAPI.TESTNET_CONFIG);
+if (typeof web3 !== 'undefined') {
+    window.web3 = new Web3(web3.currentProvider)
+} else {
+    window.web3 = new Web3(new Web3.providers.HttpProvider('https://rinkeby.infura.io:443'))
+}
 // const password = '0123456789';
 // const encrypted = seed.encrypt(password);
 // const restoredPhrase = Waves.Seed.decryptSeedPhrase(encrypted, password);
@@ -128,6 +133,7 @@ function openAccount(arg) {
       }
       catch(err) {
           alert(err.message);
+          window.open_account_sent = 0
       }
 
 
@@ -484,17 +490,53 @@ function openOrg(arg) {
 //     }
 //   })
 // }
+function Sauron(arg) {
+  console.log('sauron')
+  return false
+}
+
 function createContract(arg) {
-  var id = '#'+arg.id.split('_')[0]+'_contracts_creation'
+  console.log(arg)
+  window.id = '#'+arg.id.slice(0,-16)
   console.log(id)
   console.log('createContract')
+  // $(id).empty()
+  console.log('la puta madre')
   var cc = d3.select(id)
+
   // console.log(cc)
-  var form = cc.append('form')
+  d3.select(id).select('form').remove()
+  var form = cc.append('form').attr('id',id+'_form').attr('onsubmit','return Sauron(this)')
+
   var tr = form.append('tr')
   tr.append('td').append('label').attr('class','').text('Contract Name')
   tr.append('td').append('input')
-  tr.append('')
+
+  var tr = form.append('tr')
+  tr.append('td').append('label').attr('class','').text('Party 1')
+  tr.append('td').append('input')
+  tr.append('td').append('button').attr('onclick','PlusMinus(this)').attr('value','plus').text('+')
+  tr.append('td')
+  // .append('button').attr('onclick','PlusMinus(this)').attr('value','minus').text('-')
+}
+
+function PlusMinus(arg) {
+  console.log('PlusMinus')
+  window.ipo = arg
+  if (arg.value == 'plus') {
+    var form = d3.select(arg.parentElement.parentElement.parentElement)
+    var tr = form.append('tr')
+    tr.append('td')
+    tr.append('td').append('input')
+    tr.append('td').append('button').attr('onclick','PlusMinus(this)').attr('value','plus').text('+')
+    tr.append('td').append('button').attr('onclick','PlusMinus(this)').attr('value','minus').text('-')
+    return false
+  }
+  if (arg.value == 'minus') {
+    d3.select(arg.parentElement.parentElement).remove()
+    return false
+  }
+
 }
 
 function showCreateForm() {
@@ -554,11 +596,34 @@ function MyOrgs() {
         tr.append('td').text(d.name).attr('style','color: #E64A19')
 
         var tr = orgcell.append('tr')
-        var members = d.members
+        var members = d.members.invited
         tr.append('td').text('Members').attr('style','color:white')
-        Object.keys(members).forEach(function(o){
-          tr.append('td').text(members[o]).attr('style','color: #E64A19')
+        tr.append('td').text('Invited').attr('style','color:blue')
+        // Object.keys(members).forEach(function(o){
+          // tr.append('td').text(members[o].value).attr('style','color: #E64A19')
+        // })
+        members.forEach(function(o){
+          tr.append('td').text(o).attr('style','color: #E64A19')
         })
+
+        var tr = orgcell.append('tr')
+        var members = d.members.joined
+        tr.append('td').text('').attr('style','color:white')
+        tr.append('td').text('Joined').attr('style','color:blue')
+        try {
+          // Object.keys(members).forEach(function(o){
+            // tr.append('td').text(members[o].value).attr('style','color: #E64A19')
+          // })
+          members.forEach(function(o){
+            tr.append('td').text(o).attr('style','color: #E64A19')
+          })
+        } catch(err) {
+          console.log('below error is probably because members.joined is empty')
+          console.log(err)
+        }
+
+
+
 
         var tr = orgcell.append('tr')
         var owners = d.owners
@@ -1116,9 +1181,13 @@ function MakeOrganization(arg) {
   window.marg = arg
   var blu = $(arg).serializeArray()
   var membah = blu.filter(function(d){if (d.name.slice(0,6) == 'member'){return d}})
-  var membah_dict = {}
+  // var membah_dict = {}
+  // membah.forEach(function(d){
+  //   membah_dict[d.name] = d.value
+  // })
+  var members = []
   membah.forEach(function(d){
-    membah_dict[d.name] = d.value
+    members.push(d.value)
   })
   var form_dict = {}
   blu.forEach(function(d){
@@ -1126,7 +1195,7 @@ function MakeOrganization(arg) {
   })
   $.post('make_org',{
     user:rapo.username,
-    members:membah,
+    members:members,
     form_dict:form_dict,
   }).then(function(result){
     window.bult = result
@@ -1134,14 +1203,14 @@ function MakeOrganization(arg) {
     // $('#GeneralModalDiv').empty()
     // openModal()
 
-    var members = []
-    membah.forEach(function(d){
-      members.push(d.value)
-    })
+    // var members = []
+    // membah.forEach(function(d){
+    //   members.push(d.value)
+    // })
     var inviteData = {
-      sender:'testuser',
+      sender:rapo.username,
       title:'invitation',
-      message:'invitation mantarayacorp',
+      message:'invitation '+form_dict.organization_username,
       members:members
     }
     sendInvitation(inviteData)
