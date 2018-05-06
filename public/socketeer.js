@@ -103,7 +103,16 @@ socket.on('notifications',function(data){
   d3.select('#GeneralModalDiv').append('p').text(data)
   openModal()
 })
-
+socket.on('notification_with_data',function(data){
+  console.log('You have a notification:')
+  console.log(data)
+  $('#GeneralModalDiv').empty()
+  $('#GeneralModalClose').attr('onclick','closeModal()')
+  d3.select('#GeneralModalDiv').append('p').text(data.message)
+  window.nwd = data
+  openModal()
+  loadBalance(data)
+})
 /////////////////////////////////////////////////
 /////////////////////////////////////////////////
 /////////////////////////////////////////////////

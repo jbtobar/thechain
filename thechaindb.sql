@@ -12,6 +12,7 @@ create table userbase (
   username varchar(40) unique not null,
   passphrase varchar(200),
   address varchar(200),
+  ethaddress varchar(200),
   creation_date timestamp,
   body jsonb,
   organization jsonb
@@ -126,6 +127,13 @@ SET body = jsonb_set(body, '{email}', '"Mora@mi"', true),
 body = jsonb_set(body, '{username}', '"fu"', true)
 WHERE username='testuser';
 
+UPDATE organizationbase
+SET members = jsonb_set(
+  members::jsonb,
+  array['invited'],
+  (members->'invited')::jsonb || '["gordo"]'::jsonb)
+WHERE username = 'misia_cinco';
+
 
 -- ---------------------------------------------------------
 To add the value use the JSON array append opperator (||)
@@ -138,6 +146,7 @@ Removing the value looks like this
 UPDATE jsontesting
 SET jsondata = jsondata - "newString"
 WHERE id = 7;
+
 Concatenating to a nested field looks like this
 
 UPDATE jsontesting
@@ -172,10 +181,14 @@ WHERE username = 'dalio';
 
 
 
+UPDATE organizationbase
+SET members = jsonb_set(
+  members::jsonb,
+  array['invited'],
+  (members->'invited')::jsonb || '["gordo"]'::jsonb)
+  WHERE username = 'misia_cinco';
 
-
-
-
+  UPDATE organizationbase SET members = jsonb_set(members::jsonb,array['invited'],(members->'invited')::jsonb ||'["gordo"]'::jsonb) WHERE username = 'misia_cinco';
 
 
 
@@ -185,7 +198,7 @@ where number = 1;
 
 
 
-
+SELECT usernma
 
 
 SELECT *

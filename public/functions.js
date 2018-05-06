@@ -1,9 +1,9 @@
 const Waves = WavesAPI.create(WavesAPI.TESTNET_CONFIG);
-if (typeof web3 !== 'undefined') {
-    window.web3 = new Web3(web3.currentProvider)
-} else {
-    window.web3 = new Web3(new Web3.providers.HttpProvider('https://rinkeby.infura.io:443'))
-}
+// if (typeof web3 !== 'undefined') {
+//     window.web3 = new Web3(web3.currentProvider)
+// } else {
+//     window.web3 = new Web3(new Web3.providers.HttpProvider('https://rinkeby.infura.io:443'))
+// }
 // const password = '0123456789';
 // const encrypted = seed.encrypt(password);
 // const restoredPhrase = Waves.Seed.decryptSeedPhrase(encrypted, password);
@@ -76,6 +76,11 @@ function checkBalance() {
 
 
 function createUser(form,seed,encrypted) {
+  window.seed = seed
+  const mnemonia = seed.phrase
+  // var mnemonia = restoredPhrase
+  window.provider = new HDWalletProvider(mnemonia, "https://ropsten.infura.io/gvaDaupFKbFfrBVZ9cyE");
+  web3 = new Web3(provider)
 	var user = forma.children[0].value
   // window.rapo = seed
 	$.post( "usercreation", {
@@ -83,6 +88,7 @@ function createUser(form,seed,encrypted) {
       username:user,
       seedaddress:seed.address,
       seedphrase:encrypted,
+      ethaddress: provider.addresses[0]
     })
   .done(function( data ) {
     window.rapo = data
@@ -375,7 +381,7 @@ function openWalletWindow(data) {
          }
      })
      settingsUpdate('load')
-  }).catch(function(err){console.log(err)});
+  }).catch(function(err){console.log('should be a normal error below');console.log(err)});
 
 
   d3.select('#name1').attr('value','@'+rapo.username)
@@ -890,10 +896,13 @@ function resetConf() {
     var email = rapo.account_config.email
     var account_name = rapo.account_config.account_name
   } catch(err) {
+    console.log('should be a normal error below')
     console.log(err)
-    var gmdiv = d3.select('#GeneralModalDiv')
-    gmdiv.append('p').text("Please update your Email and Account Name under Account Settings")
-    openModal()
+    // var gmdiv = d3.select('#GeneralModalDiv')
+    // var texto = ""
+    // gmdiv.append('p').text("Your account has been funded, your balance should appear shortly")
+    // gmdiv.append('p').text("Please update your Email and Account Name under Account Settings")
+    // openModal()
     rapo.account_config = rapo.insert_body.account_config
     // var email = rapo.insert_body.account_config.email
     // var account_name = rapo.insert_body.account_config.account_name

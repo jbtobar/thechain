@@ -8,6 +8,15 @@ const seed_1 = Waves.Seed.fromExistingPhrase(seed_phrase_1);
 const express = require('express')
 const bodyParser = require('body-parser');
 const app = express()
+
+var Web3 = require('web3');
+var HDWalletProvider = require("truffle-hdwallet-provider");
+const mnemonic = 'hair route suffer hood brother virus carbon fall song jewel food upset business reunion pull'
+var provider = new HDWalletProvider(mnemonic, "https://ropsten.infura.io/gvaDaupFKbFfrBVZ9cyE");
+web3 = new Web3(provider)
+
+const ad1 = provider.addresses[0]
+console.log(ad1)
 // var http = require('http').Server(app);
 // var io = require('socket.io')(http);
 // console.log(seed_1)
@@ -494,8 +503,10 @@ app.post('/usercreation', function (req, res) {
   console.log(req.body)
 //  obj[user_input] = true
   var encrypted = req.body.seedphrase
+  var ethaddress = req.body.ethaddress
   var insert_body = {
         seedaddress:req.body.seedaddress,
+        ethaddress: req.body.ethaddress,
         encrypted:req.body.seedphrase,
         account_config:{
           email:'Unconfirmed',
@@ -505,8 +516,8 @@ app.post('/usercreation', function (req, res) {
           account_name:'',
         },
   }
-  var qm1 = "INSERT INTO userbase(username,passphrase,address,creation_date,body) "
-  var qm2 = "VALUES (\'"+user_input+"\',\'"+encrypted+"\',\'"+req.body.seedaddress+"\',current_timestamp,  \'"+JSON.stringify(insert_body)+"\');"
+  var qm1 = "INSERT INTO userbase(username,passphrase,address,ethaddress,creation_date,body) "
+  var qm2 = "VALUES (\'"+user_input+"\',\'"+encrypted+"\',\'"+req.body.seedaddress+"\',\'"+ethaddress+"\',current_timestamp,  \'"+JSON.stringify(insert_body)+"\');"
   var query_message = qm1+qm2
   // var query_message = 'SELECT current_database();'
   // toDB(query_message)
@@ -516,12 +527,24 @@ app.post('/usercreation', function (req, res) {
      console.log('options requested')
      console.log(result)
      fundAccount(insert_body,user_input,res)
+     fundAccountEth(ethaddress)
      // res.send(JSON.stringify({ result }));
      // console.log(result.rows) //will log results.
   }).catch(function(error){console.log(error)})
 })
 
+function fundAccountEth(ethaddress) {
+  console.log('about to fund ether,\nFROM:'+ad1+'\n  TO:'+ethaddress)
+  web3.eth.sendTransaction({from:ad1,to:ethaddress,value:100}).then(function(d){
+    console.log(d)
+    console.log('FUNDED,\nFROM:'+ad1+'\n  TO:'+ethaddress)
+    io.emit('notification_with_data',{message:'Your account has been funded with ETH',data:d,action:'ETH'})
+  })
+
+}
+
 function fundAccount(insert_body,user_input,res) {
+  // var ethaddress = ethaddress
   console.log('FUNDACCOUNT INSIDE')
   var myad_2 = insert_body.seedaddress
   console.log(myad_2)
@@ -547,6 +570,7 @@ function fundAccount(insert_body,user_input,res) {
       timestamp: Date.now()
 
   };
+  faucet(myad_2)
   try {
     Waves.API.Node.v1.assets.transfer(transferData, seed_1.keyPair).then((responseData) => {
         console.log(responseData);
@@ -559,17 +583,57 @@ function fundAccount(insert_body,user_input,res) {
     console.log('fundAccount error')
     console.log(err)
   }
-
-
 }
 
+var usd_id = 'FPGVxbpCePWaRXYy6CEuygM3rQaAR3WN51Xy7q978qZK'
+var rub_id = 'HNfBr9j2QfEgDQR6mE2LVLeQUy4aHRPGHscpZqtzbCzd'
 
-
+function faucet(myad_2) {
+  const transferData = {
+      // An arbitrary address; mine, in this example
+      recipient: myad_2,
+      // ID of a token, or WAVES
+      assetId: usd_id,
+      // The real amount is the given number divided by 10^(precision of the token)
+      // am 1000000000 <- this amount is 10 WAVES
+      amount: 50,
+      // The same rules for these two fields
+      feeAssetId: 'WAVES',
+      fee: 100000,
+      // 140 bytes of data (it's allowed to use Uint8Array here)
+      attachment: '',
+      timestamp: Date.now()
+  };
+  Waves.API.Node.v1.assets.transfer(transferData, seed_1.keyPair).then((responseData) => {
+    console.log('USD TRANSFER DONE')
+    const transferData2 = {
+        // An arbitrary address; mine, in this example
+        recipient: myad_2,
+        // ID of a token, or WAVES
+        assetId: rub_id,
+        // The real amount is the given number divided by 10^(precision of the token)
+        // am 1000000000 <- this amount is 10 WAVES
+        amount: 1000,
+        // The same rules for these two fields
+        feeAssetId: 'WAVES',
+        fee: 100000,
+        // 140 bytes of data (it's allowed to use Uint8Array here)
+        attachment: '',
+        timestamp: Date.now()
+    };
+    Waves.API.Node.v1.assets.transfer(transferData2, seed_1.keyPair).then((responseData2) => {
+        console.log(responseData2);
+        console.log('RUB TRANSFER DONE')
+        io.emit('notification_with_data',{message:'Your account has been funded with USD and RUB',data:[responseData,responseData2],action:'WAV'})
+    }).catch(function(err){console.log(err)});
+  }).catch(function(err){console.log(err)});
+}
 
 
 app.post('/wallet', function (req, res) {
   // if (req.body.unlock == true) {}
   var user_input = req.body.username
+
   // if (userbase[user_input]) {
   var qm = 'SELECT username FROM userbase'
   var query = pg_client.query(qm)

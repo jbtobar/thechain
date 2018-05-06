@@ -1,3 +1,5 @@
+const Pegger = artifacts.require('Pegger')
+
 module.exports = function(deployer) {
-  // Use deployer to state migration tasks.
+    deployer.deploy(Pegger,{overwrite:false})
 };
