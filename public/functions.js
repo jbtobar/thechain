@@ -193,10 +193,11 @@ function checkOrganization(arg) {
 }
 
 function usernameChecker(input) {
+  var what = input.parentElement.id.split('_')[0]
   $.post('usercheckwaddress',{
     method:"POST",
     username:input.value,
-    what:input.parentElement.id.split('_')[0]
+    what:what
   }).done(function(data){
     window.reciever_info = data
     console.log(data)
@@ -205,7 +206,12 @@ function usernameChecker(input) {
       input.setCustomValidity('Username not found')
     } else {
       input.setCustomValidity('')
-      input.parentElement.recipient_address.value = data.data.address
+      if (what == 'ETH') {
+        input.parentElement.recipient_address.value = data.data.ethaddress
+      } else {
+        input.parentElement.recipient_address.value = data.data.address
+      }
+
       // console.log()
     }
   }).catch(function(err){console.log(err)})
@@ -827,7 +833,7 @@ function DepositWithdrawSend(action) {
 
 function SendTransaction2(arg) {
   var curr = arg.id.split('_')[0]
-  if (curr = 'WAV') {
+  if (curr == 'WAV') {
     var ad2 = arg.recipient_address.value
     const transferData = {
         // An arbitrary address; mine, in this example
@@ -861,6 +867,34 @@ function SendTransaction2(arg) {
 
 
   }
+  if (curr == 'ETH') {
+    var ad1 = wallet.address.eth
+    var ad2 = arg.recipient_address.value
+    const transferDataETH = {
+        from: ad1,
+        to: ad2,
+        value: Number(arg.amount.value),
+    };
+    window.transferDataETH = transferDataETH
+    console.log('transferDataETH')
+
+
+
+    $('#GeneralModalDiv').empty()
+    d3.select('#modal_content').transition().style('width','50%').style('height','50%')
+    var gmdiv = d3.select('#GeneralModalDiv').append('div').attr('class','txconfclass')
+    gmdiv.append('p').text('You are about to send:')
+    // var asset = curr_account.issueTransaction.name.split('_')[0]
+    gmdiv.append('p').text(transferDataETH.value +' '+curr)
+    gmdiv.append('p').text('to')
+    gmdiv.append('p').text('@'+arg.recipient_username.value)
+    gmdiv.append('p').text(arg.recipient_address.value)
+    var triv = gmdiv.append('form').append('tr')
+    triv.append('input').attr('type','button').attr('value','Cancel').attr('onclick','confirmTx2ETH(this)').attr('class','ghost-button')
+    triv.append('input').attr('type','button').attr('value','Confirm').attr('onclick','confirmTx2ETH(this)').attr('class','ghost-button')
+    d3.select('#modal_content').transition().style('width','min-content').style('height','min-content')
+
+  }
 
 
 
@@ -870,11 +904,57 @@ function SendTransaction2(arg) {
   return false
 }
 
+function confirmTx2ETH(arg) {
+  window.miss = arg
+  if (miss.value == 'Cancel') {closeModal()}
+  if (miss.value == 'Confirm') {
+    $('#GeneralModalDiv').empty()
+    $('#GeneralModalClose').hide()
+    var loader_svg = d3.select('#GeneralModalDiv').append('img').attr('id','loading_svg').attr('src',"/public/assets/Rolling-1s-200px.svg").attr('alt',"embedded SVG")
+    console.log(transferDataETH)
+    web3.eth.sendTransaction(transferDataETH).then(function(responseData){
+      console.log(responseData);
+      window.responseData = responseData
+      var rd_id = responseData.transactionHash
+      var rd_date = new Date()
+      var rd_amount = responseData.amount
+      // var parsed_data = JSON.parse(data)
+      // console.log(data)
+      loader_svg.remove()
+      $('#GeneralModalClose2').show()
+      var gmdiv = d3.select('#GeneralModalDiv')
+                    // .transition(10000)
+      gmdiv.append('p').text('Transaction Sent!')
+      gmdiv.append('p').text('Transaction Hash').attr('style','color: #4b545f;width:600px')
+      // gmdiv.append('p')
+      //       .text(parsed_data.id)
+      gmdiv.append('p')
+            .text(responseData.transactionHash)
+      gmdiv.append('p').text('Date').attr('style','color: #4b545f;')
+      gmdiv.append('p')
+            .text(rd_date.toLocaleString())
+      gmdiv.append('p').text('Amount').attr('style','color: #4b545f;')
+      gmdiv.append('p')
+            .text(transferDataETH.value+' ETH')
+      gmdiv.append('p').text('To').attr('style','color: #4b545f;')
+      gmdiv.append('p')
+            .text(reciever_info.data.address)
+      gmdiv.append('p')
+            .text(reciever_info.username)
+
+    }).catch(function(err){console.log(err)})
+  }
+}
+// web3.eth.sendTransaction({from:ad1,to:dd2,value:100}).then(function(d){
+//   console.log(d)
+//   window.donya = d
+// })
+
 function confirmTx2(arg) {
   // transferData
   window.miss = arg
   if (miss.value == 'Cancel') {closeModal()}
-  if (miss.value == 'Confirm'){
+  if (miss.value == 'Confirm') {
     $('#GeneralModalDiv').empty()
     $('#GeneralModalClose').hide()
     var loader_svg = d3.select('#GeneralModalDiv').append('img').attr('id','loading_svg').attr('src',"/public/assets/Rolling-1s-200px.svg").attr('alt',"embedded SVG")
