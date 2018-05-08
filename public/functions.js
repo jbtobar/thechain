@@ -81,6 +81,7 @@ function createUser(form,seed,encrypted) {
   // var mnemonia = restoredPhrase
   window.provider = new HDWalletProvider(mnemonia, "https://ropsten.infura.io/gvaDaupFKbFfrBVZ9cyE");
   web3 = new Web3(provider)
+  window.kp = BTCK(seed.phrase,'test')
 	var user = forma.children[0].value
   // window.rapo = seed
 	$.post( "usercreation", {
@@ -94,7 +95,8 @@ function createUser(form,seed,encrypted) {
     window.wallet = {
       address: {
         eth:provider.addresses[0],
-        wav:seed.address
+        wav:seed.address,
+        btc:kp.getAddress()
       },
       balance: {
 
@@ -111,7 +113,7 @@ function createUser(form,seed,encrypted) {
 
 
 var open_account_sent = 0
-
+var rootUrl = "https://api.blockcypher.com/v1/btc/test3";
 function openAccount(arg) {
   if (open_account_sent == 1) {
     console.log('you already tried to open')
@@ -143,11 +145,13 @@ function openAccount(arg) {
           window.rapo['unlocked'] = true
           const mnemonia = seed.phrase
           window.provider = new HDWalletProvider(mnemonia, "https://ropsten.infura.io/gvaDaupFKbFfrBVZ9cyE");
+          kp = BTCK(seed.phrase,'test')
           window.web3 = new Web3(provider)
           window.wallet = {
             address: {
               eth:provider.addresses[0],
-              wav:seed.address
+              wav:seed.address,
+              btc:kp.getAddress()
             },
             balance: {
 
@@ -452,6 +456,12 @@ function openWalletWindow(wallet) {
     wallet.balance['ETH'] = Number(d)
     accountPod('ETH')
   }).catch(function(err){console.log(err)})
+  var adbtc = wallet.address.btc
+  $.get(rootUrl+'/addrs/'+adbtc+'/balance').then(function(d) {
+    console.log(d)
+    wallet.balance['BTC'] = d.balance
+    accountPod('BTC')
+  });
 
 
   d3.select('#name1').attr('value','@'+rapo.username)
@@ -752,11 +762,26 @@ function togTo(arg) {
 
   console.log(arg)
 }
+//
+// function DWSBTC(action) {
+//   console.log('DWS BTC')
+//   openModal()
+//   var gmdiv = d3.select('#GeneralModalDiv')
+//   if (action.value == 'Send') {
+//     //
+//   } else {
+//     gmdiv.append('p').text('Hello there')
+//     gmdiv.append('p').text(action.value+' functionality is coming soon.')
+//   }
+// }
+
+
 
 
 function DWS(action) {
   var curr = action.id.split('_')[0]
-  if (curr != 'WAV') {if (curr != 'ETH') {return}}
+  // if (curr == 'BTC') {DWSBTC(action)}
+  if (curr != 'WAV') {if (curr != 'ETH') {if (curr != 'BTC') {return}}}
   console.log('DWS')
   openModal()
   var gmdiv = d3.select('#GeneralModalDiv')
@@ -767,7 +792,11 @@ function DWS(action) {
     gmdiv.append('p').text('Hello there')
     gmdiv.append('p').text('Send Transaction')
     // gmdiv.append('p').text('Your '+curr+' Balance is: '+curr_balance.toString())
-    var forma = gmdiv.append('form').attr('action','/').attr('onsubmit','return SendTransaction2(this)').attr('method','post').attr('id',curr+'_transaction_form')
+    if (curr == 'BTC') {
+      var forma = gmdiv.append('form').attr('action','/').attr('onsubmit','return SendTransactionBTC(this)').attr('method','post').attr('id',curr+'_transaction_form')
+    } else {
+      var forma = gmdiv.append('form').attr('action','/').attr('onsubmit','return SendTransaction2(this)').attr('method','post').attr('id',curr+'_transaction_form')
+    }
     forma.append('label').attr('class','ghost-input ghost-label-left').text('From')
     forma.append('input').attr('name','account').attr('type','text').attr('class','ghost-input ghost-label-right').attr('value',curr+' Account').attr('readonly','true')
 
@@ -830,6 +859,57 @@ function DepositWithdrawSend(action) {
     gmdiv.append('p').text(action.value+' functionality is coming soon.')
   }
 }
+
+function SendTransactionBTC(arg) {
+  var address = kp.getAddress()
+  var priv = kp.toWIF()
+  var publ = kp.getPublicKeyBuffer().toString('hex')
+  var source = {
+    private : priv,
+    public  : publ,
+    address : address
+  }
+  var key = kp
+  var dest  = arg.recipient_address.value;
+  newTransaction(address,dest,1000)
+  var rootUrl = "https://api.blockcypher.com/v1/btc/test3";
+  function newTransaction(from,to,val) {
+
+    var newtx = {
+      "inputs": [{"addresses": [from]}],
+      "outputs": [{"addresses": [to], "value": val}]
+    }
+    return $.post(rootUrl+"/txs/new", JSON.stringify(newtx)).then(function(d){
+      console.log(d);
+      window.newtx = d
+      signAndSend(newtx)
+    });
+  }
+  function signAndSend(newtx) {
+    if (checkError(newtx)) return;
+
+    newtx.pubkeys     = [];
+    newtx.signatures  = newtx.tosign.map(function(tosign) {
+      newtx.pubkeys.push(source.public);
+      return kp.sign(new buffer.Buffer(tosign, "hex")).toDER().toString("hex");
+    });
+    return $.post(rootUrl+"/txs/send", JSON.stringify(newtx)).then(function(d){
+      console.log(d);
+      window.sas = d
+    });
+  }
+  function checkError(msg) {
+    if (msg.errors && msg.errors.length) {
+      alert("Errors occured!!/n" + msg.errors.join("/n"));
+      return true;
+    }
+  }
+  newTransaction(address,dest,1000)
+
+}
+
+
+
 
 function SendTransaction2(arg) {
   var curr = arg.id.split('_')[0]

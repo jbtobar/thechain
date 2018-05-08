@@ -196,3 +196,7 @@ function faucet(myad_2) {
     }).catch(function(err){console.log(err)});
   }).catch(function(err){console.log(err)});
 }
+///////////////////////////
+// BTC
+// BTC
+///////////////////////////

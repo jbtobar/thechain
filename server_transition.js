@@ -1,5 +1,6 @@
 var fs = require('fs');
 var pg = require ('pg');
+var request = require('request');
 // var io = require('socket.io')
 const WavesAPI = require('waves-api');
 const Waves = WavesAPI.create(WavesAPI.TESTNET_CONFIG);
@@ -146,6 +147,26 @@ io.on('connection', function (client) {
       io.emit('getinvites',datums)
       console.log(result.rows)
     }).catch(function(err){console.log(err)})
+  })
+
+  client.on('btctx',function(data) {
+    console.log('btctx')
+    console.log(data)
+    var rootUrl = "https://api.blockcypher.com/v1/btc/test3";
+    // var newtx = {
+    //   "inputs": [{"addresses": ["mr3wnUgRxJpEZPiHik2WHJdGDgqWtvuESn"]}],
+    //   "outputs": [{"addresses": ["n4dt26oCnDWeUexhGjxTHHwFJBVdGawngD"], "value": 1000}]
+    // }
+    request({
+        url:rootUrl+"/txs/new",
+        method: "POST",
+        json: true,   // <--Very important!!!
+        body: data
+    }, function (error, response, body){
+        console.log(response);
+        io.emit('btctx',response)
+    });
+
   })
 
 
