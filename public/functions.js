@@ -212,6 +212,8 @@ function usernameChecker(input) {
       input.setCustomValidity('')
       if (what == 'ETH') {
         input.parentElement.recipient_address.value = data.data.ethaddress
+      } else if (what == 'BTC') {
+        input.parentElement.recipient_address.value = data.data.btcaddress
       } else {
         input.parentElement.recipient_address.value = data.data.address
       }
@@ -392,6 +394,8 @@ function accountPod(curr) {
       .attr("class","ghost-input ghost-label-bottom bwd_l")
       .attr('value',balance)
       .attr('readonly',true)
+  // irow.append('div').attr('class','tooltip')
+        // .append('span').attr('class','tooltiptext').text('Check me out man!')
   // d3.select('#walletwindowform')
   irow.append('input')
       .attr('id',name+'_deposit_input')
@@ -399,6 +403,7 @@ function accountPod(curr) {
       .attr('value','Deposit')
       .attr('onclick','DepositWithdrawSend(this)')
       .attr('readonly',true)
+      // .attr('onmouseover',"showMyTooltip(this)")
   // d3.select('#walletwindowform')
   irow.append('input')
       .attr('id',name+'_withdraw_input')
@@ -406,7 +411,22 @@ function accountPod(curr) {
       .attr('value','Withdraw')
       .attr('onclick','DepositWithdrawSend(this)')
       .attr('readonly',true)
+  irow.append('div').attr('class','tooltippy')
+        .append('span').attr('class','tooltiptext').attr('id',name+'_deposit_input_tooltip').text('Check me out man!')
+
+  $( '#'+name+'_balance_input' ).hover(
+    function() {
+      console.log('yes')
+      $('#'+name+'_deposit_input_tooltip').show();
+    }, function() {
+      $('#'+name+'_deposit_input_tooltip').hide();
+      // $( this ).find( "span:last" ).remove();
+    }
+  );
 }
+// function showMyTooltip(input) {
+//   console.log(input)
+// }
 
 
 function openWalletWindow(wallet) {
@@ -860,52 +880,94 @@ function DepositWithdrawSend(action) {
   }
 }
 
+function signedTxResult(arg) {
+  waiting_for_btc_push = false
+  console.log('signedTxResult')
+  var rd_id = btctxp.body.tx.hash
+  var rd_date = new Date(btctxp.body.tx.received)
+  var rd_amount = btctxp.body.tx.outputs[0].value
+  loader_svg.remove()
+  $('#GeneralModalClose2').show()
+  var gmdiv = d3.select('#GeneralModalDiv')
+                // .transition(10000)
+  gmdiv.append('p').text('Transaction Sent!')
+  gmdiv.append('p').text('Transaction Hash').attr('style','color: #4b545f;width:600px')
+  // gmdiv.append('p')
+  //       .text(parsed_data.id)
+  gmdiv.append('p')
+        .text(rd_id)
+  gmdiv.append('p').text('Date').attr('style','color: #4b545f;')
+  gmdiv.append('p')
+        .text(rd_date.toLocaleString())
+  gmdiv.append('p').text('Amount').attr('style','color: #4b545f;')
+  gmdiv.append('p')
+        .text(rd_amount+' BTC')
+  gmdiv.append('p').text('To').attr('style','color: #4b545f;')
+  gmdiv.append('p')
+        .text(reciever_info.data.address)
+  gmdiv.append('p')
+        .text(reciever_info.username)
+}
+
+function confirmSignTx(arg) {
+  console.log('confirmSignTx')
+  window.miss = arg
+  if (miss.value == 'Cancel') {closeModal()}
+  if (miss.value == 'Confirm') {
+
+    $('#GeneralModalDiv').empty()
+    $('#GeneralModalClose').hide()
+    window.loader_svg = d3.select('#GeneralModalDiv').append('img').attr('id','loading_svg').attr('src',"/public/assets/Rolling-1s-200px.svg").attr('alt',"embedded SVG")
+    console.log(transferData)
+    signSend(transferData)
+
+  }
+}
+function newTransaction(from,to,val) {
+
+  var newtx = {
+    "inputs": [{"addresses": [from]}],
+    "outputs": [{"addresses": [to], "value": val}]
+  }
+  waiting_for_btc_push = true
+  socket.emit('btctx',newtx)
+
+}
+function signSend(newtx) {
+  if (checkError(newtx)) return;
+  newtx.pubkeys     = [];
+  newtx.signatures  = newtx.tosign.map(function(tosign) {
+    newtx.pubkeys.push(source.public);
+    return kp.sign(new buffer.Buffer(tosign, "hex")).toDER().toString("hex");
+  });
+  socket.emit('btctxpush',newtx)
+}
+function checkError(msg) {
+  if (msg.errors && msg.errors.length) {
+    alert("Errors occured!!/n" + msg.errors.join("/n"));
+    return true;
+  }
+}
+waiting_for_btc_push = false
 function SendTransactionBTC(arg) {
+  if (waiting_for_btc_push == true) {console.log('you sent request to create transaction, waiting for server response');return false}
   var address = kp.getAddress()
   var priv = kp.toWIF()
   var publ = kp.getPublicKeyBuffer().toString('hex')
-  var source = {
+  window.source = {
     private : priv,
     public  : publ,
     address : address
   }
   var key = kp
   var dest  = arg.recipient_address.value;
-  newTransaction(address,dest,1000)
+  var val  = Number(arg.amount.value);
+  // newTransaction(address,dest,1000)
   var rootUrl = "https://api.blockcypher.com/v1/btc/test3";
-  function newTransaction(from,to,val) {
-
-    var newtx = {
-      "inputs": [{"addresses": [from]}],
-      "outputs": [{"addresses": [to], "value": val}]
-    }
-    return $.post(rootUrl+"/txs/new", JSON.stringify(newtx)).then(function(d){
-      console.log(d);
-      window.newtx = d
-      signAndSend(newtx)
-    });
-  }
-  function signAndSend(newtx) {
-    if (checkError(newtx)) return;
-
-    newtx.pubkeys     = [];
-    newtx.signatures  = newtx.tosign.map(function(tosign) {
-      newtx.pubkeys.push(source.public);
-      return kp.sign(new buffer.Buffer(tosign, "hex")).toDER().toString("hex");
-    });
-    return $.post(rootUrl+"/txs/send", JSON.stringify(newtx)).then(function(d){
-      console.log(d);
-      window.sas = d
-    });
-  }
-  function checkError(msg) {
-    if (msg.errors && msg.errors.length) {
-      alert("Errors occured!!/n" + msg.errors.join("/n"));
-      return true;
-    }
-  }
-  newTransaction(address,dest,1000)
-
+  newTransaction(address,dest,val)
+  window.starg = arg
+  console.log('starg')
+  return false
 }
 
 
@@ -990,14 +1052,14 @@ function confirmTx2ETH(arg) {
   if (miss.value == 'Confirm') {
     $('#GeneralModalDiv').empty()
     $('#GeneralModalClose').hide()
-    var loader_svg = d3.select('#GeneralModalDiv').append('img').attr('id','loading_svg').attr('src',"/public/assets/Rolling-1s-200px.svg").attr('alt',"embedded SVG")
+    window.loader_svg = d3.select('#GeneralModalDiv').append('img').attr('id','loading_svg').attr('src',"/public/assets/Rolling-1s-200px.svg").attr('alt',"embedded SVG")
     console.log(transferDataETH)
     web3.eth.sendTransaction(transferDataETH).then(function(responseData){
       console.log(responseData);
       window.responseData = responseData
       var rd_id = responseData.transactionHash
       var rd_date = new Date()
-      var rd_amount = responseData.amount
+      var rd_amount = parseInt(transferDataETH.value, 16);
       // var parsed_data = JSON.parse(data)
       // console.log(data)
       loader_svg.remove()
@@ -1015,7 +1077,7 @@ function confirmTx2ETH(arg) {
             .text(rd_date.toLocaleString())
       gmdiv.append('p').text('Amount').attr('style','color: #4b545f;')
       gmdiv.append('p')
-            .text(transferDataETH.value+' ETH')
+            .text(rd_amount+' ETH')
       gmdiv.append('p').text('To').attr('style','color: #4b545f;')
       gmdiv.append('p')
             .text(reciever_info.data.address)
@@ -1037,7 +1099,7 @@ function confirmTx2(arg) {
   if (miss.value == 'Confirm') {
     $('#GeneralModalDiv').empty()
     $('#GeneralModalClose').hide()
-    var loader_svg = d3.select('#GeneralModalDiv').append('img').attr('id','loading_svg').attr('src',"/public/assets/Rolling-1s-200px.svg").attr('alt',"embedded SVG")
+    window.loader_svg = d3.select('#GeneralModalDiv').append('img').attr('id','loading_svg').attr('src',"/public/assets/Rolling-1s-200px.svg").attr('alt',"embedded SVG")
     console.log(transferData)
     Waves.API.Node.v1.assets.transfer(transferData, seed.keyPair).then((responseData) => {
         console.log(responseData);
@@ -1181,7 +1243,7 @@ function confirmTx(arg) {
   if (miss.value == 'Confirm'){
     $('#GeneralModalDiv').empty()
     $('#GeneralModalClose').hide()
-    var loader_svg = d3.select('#GeneralModalDiv').append('img').attr('id','loading_svg').attr('src',"/public/assets/Rolling-1s-200px.svg").attr('alt',"embedded SVG")
+    window.loader_svg = d3.select('#GeneralModalDiv').append('img').attr('id','loading_svg').attr('src',"/public/assets/Rolling-1s-200px.svg").attr('alt',"embedded SVG")
     console.log(transferData)
     Waves.API.Node.v1.assets.transfer(transferData, seed.keyPair).then((responseData) => {
         console.log(responseData);
@@ -1218,11 +1280,14 @@ function confirmTx(arg) {
 
 function reloadBalances(arg){
   if (arg == 'tx') {
-    var name = transferData.assetId.slice(0,3)
+    // var name = transferData.assetId.slice(0,3)
+    var name = starg.id.split('_')[0]
     var prev_bal = Number($('#'+name+'_balance_input').val())
-    var transfer_amount = responseData.amount
+    // var transfer_amount = responseData.amount
+    var transfer_amount = Number(starg.amount.value)
     var new_bal = prev_bal - transfer_amount
     d3.select('#'+name+'_balance_input').attr('value',new_bal)
+    d3.select('#'+name+'_balance_input').classed('waiting-confirmation',true)
   } else {
     var myad = rapo.balance.address
     Waves.API.Node.v1.assets.balances(myad).then((balancesList) => {

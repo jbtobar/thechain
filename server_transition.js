@@ -169,6 +169,20 @@ io.on('connection', function (client) {
 
   })
 
+  client.on('btctxpush',function(data) {
+    console.log('btctxpush')
+    var rootUrl = "https://api.blockcypher.com/v1/btc/test3";
+    request({
+        url:rootUrl+"/txs/send",
+        method: "POST",
+        json: true,   // <--Very important!!!
+        body: data
+    }, function (error, response, body){
+        console.log(response);
+        io.emit('btctxpush',response)
+    });
+  })
+
 
 
   client.on('disconnect', function () {
@@ -719,11 +733,14 @@ app.post('/usercheckwaddress', function (req, res) {
   if (req.body.what == 'ETH') {
     var qm = 'SELECT ethaddress from userbase a where username = \''+user_input+'\';'
   }
+  if (req.body.what == 'BTC') {
+    var qm = 'SELECT btcaddress from userbase a where username = \''+user_input+'\';'
+  }
   // console.log(qm)
   // var qm = 'SELECT username FROM userbase'
   var query = pg_client.query(qm)
   query.then(function(result) {
-    console.log(result)
+    // console.log(result)
     if (result.rows.length != 0) {
       console.log('Username taken')
       res.send(JSON.stringify({ a: false,data:result.rows[0],username:user_input}));

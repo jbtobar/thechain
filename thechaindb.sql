@@ -13,13 +13,14 @@ create table userbase (
   passphrase varchar(200),
   address varchar(200),
   ethaddress varchar(200),
+  btcaddress varchar(200),
   creation_date timestamp,
   body jsonb,
   organization jsonb
 );
 
 
-
+-- ALTER TABLE userbase ADD COLUMN btcaddress varchar(200);
 
 CREATE TABLE txbase (
   id serial primary key,
@@ -93,6 +94,9 @@ $$;
 CREATE TRIGGER updated_realtime_trigger AFTER INSERT ON realtime
 FOR EACH ROW EXECUTE PROCEDURE notify_realtime();
 -------------------------------------------------------------------------
+
+-- INSERT INTO userbase(btcaddress) VALUES ("n4dt26oCnDWeUexhGjxTHHwFJBVdGawngD") WHERE username='suero';
+UPDATE userbase SET btcaddress = 'mr3wnUgRxJpEZPiHik2WHJdGDgqWtvuESn' WHERE username='serio';
 
 INSERT INTO contractbase(creator,organization,parties,body,creation_date)
 VALUES ('test')

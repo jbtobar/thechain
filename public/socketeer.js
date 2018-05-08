@@ -116,7 +116,35 @@ socket.on('notification_with_data',function(data){
 socket.on('btctx',function(data){
   console.log('btctx')
   window.btctx = data
-  
+
+  window.transferData = data.body
+
+  var curr = 'BTC'
+  var from = transferData.tx.addresses[0]
+  var to = transferData.tx.addresses[1]
+  var amount = transferData.tx.outputs[0].value
+  var username = starg.recipient_username.value
+
+  $('#GeneralModalDiv').empty()
+  d3.select('#modal_content').transition().style('width','50%').style('height','50%')
+  var gmdiv = d3.select('#GeneralModalDiv').append('div').attr('class','txconfclass')
+  gmdiv.append('p').text('You are about to send:')
+  // var asset = curr_account.issueTransaction.name.split('_')[0]
+  gmdiv.append('p').text(amount +' '+curr)
+  gmdiv.append('p').text('to')
+  gmdiv.append('p').text('@'+username)
+  gmdiv.append('p').text(to)
+  var triv = gmdiv.append('form').append('tr')
+  triv.append('input').attr('type','button').attr('value','Cancel').attr('onclick','confirmSignTx(this)').attr('class','ghost-button')
+  triv.append('input').attr('type','button').attr('value','Confirm').attr('onclick','confirmSignTx(this)').attr('class','ghost-button')
+  d3.select('#modal_content').transition().style('width','min-content').style('height','min-content')
+})
+socket.on('btctxpush',function(data){
+  console.log('btctxpush')
+  window.btctxp = data
+  window.responseData = data
+  signedTxResult(data)
+
 })
 /////////////////////////////////////////////////
 /////////////////////////////////////////////////
