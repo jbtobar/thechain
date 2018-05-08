@@ -1,6 +1,7 @@
 var fs = require('fs');
 var pg = require ('pg');
 var request = require('request');
+var d3 = require('d3')
 // var io = require('socket.io')
 const WavesAPI = require('waves-api');
 const Waves = WavesAPI.create(WavesAPI.TESTNET_CONFIG);
@@ -46,6 +47,75 @@ var SampleContract = new web3.eth.Contract(abi);
 // socket.on('disconnect', function(){});
 const server = require('http').createServer()
 const io = require('socket.io')(server)
+
+cb = require('./public/contractlog.json')
+cb1 = d3.entries(cb)
+
+function sendContract(data) {
+  console.log("Deploying the contract");
+  var grabba = {
+    data:code,
+    arguments:[data.buyer,data.seller],
+    from:ad1,
+    gas:1000000,
+    gasPrice:'30000000000',
+  }
+  // grabba.push({})
+  SampleContract.deploy({
+    data: code,
+    arguments: [data.buyer,data.seller]
+  }).send({
+    from: ad1,
+    gas: 1000000,
+    gasPrice: '30000000000'}, function(error, transactionHash){ console.log(error);console.log(transactionHash) })
+    .on('error', function(error){
+      console.log(error)
+      // io.emit('make_escrow',{on:'error',data:error})
+      grabba['error'] = error
+    })
+    .on('transactionHash', function(transactionHash){
+      console.log(transactionHash)
+      // io.emit('make_escrow',{on:'transactionHash',data:transactionHash})
+      grabba['transactionHash'] = transactionHash
+    })
+    .on('receipt', function(receipt){
+      // console.log(receipt.contractAddress)
+      io.emit('make_escrow',{on:'receipt',data:receipt})
+      grabba['receipt'] = receipt
+    })
+    .on('confirmation', function(confirmationNumber, receipt){
+       // console.log(receipt);
+       console.log(confirmationNumber)
+       io.emit('make_escrow',{on:'receipt',data:{receipt:receipt,confirmationNumber:confirmationNumber}})
+       grabba['confirmation'] = {
+         confirmationNumber:confirmationNumber,
+         receipt:receipt
+       }
+
+       contractlog[receipt.contractAddress] = grabba
+
+     })
+    .then(function(newContractInstance){
+      var ni = {
+        address:newContractInstance.options.address,
+        jsonInterface:newContractInstance.options.jsonInterface,
+        data:newContractInstance.options.data,
+        from:newContractInstance.options.from,
+        gasPrice:newContractInstance.options.gasPrice,
+        gas:newContractInstance.options.gas,
+      }
+      grabba['then'] = ni
+      contractlog[newContractInstance.options.address] = ni
+      io.emit('make_escrow',{on:'then',data:ni})
+      console.log('sapisula')
+
+
+    });
+}
+
+
+
+
 
 io.on('connection', function (client) {
   client.on('register',function(){
@@ -187,37 +257,29 @@ io.on('connection', function (client) {
   })
 
   client.on('make_escrow',function(data) {
-    // ad1 = provider.addresses[0]
-    console.log("Deploying the contract");
-    SampleContract.deploy({
-      data: code,
-      arguments: [data.buyer,data.seller]
-    }).send({
-      from: ad1,
-      gas: 1000000,
-      gasPrice: '30000000000'}, function(error, transactionHash){ console.log(error);console.log(transactionHash) })
-      .on('error', function(error){
-        console.log(error)
-        io.emit('make_escrow',{on:'error',data:error})
-      })
-      .on('transactionHash', function(transactionHash){
-        console.log(transactionHash)
-        io.emit('make_escrow',{on:'transactionHash',data:transactionHash})
-      })
-      .on('receipt', function(receipt){
-        // console.log(receipt.contractAddress)
-        io.emit('make_escrow',{on:'receipt',data:receipt})
-      })
-      .on('confirmation', function(confirmationNumber, receipt){
-         console.log(receipt);
-         console.log(confirmationNumber)
-         io.emit('make_escrow',{on:'receipt',data:{receipt:receipt,confirmationNumber:confirmationNumber}})
-       })
-      .then(function(newContractInstance){
-        io.emit('make_escrow',{on:'then',data:newContractInstance})
-        console.log('sapisula')
-        });
+    sendContract(data)
+  })
 
+  client.on('getcontracts',function(data){
+    var ad = data.address
+    // ad = '0x64983b2b62ffb471c6c8f35d45390f0e5c8fc67e'
+    contracts = []
+    cb1.forEach(function(d){
+      var a = d.value.arguments[0]
+      var b = d.value.arguments[1]
+      if (a == ad || b == ad) {
+        var dancy = {
+          a:d.value.arguments[0],
+          b:d.value.arguments[1],
+          then:d.value.then,
+          thash:d.value.transactionHash
+        }
+        contracts.push(dancy)
+      }
+
+    })
+    io.emit('getcontracts',contracts)
+    console.log(contracts)
   })
 
   client.on('disconnect', function () {
@@ -347,7 +409,19 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 //var obj = require(__dirname+"/public/jsonusers.json");
 //var obj = require('./public/jsonusers.json');
-// var userbase = require('./public/userbase.json');
+var contractlog = require('./public/contractlog.json');
+cl = d3.entries(contractlog)
+
+var ad = ''
+supa = cl.map(function(d){
+  a1 = d.value.arguments[0]
+  a2 = d.value.arguments[1]
+  if (a1 ==ad || a2 == ad) {
+    b = d.value.receipt.contractAddress
+    return b
+  }})
+
+// var contractlog = {}
 // fs.writeFile('./public/userbase_backup.json', JSON.stringify(userbase), 'utf8',function(err){console.log(err)});
 app.get('/', function (req, res) {
   res.sendFile(__dirname +'/views/index.html')
@@ -912,7 +986,7 @@ app.post('/myorgs',function(req,res){
 process.stdin.resume();//so the program will not close instantly
 
 function exitHandler(options, err) {
-    // fs.writeFileSync('./public/userbase.json', JSON.stringify(userbase), 'utf8',function(err){console.log(err)});
+    fs.writeFileSync('./public/contractlog.json', JSON.stringify(contractlog), 'utf8',function(err){console.log(err)});
     // console.log('Wrote file at: ./public/userbase.json');
 
     if (options.cleanup) {

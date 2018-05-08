@@ -200,3 +200,14 @@ function faucet(myad_2) {
 // ETH
 // ETH
 ///////////////////////////
+
+function toggleContractPod(input) {
+  console.log('togglecontractpod')
+  // window.thrinfu = input
+  var id = input.id
+  if (id == 'contract_broker') {
+    //
+  } else {
+    $('#contract_creation_form').toggle()
+  }
+}

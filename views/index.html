@@ -116,36 +116,40 @@
           <div id='slide_2'></div>
           <div id='slide_3'></div>
           <div id='slide_4'>
-            <form action="/" method="post" id='contract_creation_form' onsubmit="return makeEscrow(this)">
-              <p>Contract Creation</p>
+            <p>Contract Creation</p>
+            <div>
+              <tr>
+                <td><input id='contract_escrow' name='contract_escrow' class="ghost-input nopad" type='button' value='Escrow' onclick='toggleContractPod(this)'></input></td>
+                <!-- <td><input name='contract_brokerage' class="ghost-input nopad" type='button' value='Brokerage'></input></td> -->
+                <!-- <td><input class="ghost-input nopad" type='button'></input></td> -->
+              </tr>
+              <form action="/" method="post" id='contract_creation_form' onsubmit="return makeEscrow(this)">
+                <table>
+                  <tr>
+                    <td><input class="ghost-input nopad">Value</input></td>
+                    <td><input class="ghost-input nopad">Buyer</input></td>
+                    <td><input class="ghost-input nopad">Seller</input></td>
+                  </tr>
+                  <tr>
+                    <td><input name='contract_value' class="ghost-input nopad" type='number'  placeholder='Value' style='display:none'></input></td>
+                    <td><input name='contract_buyer_username' id='contract_buyer_username' class="ghost-input nopad" type='text' oninput="usernameChecker2(this)" placeholder='Buyer Username' ></input></td>
+                    <td><input name='contract_seller_username' id='contract_seller_username' class="ghost-input nopad" type='text' oninput="usernameChecker2(this)" placeholder='Seller Username' ></input></td>
+                  </tr>
+                  <tr>
+                    <td></td>
+                    <td><input name='contract_buyer_address' id='contract_buyer_address' class="ghost-input nopad address-overflow" type='text' style='font-size:18px' readonly=true></input></td>
+                    <td><input name='contract_seller_address' id='contract_seller_address' class="ghost-input nopad address-overflow" type='text' style='font-size:18px' readonly=true></input></td>
+                  </tr>
+                </table>
+
+                <input type="submit" class="ghost-button nopad" value="Initiate Contract">
+              </form>
+            </div>
+
+            
 
 
 
-              <table>
-                <tr>
-                  <td><input name='contract_escrow' class="ghost-input nopad" type='button' value='Escrow'></input></td>
-                  <!-- <td><input name='contract_brokerage' class="ghost-input nopad" type='button' value='Brokerage'></input></td> -->
-                  <!-- <td><input class="ghost-input nopad" type='button'></input></td> -->
-                </tr>
-                <tr>
-                  <td><input class="ghost-input nopad">Value</input></td>
-                  <td><input class="ghost-input nopad">Buyer</input></td>
-                  <td><input class="ghost-input nopad">Seller</input></td>
-                </tr>
-                <tr>
-                  <td><input name='contract_value' class="ghost-input nopad" type='number'  placeholder='Value'></input></td>
-                  <td><input name='contract_buyer_username' id='contract_buyer_username' class="ghost-input nopad" type='text' oninput="usernameChecker2(this)" placeholder='Buyer Username' readonly=true></input></td>
-                  <td><input name='contract_seller_username' id='contract_seller_username' class="ghost-input nopad" type='text' oninput="usernameChecker2(this)" placeholder='Seller Username' readonly=true></input></td>
-                </tr>
-                <tr>
-                  <td></td>
-                  <td><input name='contract_buyer_address' id='contract_buyer_address' class="ghost-input nopad address-overflow" type='text' style='font-size:18px'></input></td>
-                  <td><input name='contract_seller_address' id='contract_seller_address' class="ghost-input nopad address-overflow" type='text' style='font-size:18px'></input></td>
-                </tr>
-              </table>
-
-              <input type="submit" class="ghost-button nopad" value="Initiate Contract">
-            </form>
 
           </div>
 

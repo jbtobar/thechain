@@ -164,6 +164,13 @@ socket.on('make_escrow',function(data) {
   makeEscrowData.push(data)
 })
 /////////////////////////////////////////////////
+// socket.emit('getcontracts',{address:''})
+socket.on('getcontracts', function(data){
+  window.dancy = data
+  console.log('mycontracts')
+  showTransactions('out')
+})
+/////////////////////////////////////////////////
 /////////////////////////////////////////////////
 /////////////////////////////////////////////////
 function sendInvitation(cb) {

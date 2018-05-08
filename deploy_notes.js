@@ -46,7 +46,8 @@ ad1 = provider.addresses[0]
 console.log("Deploying the contract");
 // let contract = SampleContract.new('0xc4DaC89C660fC3DaE378167380261e0135d1591b','0xf1d4E353A9650750B2f6497f61Bb5DAAcb19C54a',{from: ad1, gas: 1000000, data: code});
 
-
+var comeback = {}
+var comeback2 = {}
 
 SampleContract.deploy({
   data: code,
@@ -54,14 +55,19 @@ SampleContract.deploy({
 }).send({
   from: ad1,
   gas: 1000000,
-  gasPrice: '30000000000'}, function(error, transactionHash){ console.log(error);console.log(transactionHash) })
-  .on('error', function(error){ console.log(error) })
-  .on('transactionHash', function(transactionHash){ console.log(transactionHash) })
+  gasPrice: '30000000000'}, function(error, transactionHash){ comeback.error = error;comeback.transactionHash = transactionHash;console.log(error);console.log(transactionHash) })
+  .on('error', function(error){ comeback.error = error;console.log(error) })
+  .on('transactionHash', function(transactionHash){ comeback.transactionHash = transactionHash;console.log(transactionHash) })
   // .on('receipt', function(receipt){console.log(receipt.contractAddress)})
   // .on('confirmation', function(confirmationNumber, receipt){ console.log(receipt);console.log(confirmationNumber) })
   .then(function(newContractInstance){
+    // comeback2 = newContractInstance
 // console.log(newContractInstance.options.address)
 console.log('sapisula')
+console.log(comeback)
+fs.writeFile('./comeback.json', JSON.stringify(comeback), 'utf8',function(err){console.log(err)});
+fs.writeFile('./comeback2.json', JSON.stringify(newContractInstance), 'utf8',function(err){console.log(err)});
+
 });
 
 

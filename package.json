@@ -23,6 +23,7 @@
   "dependencies": {
     "bitcoinjs-lib": "^3.3.2",
     "body-parser": "^1.18.2",
+    "d3": "^5.2.0",
     "express": "^4.16.3",
     "pg": "^7.4.1",
     "socket.io": "^2.1.0",

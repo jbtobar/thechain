@@ -1743,14 +1743,49 @@ function contractSlider(arg) {
   })
 }
 
+// var adu = dos.then.address
+// web3.eth.getBalance(adu).then(function(d){
+//   // rapo.eth = {address:ad1,balance:Number(d)}
+//   console.log(d)
+// }).catch(function(err){console.log(err)})
+
+function showMyContracts(arg) {
+  if (arg == 'in') {
+    socket.emit('getcontracts',{address:wallet.address.eth})
+  } else {
+    var dos = dancy[7]
+    var a = dos.a
+    var b = dos.b
+    var ca = dos.then.address
+    var divo = d3.select('#slide_2')
+    var trow = divo.append('tr')
+    trow.append('td').text('Escrow')
+    var trow = divo.append('tr')
+    trow.append('td').text('Buyer:\n'+a )
+    trow.append('td').text('Seller:\n'+b)
+    trow.append('td').text('')
+    var trow = divo.append('tr')
+    trow.append('td').text('Contract Address:\n'+ ca)
+    trow.append('td').text('')
+    trow.append('td').text('')
+    var trow = divo.append('tr')
+    trow.append('td').text('Balance:\n'+ 'soon')
+    var trow = divo.append('tr')
+    trow.append('td').text('Actions:')
+    trow.append('td').text('Accept')
+    trow.append('td').text('Reject')
+
+  }
+}
+
 function showMyData(arg) {
   // d3.select('#'+arg).text(arg)
   // if (arg == 'slide_1') {showMyOptionData(arg)}
   if (arg == 'slide_1') {console.log('no function yet')}
-  if (arg == 'slide_2') {console.log('no function yet')}
+  if (arg == 'slide_2') {showMyContracts()}
   if (arg == 'slide_3') {console.log('no function yet')}
   if (arg == 'slide_4') {console.log('no function yet')}
-  if (arg == 'button3') {showTransactions()}
+  if (arg == 'button3') {showTransactions('in')}
 }
 
 var coin_mask = {

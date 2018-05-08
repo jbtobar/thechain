@@ -42,11 +42,27 @@ CREATE TABLE organizationbase (
 CREATE TABLE contractbase (
   id serial primary key,
   creator varchar(40),
-  organization varchar(40),
-  parties jsonb,
+  username1 varchar(200),
+  username2 varchar(200),
+  address1 varchar(200),
+  address2 varchar(200),
+  contractaddress varchar(200),
+  transactionhash varchar(200),
   body jsonb,
+  contract jsonb,
   creation_date timestamp
 );
+
+CREATE TABLE contractbase (
+  id serial primary key,
+  body varchar(200),
+  creation_date timestamp
+);
+
+CREATE TABLE contractlog (
+  id serial primary key,
+  body jsonb
+)
 
 
 
