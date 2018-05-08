@@ -50,17 +50,17 @@ console.log("Deploying the contract");
 
 SampleContract.deploy({
   data: code,
-  arguments: ['0xc4DaC89C660fC3DaE378167380261e0135d1591b','0xf1d4E353A9650750B2f6497f61Bb5DAAcb19C54a']
+  arguments: ['0xc4DaC89C660fC3DaE378167380261e0135d1591b','0xe65bd7bedbb8c72bd089e8699fd6d2a85fed4ab4']
 }).send({
   from: ad1,
   gas: 1000000,
   gasPrice: '30000000000'}, function(error, transactionHash){ console.log(error);console.log(transactionHash) })
   .on('error', function(error){ console.log(error) })
   .on('transactionHash', function(transactionHash){ console.log(transactionHash) })
-  .on('receipt', function(receipt){console.log(receipt.contractAddress)})
+  // .on('receipt', function(receipt){console.log(receipt.contractAddress)})
   // .on('confirmation', function(confirmationNumber, receipt){ console.log(receipt);console.log(confirmationNumber) })
   .then(function(newContractInstance){
-console.log(newContractInstance.options.address)
+// console.log(newContractInstance.options.address)
 console.log('sapisula')
 });
 

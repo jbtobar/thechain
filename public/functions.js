@@ -195,7 +195,37 @@ function checkOrganization(arg) {
     }
   }).catch(function(err){console.log(err)})
 }
+// THE BELOW ONE IS TO GET THE ADDRESS IN THE ESCROW PROCESS
+function usernameChecker2(input) {
+  console.log('usernamechecker2')
+  var what = 'ETH'
+  $.post('usercheckwaddress',{
+    method:"POST",
+    username:input.value,
+    what:what
+  }).done(function(data){
+    window.reciever_info = data
+    console.log(data)
+    console.log('usercheckwaddress')
+    if (data['a'] == true) {
+      input.setCustomValidity('Username not found')
+    } else {
+      input.setCustomValidity('')
+      if (input.id == 'contract_seller_username') {
+        d3.select('#contract_seller_address').attr('value',data.data.ethaddress)
+      }
+      if (input.id == 'contract_buyer_username') {
+        d3.select('#contract_buyer_address').attr('value',data.data.ethaddress)
+      }
 
+      // d3.select('#contract_seller_address').attr('value',wallet.address.eth)
+      // console.log('input.parentElement')
+      // window.supra = input.parentElement
+      // input.parentElement.contract_seller.value = data.data.ethaddress
+    }
+  }).catch(function(err){console.log(err)})
+}
+// THE BELOW ONE IS TO GET THE ADDRESS IN THE SEND PROCESS
 function usernameChecker(input) {
   var what = input.parentElement.id.split('_')[0]
   $.post('usercheckwaddress',{
@@ -1586,9 +1616,9 @@ function buildMenus() {
   cm = d3.select('#ContractsMenu')
   cmdiv = cm.append('div').attr('class','btn-group')
   cmdiv.append('button').attr('class','ghost-button4').attr('id','button_1').attr('onclick','contractSlider(this)').text('Options')
-  cmdiv.append('button').attr('class','ghost-button4').attr('id','button_2').attr('onclick','contractSlider(this)').text('Futures')
-  cmdiv.append('button').attr('class','ghost-button4').attr('id','button_3').attr('onclick','contractSlider(this)').text('Coins')
-  cmdiv.append('button').attr('class','ghost-button4').attr('id','button_4').attr('onclick','contractSlider(this)').text('Tokens')
+  cmdiv.append('button').attr('class','ghost-button4').attr('id','button_2').attr('onclick','contractSlider(this)').text('Activity')
+  cmdiv.append('button').attr('class','ghost-button4').attr('id','button_3').attr('onclick','contractSlider(this)').text('Search')
+  cmdiv.append('button').attr('class','ghost-button4').attr('id','button_4').attr('onclick','contractSlider(this)').text('Create')
 
 }
 var member_counter = 0
@@ -1715,7 +1745,8 @@ function contractSlider(arg) {
 
 function showMyData(arg) {
   // d3.select('#'+arg).text(arg)
-  if (arg == 'slide_1') {showMyOptionData(arg)}
+  // if (arg == 'slide_1') {showMyOptionData(arg)}
+  if (arg == 'slide_1') {console.log('no function yet')}
   if (arg == 'slide_2') {console.log('no function yet')}
   if (arg == 'slide_3') {console.log('no function yet')}
   if (arg == 'slide_4') {console.log('no function yet')}

@@ -149,6 +149,23 @@ socket.on('btctxpush',function(data){
 /////////////////////////////////////////////////
 /////////////////////////////////////////////////
 /////////////////////////////////////////////////
+function makeEscrow(arg) {
+  console.log('makeEscrow')
+  window.kark = arg
+  var invite = $(arg).serializeArray()
+  var buyer = kark.contract_buyer_address.value
+  var seller = kark.contract_seller_address.value
+  socket.emit('make_escrow',{buyer:buyer,seller:seller})
+  return false
+}
+makeEscrowData = []
+socket.on('make_escrow',function(data) {
+  console.log('make escrow reciept')
+  makeEscrowData.push(data)
+})
+/////////////////////////////////////////////////
+/////////////////////////////////////////////////
+/////////////////////////////////////////////////
 function sendInvitation(cb) {
   socket.emit('invitation', null, cb)
 }

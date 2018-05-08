@@ -21,7 +21,10 @@ console.log(ad1)
 // var http = require('http').Server(app);
 // var io = require('socket.io')(http);
 // console.log(seed_1)
-
+bld = require('./build/contracts/Escrow.json')
+let abi = bld.abi
+let code = bld.bytecode
+var SampleContract = new web3.eth.Contract(abi);
 
 // var app = require('express')();
 // var http = require('http').Server(app);
@@ -183,7 +186,39 @@ io.on('connection', function (client) {
     });
   })
 
+  client.on('make_escrow',function(data) {
+    // ad1 = provider.addresses[0]
+    console.log("Deploying the contract");
+    SampleContract.deploy({
+      data: code,
+      arguments: [data.buyer,data.seller]
+    }).send({
+      from: ad1,
+      gas: 1000000,
+      gasPrice: '30000000000'}, function(error, transactionHash){ console.log(error);console.log(transactionHash) })
+      .on('error', function(error){
+        console.log(error)
+        io.emit('make_escrow',{on:'error',data:error})
+      })
+      .on('transactionHash', function(transactionHash){
+        console.log(transactionHash)
+        io.emit('make_escrow',{on:'transactionHash',data:transactionHash})
+      })
+      .on('receipt', function(receipt){
+        // console.log(receipt.contractAddress)
+        io.emit('make_escrow',{on:'receipt',data:receipt})
+      })
+      .on('confirmation', function(confirmationNumber, receipt){
+         console.log(receipt);
+         console.log(confirmationNumber)
+         io.emit('make_escrow',{on:'receipt',data:{receipt:receipt,confirmationNumber:confirmationNumber}})
+       })
+      .then(function(newContractInstance){
+        io.emit('make_escrow',{on:'then',data:newContractInstance})
+        console.log('sapisula')
+        });
 
+  })
 
   client.on('disconnect', function () {
     console.log('client disconnect...', client.id)
