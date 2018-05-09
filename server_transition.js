@@ -293,9 +293,9 @@ io.on('connection', function (client) {
   })
 })
 
-server.listen(3000, function (err) {
+server.listen(8080, function (err) {
   if (err) throw err
-  console.log('listening on port 3000')
+  console.log('server listening on port 8080')
 })
 
 
@@ -427,8 +427,8 @@ app.get('/', function (req, res) {
   res.sendFile(__dirname +'/views/index.html')
 })
 
-app.listen(8080, function () {
-  console.log('Example app listening on port 8080!')
+app.listen(3000, function () {
+  console.log('App listening on port 3000!')
 })
 
 
