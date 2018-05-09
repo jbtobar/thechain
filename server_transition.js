@@ -19,7 +19,7 @@ web3 = new Web3(provider)
 
 const ad1 = provider.addresses[0]
 console.log(ad1)
-var http = require('http').Server(app);
+// var http = require('http').Server(app);
 // var io = require('socket.io')(http);
 // console.log(seed_1)
 bld = require('./build/contracts/Escrow.json')
@@ -47,7 +47,6 @@ var SampleContract = new web3.eth.Contract(abi);
 // socket.on('disconnect', function(){});
 const server = require('http').createServer(app)
 const io = require('socket.io')(server)
-var port = process.env.PORT || 3000;
 
 cb = require('./public/contractlog.json')
 cb1 = d3.entries(cb)
@@ -294,9 +293,9 @@ io.on('connection', function (client) {
   })
 })
 
-server.listen(port, function (err) {
+server.listen(8080, function (err) {
   if (err) throw err
-  console.log('server listening on port '+port)
+  console.log('server listening on port 8080')
 })
 
 
@@ -428,9 +427,9 @@ app.get('/', function (req, res) {
   res.sendFile(__dirname +'/views/index.html')
 })
 
-app.listen(8080, function () {
-  console.log('App listening on port 8080!')
-})
+//app.listen(8080, function () {
+//  console.log('App listening on port 8080!')
+//})
 
 
 app.post('/', function (req, res) {
