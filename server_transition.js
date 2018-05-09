@@ -19,7 +19,7 @@ web3 = new Web3(provider)
 
 const ad1 = provider.addresses[0]
 console.log(ad1)
-// var http = require('http').Server(app);
+var http = require('http').Server(app);
 // var io = require('socket.io')(http);
 // console.log(seed_1)
 bld = require('./build/contracts/Escrow.json')
@@ -45,8 +45,9 @@ var SampleContract = new web3.eth.Contract(abi);
 // socket.on('connect', function(){});
 // socket.on('event', function(data){});
 // socket.on('disconnect', function(){});
-const server = require('http').createServer()
+const server = require('http').createServer(app)
 const io = require('socket.io')(server)
+var port = process.env.PORT || 3000;
 
 cb = require('./public/contractlog.json')
 cb1 = d3.entries(cb)
@@ -293,9 +294,9 @@ io.on('connection', function (client) {
   })
 })
 
-server.listen(8080, function (err) {
+server.listen(port, function (err) {
   if (err) throw err
-  console.log('server listening on port 8080')
+  console.log('server listening on port '+port)
 })
 
 
@@ -307,7 +308,7 @@ server.listen(8080, function (err) {
 
 
 
-var con_string = 'tcp://juanbernardotobar:@0.0.0.0:5432/thechain'
+var con_string = 'tcp://thechainuser:th3ch@1nUz3r@0.0.0.0:5432/thechain'
 var pg_client = new pg.Client(con_string);
 pg_client.connect().then(console.log('Connected to: '+con_string));
 var intro_query_message = 'SELECT current_database();'
@@ -427,8 +428,8 @@ app.get('/', function (req, res) {
   res.sendFile(__dirname +'/views/index.html')
 })
 
-app.listen(3000, function () {
-  console.log('App listening on port 3000!')
+app.listen(8080, function () {
+  console.log('App listening on port 8080!')
 })
 
 
