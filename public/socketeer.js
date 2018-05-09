@@ -8,7 +8,7 @@ console.log('socketeer')
 // registerHandler('Mueller')
 //
 // const io = require('socket.io-client')
-const socket = io.connect('http://localhost:3000')
+const socket = io.connect('http://localhost:8080')
 
 
 /////////////////////////////////////////////////
@@ -18,7 +18,7 @@ const socket = io.connect('http://localhost:3000')
 // socket.emit('getinvites',rapo.username)
 socket.on('getinvites', function(data){
   console.log(data)
-  // window.duds = data
+  window.duds = data
   var rec_msg = data.filter(function(d){if (d.reciever == rapo.username){return d}})
   var sent_msg = data.filter(function(d){if (d.sender == rapo.username){return d}})
 
@@ -75,10 +75,13 @@ socket.on('getinvites', function(data){
 /////////////////////////////////////////////////
 function replyInvite(action) {
   var id = action.value
+  var notification = duds.filter(function(d){if (d.id == id){return d}})[0]
+  var organization = notification.message.split(' ')[1]
   var daters = {
     username:rapo.username,
     id:id,
-    action:action.id.split('_')[0]
+    action:action.id.split('_')[0],
+    organization:organization
   }
   console.log(daters)
   socket.emit('respondinvites',daters)
@@ -92,7 +95,81 @@ socket.on('respondinvites',function(data){
   d3.select('#dismiss_confirm_result_'+id).text(action)
   // console.log('respondinvites')
 })
+socket.on('notifications',function(data){
+  console.log('You have a notification:')
+  console.log(data)
+  $('#GeneralModalDiv').empty()
+  $('#GeneralModalClose').attr('onclick','closeModal()')
+  d3.select('#GeneralModalDiv').append('p').text(data)
+  openModal()
+})
+socket.on('notification_with_data',function(data){
+  console.log('You have a notification:')
+  console.log(data)
+  $('#GeneralModalDiv').empty()
+  $('#GeneralModalClose').attr('onclick','closeModal()')
+  d3.select('#GeneralModalDiv').append('p').text(data.message)
+  window.nwd = data
+  openModal()
+  loadBalance(data)
+})
+socket.on('btctx',function(data){
+  console.log('btctx')
+  window.btctx = data
 
+  window.transferData = data.body
+
+  var curr = 'BTC'
+  var from = transferData.tx.addresses[0]
+  var to = transferData.tx.addresses[1]
+  var amount = transferData.tx.outputs[0].value
+  var username = starg.recipient_username.value
+
+  $('#GeneralModalDiv').empty()
+  d3.select('#modal_content').transition().style('width','50%').style('height','50%')
+  var gmdiv = d3.select('#GeneralModalDiv').append('div').attr('class','txconfclass')
+  gmdiv.append('p').text('You are about to send:')
+  // var asset = curr_account.issueTransaction.name.split('_')[0]
+  gmdiv.append('p').text(amount +' '+curr)
+  gmdiv.append('p').text('to')
+  gmdiv.append('p').text('@'+username)
+  gmdiv.append('p').text(to)
+  var triv = gmdiv.append('form').append('tr')
+  triv.append('input').attr('type','button').attr('value','Cancel').attr('onclick','confirmSignTx(this)').attr('class','ghost-button')
+  triv.append('input').attr('type','button').attr('value','Confirm').attr('onclick','confirmSignTx(this)').attr('class','ghost-button')
+  d3.select('#modal_content').transition().style('width','min-content').style('height','min-content')
+})
+socket.on('btctxpush',function(data){
+  console.log('btctxpush')
+  window.btctxp = data
+  window.responseData = data
+  signedTxResult(data)
+
+})
+/////////////////////////////////////////////////
+/////////////////////////////////////////////////
+/////////////////////////////////////////////////
+function makeEscrow(arg) {
+  console.log('makeEscrow')
+  window.kark = arg
+  var invite = $(arg).serializeArray()
+  var buyer = kark.contract_buyer_address.value
+  var seller = kark.contract_seller_address.value
+  socket.emit('make_escrow',{buyer:buyer,seller:seller})
+  return false
+}
+makeEscrowData = []
+socket.on('make_escrow',function(data) {
+  console.log('make escrow reciept')
+  makeEscrowData.push(data)
+})
+/////////////////////////////////////////////////
+// socket.emit('getcontracts',{address:''})
+socket.on('getcontracts', function(data){
+  window.dancy = data
+  console.log('mycontracts')
+  showTransactions('out')
+})
 /////////////////////////////////////////////////
 /////////////////////////////////////////////////
 /////////////////////////////////////////////////

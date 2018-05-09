@@ -12,13 +12,15 @@ create table userbase (
   username varchar(40) unique not null,
   passphrase varchar(200),
   address varchar(200),
+  ethaddress varchar(200),
+  btcaddress varchar(200),
   creation_date timestamp,
   body jsonb,
   organization jsonb
 );
 
 
-
+-- ALTER TABLE userbase ADD COLUMN btcaddress varchar(200);
 
 CREATE TABLE txbase (
   id serial primary key,
@@ -40,11 +42,27 @@ CREATE TABLE organizationbase (
 CREATE TABLE contractbase (
   id serial primary key,
   creator varchar(40),
-  organization varchar(40),
-  parties jsonb,
+  username1 varchar(200),
+  username2 varchar(200),
+  address1 varchar(200),
+  address2 varchar(200),
+  contractaddress varchar(200),
+  transactionhash varchar(200),
   body jsonb,
+  contract jsonb,
   creation_date timestamp
 );
+
+CREATE TABLE contractbase (
+  id serial primary key,
+  body varchar(200),
+  creation_date timestamp
+);
+
+CREATE TABLE contractlog (
+  id serial primary key,
+  body jsonb
+)
 
 
 
@@ -93,6 +111,9 @@ CREATE TRIGGER updated_realtime_trigger AFTER INSERT ON realtime
 FOR EACH ROW EXECUTE PROCEDURE notify_realtime();
 -------------------------------------------------------------------------
 
+-- INSERT INTO userbase(btcaddress) VALUES ("n4dt26oCnDWeUexhGjxTHHwFJBVdGawngD") WHERE username='suero';
+UPDATE userbase SET btcaddress = 'mr3wnUgRxJpEZPiHik2WHJdGDgqWtvuESn' WHERE username='serio';
+
 INSERT INTO contractbase(creator,organization,parties,body,creation_date)
 VALUES ('test')
 
@@ -126,6 +147,13 @@ SET body = jsonb_set(body, '{email}', '"Mora@mi"', true),
 body = jsonb_set(body, '{username}', '"fu"', true)
 WHERE username='testuser';
 
+UPDATE organizationbase
+SET members = jsonb_set(
+  members::jsonb,
+  array['invited'],
+  (members->'invited')::jsonb || '["gordo"]'::jsonb)
+WHERE username = 'misia_cinco';
+
 
 -- ---------------------------------------------------------
 To add the value use the JSON array append opperator (||)
@@ -138,6 +166,7 @@ Removing the value looks like this
 UPDATE jsontesting
 SET jsondata = jsondata - "newString"
 WHERE id = 7;
+
 Concatenating to a nested field looks like this
 
 UPDATE jsontesting
@@ -172,10 +201,14 @@ WHERE username = 'dalio';
 
 
 
+UPDATE organizationbase
+SET members = jsonb_set(
+  members::jsonb,
+  array['invited'],
+  (members->'invited')::jsonb || '["gordo"]'::jsonb)
+  WHERE username = 'misia_cinco';
 
-
-
-
+  UPDATE organizationbase SET members = jsonb_set(members::jsonb,array['invited'],(members->'invited')::jsonb ||'["gordo"]'::jsonb) WHERE username = 'misia_cinco';
 
 
 
@@ -185,7 +218,7 @@ where number = 1;
 
 
 
-
+SELECT usernma
 
 
 SELECT *
@@ -228,3 +261,13 @@ CREATE TABLE pups (
 
 INSERT INTO pups (name, breed, age, sex)
   VALUES ('Tyler', 'Retrieved', 3, 'M');
+
+
+
+
+
+
+
+
+
+  'select 1 from (select username as username from userbase union all select username from organizationbase ) a where username = \''+user_input+'\';'

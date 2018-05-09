@@ -1,5 +1,7 @@
 var fs = require('fs');
 var pg = require ('pg');
+var request = require('request');
+var d3 = require('d3')
 // var io = require('socket.io')
 const WavesAPI = require('waves-api');
 const Waves = WavesAPI.create(WavesAPI.TESTNET_CONFIG);
@@ -8,10 +10,22 @@ const seed_1 = Waves.Seed.fromExistingPhrase(seed_phrase_1);
 const express = require('express')
 const bodyParser = require('body-parser');
 const app = express()
+
+var Web3 = require('web3');
+var HDWalletProvider = require("truffle-hdwallet-provider");
+const mnemonic = 'hair route suffer hood brother virus carbon fall song jewel food upset business reunion pull'
+var provider = new HDWalletProvider(mnemonic, "https://ropsten.infura.io/gvaDaupFKbFfrBVZ9cyE");
+web3 = new Web3(provider)
+
+const ad1 = provider.addresses[0]
+console.log(ad1)
 // var http = require('http').Server(app);
 // var io = require('socket.io')(http);
 // console.log(seed_1)
-
+bld = require('./build/contracts/Escrow.json')
+let abi = bld.abi
+let code = bld.bytecode
+var SampleContract = new web3.eth.Contract(abi);
 
 // var app = require('express')();
 // var http = require('http').Server(app);
@@ -33,6 +47,75 @@ const app = express()
 // socket.on('disconnect', function(){});
 const server = require('http').createServer()
 const io = require('socket.io')(server)
+
+cb = require('./public/contractlog.json')
+cb1 = d3.entries(cb)
+
+function sendContract(data) {
+  console.log("Deploying the contract");
+  var grabba = {
+    data:code,
+    arguments:[data.buyer,data.seller],
+    from:ad1,
+    gas:1000000,
+    gasPrice:'30000000000',
+  }
+  // grabba.push({})
+  SampleContract.deploy({
+    data: code,
+    arguments: [data.buyer,data.seller]
+  }).send({
+    from: ad1,
+    gas: 1000000,
+    gasPrice: '30000000000'}, function(error, transactionHash){ console.log(error);console.log(transactionHash) })
+    .on('error', function(error){
+      console.log(error)
+      // io.emit('make_escrow',{on:'error',data:error})
+      grabba['error'] = error
+    })
+    .on('transactionHash', function(transactionHash){
+      console.log(transactionHash)
+      // io.emit('make_escrow',{on:'transactionHash',data:transactionHash})
+      grabba['transactionHash'] = transactionHash
+    })
+    .on('receipt', function(receipt){
+      // console.log(receipt.contractAddress)
+      io.emit('make_escrow',{on:'receipt',data:receipt})
+      grabba['receipt'] = receipt
+    })
+    .on('confirmation', function(confirmationNumber, receipt){
+       // console.log(receipt);
+       console.log(confirmationNumber)
+       io.emit('make_escrow',{on:'receipt',data:{receipt:receipt,confirmationNumber:confirmationNumber}})
+       grabba['confirmation'] = {
+         confirmationNumber:confirmationNumber,
+         receipt:receipt
+       }
+
+       contractlog[receipt.contractAddress] = grabba
+
+     })
+    .then(function(newContractInstance){
+      var ni = {
+        address:newContractInstance.options.address,
+        jsonInterface:newContractInstance.options.jsonInterface,
+        data:newContractInstance.options.data,
+        from:newContractInstance.options.from,
+        gasPrice:newContractInstance.options.gasPrice,
+        gas:newContractInstance.options.gas,
+      }
+      grabba['then'] = ni
+      contractlog[newContractInstance.options.address] = ni
+      io.emit('make_escrow',{on:'then',data:ni})
+      console.log('sapisula')
+
+
+    });
+}
+
+
+
+
 
 io.on('connection', function (client) {
   client.on('register',function(){
@@ -86,6 +169,45 @@ io.on('connection', function (client) {
       console.log(err)
       io.emit('respondinvites','error...')
     })
+    if (action == 'confirm') {
+      var user_input = data.username
+      var neworg = data.organization
+      var qm = 'UPDATE userbase SET organization = (CASE WHEN organization IS NULL THEN \'[]\'::JSONB ELSE organization END) || \'["'+neworg+'"]\'::JSONB WHERE username = \''+user_input+'\';'
+      var query = pg_client.query(qm)
+      query.then(function(result) {
+        console.log(qm)
+        console.log(result)
+        io.emit('notifications','added '+user_input+' to '+neworg)
+      }).catch(function(err){console.log(err)})
+
+      var qm = 'UPDATE organizationbase SET members = jsonb_set(members::jsonb,array[\'joined\'],(members->\'joined\')::jsonb ||\'["'+user_input+'"]\'::jsonb) WHERE username = \''+neworg+'\';'
+      var query = pg_client.query(qm)
+      query.then(function(result) {
+        console.log(result)
+        console.log(qm)
+      }).catch(function(err){console.log(err)})
+    }
+    if (action == 'dismiss') {
+      var user_input = data.username
+      var neworg = data.organization
+      // var qm = 'UPDATE userbase SET organization = (CASE WHEN organization IS NULL THEN \'[]\'::JSONB ELSE organization END) || \'["'+neworg+'"]\'::JSONB WHERE username = \''+user_input+'\';'
+      // var query = pg_client.query(qm)
+      // query.then(function(result) {
+        // console.log(qm)
+        // console.log(result)
+        // io.emit('notifications','added '+user_input+' to '+neworg)
+      // }).catch(function(err){console.log(err)})
+
+      var qm = 'UPDATE organizationbase SET members = jsonb_set(members::jsonb,array[\'declined\'],(members->\'declined\')::jsonb ||\'["'+user_input+'"]\'::jsonb) WHERE username = \''+neworg+'\';'
+      var query = pg_client.query(qm)
+      query.then(function(result) {
+        console.log(result)
+        console.log(qm)
+      }).catch(function(err){console.log(err)})
+    }
+
+
+
   })
 
   client.on('getinvites',function(data) {
@@ -100,7 +222,65 @@ io.on('connection', function (client) {
     }).catch(function(err){console.log(err)})
   })
 
+  client.on('btctx',function(data) {
+    console.log('btctx')
+    console.log(data)
+    var rootUrl = "https://api.blockcypher.com/v1/btc/test3";
+    // var newtx = {
+    //   "inputs": [{"addresses": ["mr3wnUgRxJpEZPiHik2WHJdGDgqWtvuESn"]}],
+    //   "outputs": [{"addresses": ["n4dt26oCnDWeUexhGjxTHHwFJBVdGawngD"], "value": 1000}]
+    // }
+    request({
+        url:rootUrl+"/txs/new",
+        method: "POST",
+        json: true,   // <--Very important!!!
+        body: data
+    }, function (error, response, body){
+        console.log(response);
+        io.emit('btctx',response)
+    });
 
+  })
+
+  client.on('btctxpush',function(data) {
+    console.log('btctxpush')
+    var rootUrl = "https://api.blockcypher.com/v1/btc/test3";
+    request({
+        url:rootUrl+"/txs/send",
+        method: "POST",
+        json: true,   // <--Very important!!!
+        body: data
+    }, function (error, response, body){
+        console.log(response);
+        io.emit('btctxpush',response)
+    });
+  })
+
+  client.on('make_escrow',function(data) {
+    sendContract(data)
+  })
+
+  client.on('getcontracts',function(data){
+    var ad = data.address
+    // ad = '0x64983b2b62ffb471c6c8f35d45390f0e5c8fc67e'
+    contracts = []
+    cb1.forEach(function(d){
+      var a = d.value.arguments[0]
+      var b = d.value.arguments[1]
+      if (a == ad || b == ad) {
+        var dancy = {
+          a:d.value.arguments[0],
+          b:d.value.arguments[1],
+          then:d.value.then,
+          thash:d.value.transactionHash
+        }
+        contracts.push(dancy)
+      }
+
+    })
+    io.emit('getcontracts',contracts)
+    console.log(contracts)
+  })
 
   client.on('disconnect', function () {
     console.log('client disconnect...', client.id)
@@ -113,9 +293,9 @@ io.on('connection', function (client) {
   })
 })
 
-server.listen(3000, function (err) {
+server.listen(8080, function (err) {
   if (err) throw err
-  console.log('listening on port 3000')
+  console.log('server listening on port 8080')
 })
 
 
@@ -229,14 +409,26 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 //var obj = require(__dirname+"/public/jsonusers.json");
 //var obj = require('./public/jsonusers.json');
-// var userbase = require('./public/userbase.json');
+var contractlog = require('./public/contractlog.json');
+cl = d3.entries(contractlog)
+
+var ad = ''
+supa = cl.map(function(d){
+  a1 = d.value.arguments[0]
+  a2 = d.value.arguments[1]
+  if (a1 ==ad || a2 == ad) {
+    b = d.value.receipt.contractAddress
+    return b
+  }})
+
+// var contractlog = {}
 // fs.writeFile('./public/userbase_backup.json', JSON.stringify(userbase), 'utf8',function(err){console.log(err)});
 app.get('/', function (req, res) {
   res.sendFile(__dirname +'/views/index.html')
 })
 
-app.listen(8080, function () {
-  console.log('Example app listening on port 8080!')
+app.listen(3000, function () {
+  console.log('App listening on port 3000!')
 })
 
 
@@ -348,7 +540,7 @@ app.post('/make_org', function(req,res) {
   qm = qm +'\''+JSON.stringify({owner:req.body.user})+'\','
   try {
     console.log(req.body.members.length+' Members')
-    qm = qm +'\''+JSON.stringify(req.body.members)+'\','
+    qm = qm +'\''+JSON.stringify({invited:req.body.members,joined:['testuser'],declined:[]})+'\','
     sendInvitations(req.body.members)
   } catch(err) {
     qm = qm +'\''+JSON.stringify({'member_1':user_input})+'\','
@@ -455,8 +647,10 @@ app.post('/usercreation', function (req, res) {
   console.log(req.body)
 //  obj[user_input] = true
   var encrypted = req.body.seedphrase
+  var ethaddress = req.body.ethaddress
   var insert_body = {
         seedaddress:req.body.seedaddress,
+        ethaddress: req.body.ethaddress,
         encrypted:req.body.seedphrase,
         account_config:{
           email:'Unconfirmed',
@@ -466,8 +660,8 @@ app.post('/usercreation', function (req, res) {
           account_name:'',
         },
   }
-  var qm1 = "INSERT INTO userbase(username,passphrase,address,creation_date,body) "
-  var qm2 = "VALUES (\'"+user_input+"\',\'"+encrypted+"\',\'"+req.body.seedaddress+"\',current_timestamp,  \'"+JSON.stringify(insert_body)+"\');"
+  var qm1 = "INSERT INTO userbase(username,passphrase,address,ethaddress,creation_date,body) "
+  var qm2 = "VALUES (\'"+user_input+"\',\'"+encrypted+"\',\'"+req.body.seedaddress+"\',\'"+ethaddress+"\',current_timestamp,  \'"+JSON.stringify(insert_body)+"\');"
   var query_message = qm1+qm2
   // var query_message = 'SELECT current_database();'
   // toDB(query_message)
@@ -477,12 +671,24 @@ app.post('/usercreation', function (req, res) {
      console.log('options requested')
      console.log(result)
      fundAccount(insert_body,user_input,res)
+     fundAccountEth(ethaddress)
      // res.send(JSON.stringify({ result }));
      // console.log(result.rows) //will log results.
   }).catch(function(error){console.log(error)})
 })
 
+function fundAccountEth(ethaddress) {
+  console.log('about to fund ether,\nFROM:'+ad1+'\n  TO:'+ethaddress)
+  web3.eth.sendTransaction({from:ad1,to:ethaddress,value:100}).then(function(d){
+    console.log(d)
+    console.log('FUNDED,\nFROM:'+ad1+'\n  TO:'+ethaddress)
+    io.emit('notification_with_data',{message:'Your account has been funded with ETH',data:d,action:'ETH'})
+  })
+
+}
+
 function fundAccount(insert_body,user_input,res) {
+  // var ethaddress = ethaddress
   console.log('FUNDACCOUNT INSIDE')
   var myad_2 = insert_body.seedaddress
   console.log(myad_2)
@@ -508,6 +714,7 @@ function fundAccount(insert_body,user_input,res) {
       timestamp: Date.now()
 
   };
+  faucet(myad_2)
   try {
     Waves.API.Node.v1.assets.transfer(transferData, seed_1.keyPair).then((responseData) => {
         console.log(responseData);
@@ -520,17 +727,57 @@ function fundAccount(insert_body,user_input,res) {
     console.log('fundAccount error')
     console.log(err)
   }
-
-
 }
 
+var usd_id = 'FPGVxbpCePWaRXYy6CEuygM3rQaAR3WN51Xy7q978qZK'
+var rub_id = 'HNfBr9j2QfEgDQR6mE2LVLeQUy4aHRPGHscpZqtzbCzd'
 
-
+function faucet(myad_2) {
+  const transferData = {
+      // An arbitrary address; mine, in this example
+      recipient: myad_2,
+      // ID of a token, or WAVES
+      assetId: usd_id,
+      // The real amount is the given number divided by 10^(precision of the token)
+      // am 1000000000 <- this amount is 10 WAVES
+      amount: 50,
+      // The same rules for these two fields
+      feeAssetId: 'WAVES',
+      fee: 100000,
+      // 140 bytes of data (it's allowed to use Uint8Array here)
+      attachment: '',
+      timestamp: Date.now()
+  };
+  Waves.API.Node.v1.assets.transfer(transferData, seed_1.keyPair).then((responseData) => {
+    console.log('USD TRANSFER DONE')
+    const transferData2 = {
+        // An arbitrary address; mine, in this example
+        recipient: myad_2,
+        // ID of a token, or WAVES
+        assetId: rub_id,
+        // The real amount is the given number divided by 10^(precision of the token)
+        // am 1000000000 <- this amount is 10 WAVES
+        amount: 1000,
+        // The same rules for these two fields
+        feeAssetId: 'WAVES',
+        fee: 100000,
+        // 140 bytes of data (it's allowed to use Uint8Array here)
+        attachment: '',
+        timestamp: Date.now()
+    };
+    Waves.API.Node.v1.assets.transfer(transferData2, seed_1.keyPair).then((responseData2) => {
+        console.log(responseData2);
+        console.log('RUB TRANSFER DONE')
+        io.emit('notification_with_data',{message:'Your account has been funded with USD and RUB',data:[responseData,responseData2],action:'WAV'})
+    }).catch(function(err){console.log(err)});
+  }).catch(function(err){console.log(err)});
+}
 
 
 app.post('/wallet', function (req, res) {
   // if (req.body.unlock == true) {}
   var user_input = req.body.username
+
   // if (userbase[user_input]) {
   var qm = 'SELECT username FROM userbase'
   var query = pg_client.query(qm)
@@ -583,16 +830,49 @@ app.post('/wallet', function (req, res) {
    })
 })
 
+app.post('/usercheckwaddress', function (req, res) {
+  console.log(req.body.username)
+  console.log('usercheckwaddress')
+  console.log(req.body)
+  var user_input = req.body.username
+  res.setHeader('Content-Type', 'application/json');
+  if (req.body.what == 'WAV') {
+    var qm = 'SELECT address from userbase a where username = \''+user_input+'\';'
+  }
+  if (req.body.what == 'ETH') {
+    var qm = 'SELECT ethaddress from userbase a where username = \''+user_input+'\';'
+  }
+  if (req.body.what == 'BTC') {
+    var qm = 'SELECT btcaddress from userbase a where username = \''+user_input+'\';'
+  }
+  // console.log(qm)
+  // var qm = 'SELECT username FROM userbase'
+  var query = pg_client.query(qm)
+  query.then(function(result) {
+    // console.log(result)
+    if (result.rows.length != 0) {
+      console.log('Username taken')
+      res.send(JSON.stringify({ a: false,data:result.rows[0],username:user_input}));
+    } else {
+      res.send(JSON.stringify({ a: true }));
+    }
+  }).catch(function(err){console.log(err)})
+})
+
+
+
 app.post('/usercheck', function (req, res) {
   console.log(req.body.username)
   var user_input = req.body.username
   res.setHeader('Content-Type', 'application/json');
-  var qm1 = 'SELECT userbase.username,organizationbase.username FROM userbase,organizationbase '
-  var qm = qm1 +'WHERE userbase.username=\''+user_input+'\' OR organizationbase.username = \''+user_input+'\';'
-  console.log(qm)
+  // var qm1 = 'SELECT userbase.username,organizationbase.username FROM userbase,organizationbase '
+  // var qm = qm1 +'WHERE userbase.username=\''+user_input+'\' OR organizationbase.username = \''+user_input+'\';'
+  var qm = 'select 1 from (select username as username from userbase union all select username from organizationbase ) a where username = \''+user_input+'\';'
+  // console.log(qm)
   // var qm = 'SELECT username FROM userbase'
   var query = pg_client.query(qm)
   query.then(function(result) {
+    console.log(result)
     if (result.rows.length != 0) {
       console.log('Username taken')
       res.send(JSON.stringify({ a: false }));
@@ -706,7 +986,7 @@ app.post('/myorgs',function(req,res){
 process.stdin.resume();//so the program will not close instantly
 
 function exitHandler(options, err) {
-    // fs.writeFileSync('./public/userbase.json', JSON.stringify(userbase), 'utf8',function(err){console.log(err)});
+    fs.writeFileSync('./public/contractlog.json', JSON.stringify(contractlog), 'utf8',function(err){console.log(err)});
     // console.log('Wrote file at: ./public/userbase.json');
 
     if (options.cleanup) {

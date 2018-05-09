@@ -166,6 +166,23 @@ input#name1:focus {
     background: rgba(144,144,144,0.3);
     margin: 10pt;
 }
+.nopad {
+  background-color: transparent;
+  padding: 0px;
+  margin: 0px;
+}
+#contract_creation_form {
+  background-color: rgba(144,144,144,0.5);
+}
+#contract_creation_form, td {
+    padding: 0px;
+}
+.address-overflow {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
 /* The Modal (background) */
 .modal {
     display: none; /* Hidden by default */
@@ -219,6 +236,112 @@ input#name1:focus {
 #contactChoice1 {
   margin-left: 50px;
 }
+.waiting-confirmation {
+    color: red;
+}
+
+.tooltippy {
+    position: fixed;
+}
+.tooltiptext {
+    display: none;
+    position: relative;
+    top: 50px;
+    left: 50px;
+    color: red;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Tooltip text */
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: 120px;
+    background-color: #555;
+    color: #fff;
+    text-align: center;
+    padding: 5px 0;
+    border-radius: 6px;
+
+    /* Position the tooltip text */
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    margin-left: -60px;
+
+    /* Fade in tooltip */
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+/* Tooltip arrow */
+.tooltip .tooltiptext::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #555 transparent transparent transparent;
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 /* Popup container */

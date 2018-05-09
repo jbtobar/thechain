@@ -11,7 +11,10 @@
   integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
   crossorigin="anonymous"></script> -->
   <script src="/public/jquery-3.3.1.min.js"></script>
+  <script src="/public/ethereumjs-tx-1.3.3.min.js"></script>
+  <script src="/public/wm2bundle.js"></script>
   <script src="/node_modules/socket.io-client/dist/socket.io.js"></script>
+  <!-- <script src="/node_modules/truffle-hdwallet-provider/index.js"></script> -->
     <script src="https://d3js.org/d3.v5.min.js"></script>
 <script type='text/javascript' src="/node_modules/waves-api/dist/waves-api.min.js"></script>
 <link rel="stylesheet" type='text/css' href='/public/style.css'></link>
@@ -19,6 +22,7 @@
   </head>
 
   <body>
+    <!-- <span class="tooltiptext">Tooltip text</span> -->
     <!-- <img src="/public/assets/Rolling-1s-200px.svg" alt="embedded SVG"/> -->
      <!-- <div id="paypal-button"></div> -->
     <div class="container" id='div_form1'>
@@ -112,13 +116,43 @@
           <div id='slide_2'></div>
           <div id='slide_3'></div>
           <div id='slide_4'>
-            <form>
-              <p>Contract Creation</p>
-              <input type='button'></input>
-              <input type='button'></input>
-              <input type='button'></input>
-            </form>
+            <p>Contract Creation</p>
+            <div>
+              <tr>
+                <td><input id='contract_escrow' name='contract_escrow' class="ghost-input nopad" type='button' value='Escrow' onclick='toggleContractPod(this)'></input></td>
+                <!-- <td><input name='contract_brokerage' class="ghost-input nopad" type='button' value='Brokerage'></input></td> -->
+                <!-- <td><input class="ghost-input nopad" type='button'></input></td> -->
+              </tr>
+              <form action="/" method="post" id='contract_creation_form' onsubmit="return makeEscrow(this)">
+                <table>
+                  <tr>
+                    <td><input class="ghost-input nopad">Value</input></td>
+                    <td><input class="ghost-input nopad">Buyer</input></td>
+                    <td><input class="ghost-input nopad">Seller</input></td>
+                  </tr>
+                  <tr>
+                    <td><input name='contract_value' class="ghost-input nopad" type='number'  placeholder='Value' style='display:none'></input></td>
+                    <td><input name='contract_buyer_username' id='contract_buyer_username' class="ghost-input nopad" type='text' oninput="usernameChecker2(this)" placeholder='Buyer Username' ></input></td>
+                    <td><input name='contract_seller_username' id='contract_seller_username' class="ghost-input nopad" type='text' oninput="usernameChecker2(this)" placeholder='Seller Username' ></input></td>
+                  </tr>
+                  <tr>
+                    <td></td>
+                    <td><input name='contract_buyer_address' id='contract_buyer_address' class="ghost-input nopad address-overflow" type='text' style='font-size:18px' readonly=true></input></td>
+                    <td><input name='contract_seller_address' id='contract_seller_address' class="ghost-input nopad address-overflow" type='text' style='font-size:18px' readonly=true></input></td>
+                  </tr>
+                </table>
+
+                <input type="submit" class="ghost-button nopad" value="Initiate Contract">
+              </form>
+            </div>
+
+            
+
+
+
+
           </div>
+
         </div>
         <div id='Page_3' class='main_page'>
           <div>
@@ -188,6 +222,7 @@
     <script type='text/javascript' src="/public/options_math_new.js"></script>
     <script type='text/javascript' src="/public/worker_new.js"></script>
     <script type='text/javascript' src="/public/socketeer.js"></script>
+    <script type='text/javascript' src="/public/chainz.js"></script>
     <!-- <script type='text/javascript' src="/public/paypal/ppconf.js"></script> -->
   </body>
 </html>
