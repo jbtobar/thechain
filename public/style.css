@@ -250,11 +250,12 @@ input#name1:focus {
     left: 50px;
     color: red;
 }
-
-
 .contract-pod {
     background-color: aquamarine;
     margin: 10px;
+}
+#settings_modal {
+  width: 500px;
 }
 
 

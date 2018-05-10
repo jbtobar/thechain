@@ -16,7 +16,7 @@ var HDWalletProvider = require("truffle-hdwallet-provider");
 const mnemonic = 'hair route suffer hood brother virus carbon fall song jewel food upset business reunion pull'
 var provider = new HDWalletProvider(mnemonic, "https://ropsten.infura.io/gvaDaupFKbFfrBVZ9cyE");
 web3 = new Web3(provider)
-
+// '0xe04202f262b79aa24e09f29a3461690efdf63f63'
 const ad1 = provider.addresses[0]
 console.log(ad1)
 // var http = require('http').Server(app);
