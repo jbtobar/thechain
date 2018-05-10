@@ -1,3 +1,5 @@
+sudo -u postgres psql -f public/thechaindb_script.sql
+
 DROP DATABASE IF EXISTS thechain;
 CREATE DATABASE thechain;
 CREATE USER thechainuser WITH PASSWORD 'th3ch@1nUz3r';
@@ -6,7 +8,19 @@ ALTER ROLE thechainuser SET client_encoding TO 'utf8';
 ALTER ROLE thechainuser SET default_transaction_isolation TO 'read committed';
 ALTER ROLE thechainuser SET timezone TO 'UTC';
 
-GRANT ALL PRIVILEGES ON DATABASE thechain TO thechainuser;
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO thechainuser;
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO thechainuser;
+
+-- grant all on sequence userbase_id_seq to thechainuser;
+
+
+
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO thechainuser;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public
+    GRANT USAGE, SELECT ON SEQUENCES TO thechainuser;
+
+
+-- psql -U thechainuser -d thechain
 
 \c thechain;
 
@@ -50,5 +64,6 @@ CREATE TABLE contractlog (
 id serial primary key,
 body jsonb
 )
+
 
 \q

@@ -8,7 +8,7 @@ console.log('socketeer')
 // registerHandler('Mueller')
 //
 // const io = require('socket.io-client')
-const socket = io.connect('http://localhost:8080')
+const socket = io.connect('https://localhost:8080')
 
 
 /////////////////////////////////////////////////
