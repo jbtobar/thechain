@@ -103,7 +103,7 @@ function createUser(form,seed,encrypted) {
       }
     }
     window.rapo = data
-    openWalletWindow(data)
+    openWalletWindow(wallet)
     // openNewWallet(data)
   })
 
