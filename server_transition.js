@@ -114,7 +114,9 @@ function sendContract(data) {
 }
 
 
-
+// function handleContractResponse(data) {
+//
+// }
 
 
 io.on('connection', function (client) {
@@ -129,6 +131,32 @@ io.on('connection', function (client) {
   // client.on('message', handleMessage)
   //
   // client.on('chatrooms', handleGetChatrooms)
+
+  client.on('respond_to_contracts',function(data) {
+    console.log('handleContractResponse')
+    console.log(data)
+    if (contractlog[data.contract]['other']) {
+      var m = contractlog[data.contract]['other']
+      m.push({
+        action:data.action,
+        user: data.address,
+        date:data.date
+      })
+      contractlog[data.contract]['other'] = m
+      console.log('handleContractResponse appending')
+    } else {
+      console.log('handleContractResponse new')
+      contractlog[data.contract]['other'] = [{
+        action:data.action,
+        user: data.address,
+        date:data.date,
+        data:data.data
+      },]
+    }
+    console.log('handleContractResponse End')
+    console.log(Object.keys(contractlog[data.contract]))
+    io.emit('respond_to_contracts',contractlog[data.contract])
+  })
   //
   client.on('invitation', function(a,data){
     console.log(data)
@@ -264,21 +292,25 @@ io.on('connection', function (client) {
     var ad = data.address
     // ad = '0x64983b2b62ffb471c6c8f35d45390f0e5c8fc67e'
     contracts = []
+    var mask = {}
     cb1.forEach(function(d){
       var a = d.value.arguments[0]
       var b = d.value.arguments[1]
       if (a == ad || b == ad) {
+        mask[a] = clientmask.eth[a]
+        mask[b] = clientmask.eth[b]
         var dancy = {
           a:d.value.arguments[0],
           b:d.value.arguments[1],
           then:d.value.then,
+          other:d.value.other,
           thash:d.value.transactionHash
         }
         contracts.push(dancy)
       }
 
     })
-    io.emit('getcontracts',contracts)
+    io.emit('getcontracts',{contracts:contracts,abi:abi,mask:mask})
     console.log(contracts)
   })
 
@@ -305,12 +337,40 @@ server.listen(8080, function (err) {
 
 
 
-
-
-var con_string = 'tcp://thechainuser:th3ch@1nUz3r@0.0.0.0:5432/thechain'
+var con_string = 'tcp://juanbernardotobar:@0.0.0.0:5432/thechain'
+// var con_string = 'tcp://thechainuser:th3ch@1nUz3r@0.0.0.0:5432/thechain'
 var pg_client = new pg.Client(con_string);
 pg_client.connect().then(console.log('Connected to: '+con_string));
 var intro_query_message = 'SELECT current_database();'
+
+var clientmask = {
+  btc:{},
+  eth:{},
+  wav:{},
+  username:{}
+}
+function clientmasks() {
+  var qm = 'SELECT username,address,btcaddress,ethaddress FROM userbase;'
+  var query = pg_client.query(qm)
+  query.then(function(result){
+    var data = result.rows
+    data.forEach(function(d){
+      clientmask.wav[d.address] = d.username
+      clientmask.eth[d.ethaddress] =  d.username
+      clientmask.btc[d.btcaddress] = d.username
+      clientmask.username[d.username] = {
+        wav:d.address,
+        eth:d.ethaddress,
+        btc:d.btcaddress,
+      }
+
+    })
+    console.log('clientmasked')
+    console.log(clientmask)
+  }).catch(function(err){console.log(err)})
+}
+clientmasks()
+
 var intro_query = pg_client.query(intro_query_message)
 var users = []
 intro_query.then(function(result) {

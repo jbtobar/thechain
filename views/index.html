@@ -113,7 +113,18 @@
           <form action="/" method="post" onsubmit="return false" id="ContractsMenu">
           </form>
           <div id='slide_1'></div>
-          <div id='slide_2'></div>
+          <div id='slide_2'>
+            <div id='slide_2_buttons'>
+              <span id='new_contracts_button' class="close" style="float:none" onclick="ContractActions(this)">New</span>
+              <span id='active_contracts_button' class="close" style="float:none" onclick="ContractActions(this)">Active</span>
+              <span id='past_contracts_button' class="close" style="float:none" onclick="ContractActions(this)">Past</span>
+            </div>
+            <div id='slide_2_div'>
+              <div id='slide_2_new'></div>
+              <div id='slide_2_active' style='display:none'></div>
+              <div id='slide_2_past' style='display:none'></div>
+            </div>
+          </div>
           <div id='slide_3'></div>
           <div id='slide_4'>
             <p>Contract Creation</p>
@@ -146,7 +157,7 @@
               </form>
             </div>
 
-            
+
 
 
 

@@ -252,7 +252,10 @@ input#name1:focus {
 }
 
 
-
+.contract-pod {
+    background-color: aquamarine;
+    margin: 10px;
+}
 
 
 

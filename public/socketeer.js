@@ -166,9 +166,10 @@ socket.on('make_escrow',function(data) {
 /////////////////////////////////////////////////
 // socket.emit('getcontracts',{address:''})
 socket.on('getcontracts', function(data){
-  window.dancy = data
+  window.fulldance = data
+  window.dancy = data.contracts
   console.log('mycontracts')
-  showTransactions('out')
+  SMC()
 })
 /////////////////////////////////////////////////
 /////////////////////////////////////////////////
@@ -197,6 +198,12 @@ socket.on('connect', function(){
 socket.on('disconnect', function(){
   console.log('disconnect')
 });
+
+socket.on('respond_to_contracts',function(data){
+  console.log('respond_to_contracts')
+  window.rtc = data
+  socket.emit('getcontracts',{address:wallet.address.eth})
+})
 
   // function registerHandler(onMessageReceived) {
   //   socket.on('message', onMessageReceived)

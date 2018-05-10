@@ -83,6 +83,37 @@ var contract = new web3.eth.Contract(bld.abi,bld.networks['3'].address)
 
 ad1 = provider.addresses[0]
 
+ad1 = wallet.address.eth
 contract.methods.accept().send({from:ad1}).then(function(result){console.log(result)})
 
 contract.methods.accept().call().then(function(d){console.log(d)})
+
+
+
+contract.methods.deposit().send({from:wallet.address.eth,value:100}).then(function(result){console.log(result)})
+
+
+
+
+
+tca = '0x8E8CC4609160BE60DA30b1EebA3D6AF08c87A1c9'
+// var contract = new web3.eth.Contract(bld.abi,bld.networks['3'].address)
+var contract = new web3.eth.Contract(fulldance.abi,tca)
+ad1 = wallet.address.eth
+contract.methods.accept().send({from:ad1}).then(function(result){console.log(result)})
+
+web3.eth.getBalance(tca)
+
+
+address
+YourApiKeyToken = '8HCIKQI86UY9A37I283MPYTIR98KCUU24F'
+url = 'https://api.etherscan.io/api?module=account&action=txlist&address='+address+'a&startblock=0&endblock=99999999&page=1&offset=10&sort=asc&apikey='+YourApiKeyToken
+
+// web3.currentProvider.sendAsync({
+//     method: "debug_traceTransaction",
+//     params: ['0x3fac854179691e377fc1aa180b71a4033b6bb3bde2a7ef00bc8e78f849ad356e', {}],
+//     jsonrpc: "2.0",
+//     id: "2"
+// }, function (err, result) {
+//     ...
+// });

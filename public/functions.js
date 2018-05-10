@@ -1749,31 +1749,143 @@ function contractSlider(arg) {
 //   console.log(d)
 // }).catch(function(err){console.log(err)})
 
-function showMyContracts(arg) {
+// socket.emit('getcontracts',{address:wallet.address.eth})
+function SMC() {
+  $('#slide_2_active').empty()
+  $('#slide_2_new').empty()
+  $('#slide_2_past').empty()
+  var contract_count = 0
+  dancy.forEach(function(d){
+    if (d.then) {
+
+      showMyContracts('plot',d,contract_count)
+      contract_count = contract_count+1
+    }
+  })
+}
+
+function ContractResponse(arg) {
+  window.parka = arg
+  var action = parka.id.split('_')[0]
+  var contract = parka.id.split('_')[1]
+  var cad = $('#address_'+contract).val()
+  var date = new Date()
+  date = date.toString()
+  tca = cad
+  // var contract = new web3.eth.Contract(bld.abi,bld.networks['3'].address)
+  window.contract = new web3.eth.Contract(fulldance.abi,tca)
+  var ad1 = wallet.address.eth
+  contract.methods.accept().send({from:ad1}).then(function(result){
+    console.log(result)
+    window.sila = result
+    var data = result
+    socket.emit('respond_to_contracts',{username:rapo.username,address:wallet.address.eth,contract:cad,action:action,date:date,data:data})
+  })
+  // socket.emit('respond_to_contracts',{username:rapo.username,address:wallet.address.eth,contract:cad,action:action,date:date})
+}
+
+function ContractActions(input) {
+  var id = input.id.split('_')[0]
+  if (id == 'past') {$('#slide_2_past').show();$('#slide_2_active').hide();$('#slide_2_new').hide();}
+  if (id == 'active') {$('#slide_2_past').hide();$('#slide_2_active').show();$('#slide_2_new').hide();}
+  if (id == 'new') {$('#slide_2_past').hide();$('#slide_2_active').hide();$('#slide_2_new').show();}
+
+}
+
+function showMyContracts(arg,d,contract_count) {
   if (arg == 'in') {
     socket.emit('getcontracts',{address:wallet.address.eth})
   } else {
-    var dos = dancy[7]
+    var dos = d
     var a = dos.a
     var b = dos.b
     var ca = dos.then.address
-    var divo = d3.select('#slide_2')
+    if (dos.other) {
+      var sal = dos.other
+      if (sal[sal.length-1].action == 'reject') {
+        var divo = d3.select('#slide_2_past').append('div').attr('class','contract-pod')
+        var fresh = 'past'
+      } else {
+        var divo = d3.select('#slide_2_active').append('div').attr('class','contract-pod')
+        var fresh = 'active'
+      }
+
+    } else {
+      var divo = d3.select('#slide_2_new').append('div').attr('class','contract-pod')
+      var fresh = 'new'
+    }
+
     var trow = divo.append('tr')
     trow.append('td').text('Escrow')
     var trow = divo.append('tr')
-    trow.append('td').text('Buyer:\n'+a )
-    trow.append('td').text('Seller:\n'+b)
+    trow.append('td').text('Buyer:')
+    trow.append('td').text('Seller:')
     trow.append('td').text('')
     var trow = divo.append('tr')
-    trow.append('td').text('Contract Address:\n'+ ca)
-    trow.append('td').text('')
+    trow.append('td').append('input').attr('type','text').attr('readonly','readonly').attr('value',a)
+    trow.append('td').append('input').attr('type','text').attr('readonly','readonly').attr('value',b)
     trow.append('td').text('')
     var trow = divo.append('tr')
-    trow.append('td').text('Balance:\n'+ 'soon')
+    trow.append('td').append('input').attr('type','text').attr('readonly','readonly').attr('value',fulldance.mask[a])
+    trow.append('td').append('input').attr('type','text').attr('readonly','readonly').attr('value',fulldance.mask[b])
+    trow.append('td').text('')
     var trow = divo.append('tr')
-    trow.append('td').text('Actions:')
-    trow.append('td').text('Accept')
-    trow.append('td').text('Reject')
+    trow.append('td').text('Contract Address:\n')
+    trow.append('td').append('input').attr('type','text').attr('readonly','readonly').attr('value',ca).attr('id','address_'+contract_count)
+    trow.append('td').text('')
+    var trow = divo.append('tr')
+    console.log(d)
+    trow.append('td').text('Balance:\n')
+    trow.append('td').append('input').attr('type','text').attr('readonly','readonly').attr('id','contract_pod_'+contract_count)
+
+    if (fresh == 'new') {
+      var trow = divo.append('tr')
+      trow.append('td').text('Actions:')
+      trow.append('td').append('input').attr('type','text').attr('readonly','readonly').attr('value','Accept').attr('onclick','ContractResponse(this)').attr('id','accept_'+contract_count).text('Accept')
+      trow.append('td').append('input').attr('type','text').attr('readonly','readonly').attr('value','Reject').attr('onclick','ContractResponse(this)').attr('id','reject_'+contract_count).text('Reject')
+    }
+    if (fresh == 'past') {
+      console.log(sal)
+      dos.other.forEach(function(x){
+        var trow = divo.append('tr')
+        trow.append('td').text('Action: '+x.action)
+        trow.append('td').text('User: '+fulldance.mask[x.user])
+        trow.append('td').text('Date: '+x.date)
+      })
+    }
+    if (fresh == 'active') {
+      console.log(sal)
+      var did_i_accept = false
+      dos.other.forEach(function(x){
+          console.log('jula')
+          var trow = divo.append('tr')
+          trow.append('td').text('Action: '+x.action)
+          trow.append('td').text('User: '+fulldance.mask[x.user])
+          trow.append('td').text('Date: '+x.date)
+          if (x.user == wallet.address.eth && x.action == 'accept') {
+            console.log('you already accepted son')
+            did_i_accept = true
+          }
+      })
+      if (did_i_accept == true) {
+        var trow = divo.append('tr')
+        trow.append('td').text('You have already accepted this Contract, Awaiting confirmation from other party')
+      } else {
+        var trow = divo.append('tr')
+        trow.append('td').text('Actions:')
+        trow.append('td').append('input').attr('type','text').attr('readonly','readonly').attr('value','Accept').attr('onclick','ContractResponse(this)').attr('id','accept_'+contract_count).text('Accept')
+        trow.append('td').append('input').attr('type','text').attr('readonly','readonly').attr('value','Reject').attr('onclick','ContractResponse(this)').attr('id','reject_'+contract_count).text('Reject')
+
+      }
+
+    }
+    web3.eth.getBalance(ca).then(function(d){
+      console.log('Balance: ' +ca)
+      console.log('#'+'contract_pod_'+contract_count)
+      d3.select('#'+'contract_pod_'+contract_count).attr('value',d)
+      console.log(d)
+    })
+
 
   }
 }
@@ -1782,7 +1894,7 @@ function showMyData(arg) {
   // d3.select('#'+arg).text(arg)
   // if (arg == 'slide_1') {showMyOptionData(arg)}
   if (arg == 'slide_1') {console.log('no function yet')}
-  if (arg == 'slide_2') {showMyContracts()}
+  if (arg == 'slide_2') {showMyContracts('in',null)}
   if (arg == 'slide_3') {console.log('no function yet')}
   if (arg == 'slide_4') {console.log('no function yet')}
   if (arg == 'button3') {showTransactions('in')}
