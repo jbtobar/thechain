@@ -495,6 +495,25 @@ app.get('/', function (req, res) {
 app.post('/', function (req, res) {
   console.log(req.body);
 })
+var stripe = require("stripe")("sk_test_p8QZekzhhTh8YiktfyPsoT2S");
+app.post('/payment',function(request,response){
+
+console.log('payment')
+console.log(request)
+// Token is created using Checkout or Elements!
+// Get the payment token ID submitted by the form:
+const token = request.body.stripeToken; // Using Express
+
+const charge = stripe.charges.create({
+  amount: 999,
+  currency: 'usd',
+  description: 'Example charge',
+  source: token,
+});
+response.json(200)
+// res.send(JSON.stringify({ what:'transaction'}));
+})
+
 
 app.post('/sendtransaction', function(req,res) {
   console.log('sendtransaction')
