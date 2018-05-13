@@ -107,3 +107,91 @@ web3.eth.getBalance(ad3).then(function(d){console.log(d);console.log(web3.utils.
 
 // Lost 6 cents in transaction.
 // 971631851864064
+
+
+
+
+
+
+
+
+
+// NEW TEST
+
+
+
+// FutureToken: 0xc769b3e9e6cc4cd69713430bd40dc74d7cc28d87
+var Web3 = require('web3');
+var web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'));
+bld = require('./build/contracts/FutureToken.json')
+adl = '0xb2079d3c91061beedfbac4a593d219faa0cbf28f'
+var contract = new web3.eth.Contract(bld.abi,adl)
+
+
+
+contract.methods.price().call().then(function(d){console.log(d)})
+// price()
+// > 1000000000000000000
+// collateral_buyer()
+// > 150000000000000000
+// collateral_seller()
+// > 300000000000000000
+
+// Price of Underlying is 1.0 ETH
+// wei: 1000000000000000000
+// Buyer Collateral is:
+contract.methods.setPrice(2000000000000000000).send({from:'0xFa54Ff47f3Baf5D52f9B7e8390cf4357f65DA1bd'}).then(function(d){console.log(d)})
+// > 2000000000000000000
+
+ad10 = '0x9a9bafcda2b54e7c16e244300113e1842bd8f486'
+contract.methods.openLongSide().send({from:ad10,value:web3.utils.toWei('2','ether')}).then(function(d){console.log(d)})
+// HASH
+web3.eth.getBalance(adl).then(function(d){console.log(d)})
+// > 2000000000000000000
+contract.methods.balances_buyers(ad10).call().then(function(d){console.log(d)})
+// > 13
+
+ad9 = '0x980ec79a8365356e4188240d2d0765b5f4d2248e'
+contract.methods.openShortSide().send({from:ad9,value:web3.utils.toWei('2','ether')}).then(function(d){console.log(d)})
+// HASH
+web3.eth.getBalance(adl).then(function(d){console.log(d)})
+// > 4000000000000000000
+contract.methods.balances_sellers(ad9).call().then(function(d){console.log(d)})
+// > 6
+
+
+ad10 = '0x9a9bafcda2b54e7c16e244300113e1842bd8f486'
+contract.methods.closeLongSide(3).send({from:ad10}).then(function(d){console.log(d)})
+// HASH
+web3.eth.getBalance(adl).then(function(d){console.log(d)})
+// > 3550000000000000000
+contract.methods.balances_buyers(ad10).call().then(function(d){console.log(d)})
+// > 10
+web3.eth.getBalance(ad10).then(function(d){console.log(d)})
+// > 98446969780000000000
+
+
+ad9 = '0x980ec79a8365356e4188240d2d0765b5f4d2248e'
+web3.eth.getBalance(ad9).then(function(d){console.log(d)})
+// > 97998323060000000000
+contract.methods.closeLongSide(2).send({from:ad9}).then(function(d){console.log(d)})
+// VM EXCEPTION
+contract.methods.closeShortSide(2).send({from:ad9}).then(function(d){console.log(d)})
+// HASH
+contract.methods.balances_sellers(ad9).call().then(function(d){console.log(d)})
+// > 4
+web3.eth.getBalance(ad9).then(function(d){console.log(d)})
+// > 98596841240000000000
+
+web3.eth.getBalance(adl).then(function(d){console.log(d)})
+// > 2950000000000000000
+
+
+contract.methods.owner().call().then(function(d){console.log(d)})
+// 0xFa54Ff47f3Baf5D52f9B7e8390cf4357f65DA1bd
+ad1 = '0xFa54Ff47f3Baf5D52f9B7e8390cf4357f65DA1bd'
+contract.methods.price().call().then(function(d){console.log(d)})
+// > 1000000000000000000
+
+contract.methods.setPrice(2000000000000000000).send({from:'0xFa54Ff47f3Baf5D52f9B7e8390cf4357f65DA1bd'}).then(function(d){console.log(d)})
+contract.methods.withdrawAll().send({from:'0xFa54Ff47f3Baf5D52f9B7e8390cf4357f65DA1bd'}).then(function(d){console.log(d)})

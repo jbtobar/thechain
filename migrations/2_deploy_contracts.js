@@ -9,7 +9,7 @@
 // module.exports = function(deployer) {
 //   deployer.deploy(Future,);
 // };
-FutureToken
+// FutureToken
 
 var FutureToken = artifacts.require("./FutureToken.sol");
 

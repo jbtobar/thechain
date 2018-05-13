@@ -21,9 +21,10 @@ contract SafeMath {
 
 contract FutureToken is SafeMath {
 	string public name;
+  address public owner;
 
 	mapping(address => uint) public balances_buyers;
-	mapping(address => uint) public balances_seller;
+	mapping(address => uint) public balances_sellers;
 
 	mapping(address => uint) public deposits_buyers;
 	mapping(address => uint) public deposits_sellers;
@@ -36,16 +37,18 @@ contract FutureToken is SafeMath {
 	uint public collateral_buyer;
 
 
+
+
 	function FutureToken() public {
-		symbol = 'RTSX';
+		name = 'RTSX';
 		owner = msg.sender;
 		// 0.3 ETH
 		// $ 211
-		collateral_seller = 300000000000000000
+		collateral_seller = 300000000000000000;
 		// 0.15 ETH
 		// $ 105
-		collateral_buyer  = 150000000000000000
-		price = 1000000000000000000
+		collateral_buyer  = 150000000000000000;
+		price = 1000000000000000000;
 		// 1 ETH
 		// 705 $
 	}
@@ -56,18 +59,19 @@ contract FutureToken is SafeMath {
 		balances_buyers[msg.sender] = safeAdd(balances_buyers[msg.sender], safeDiv(msg.value,collateral_buyer));
 		deposits_buyers[msg.sender] = safeAdd(deposits_buyers[msg.sender], msg.value);
 		balances[msg.sender] = safeAdd(balances[msg.sender], safeDiv(msg.value,collateral_buyer));
-		return true
+		return true;
 	}
 
 	function openShortSide() public payable returns (bool success) {
 		require(msg.value >= collateral_seller);
-		balances_sellers[msg.sender] = safeAdd(balances_seller[msg.sender], safeDiv(msg.value,collateral_seller));
+		balances_sellers[msg.sender] = safeAdd(balances_sellers[msg.sender], safeDiv(msg.value,collateral_seller));
 		deposits_sellers[msg.sender] = safeAdd(deposits_sellers[msg.sender], msg.value);
 		balances[msg.sender] = safeAdd(balances[msg.sender], safeDiv(msg.value,collateral_seller));
-		return true
+		return true;
 	}
 
 	function closeLongSide(uint tokens) public payable returns (bool success) {
+    require(balances_buyers[msg.sender] >= tokens);
 		balances[msg.sender] = safeSub(balances[msg.sender], tokens);
 		balances_buyers[msg.sender] = safeSub(balances_buyers[msg.sender], tokens);
 		deposits_buyers[msg.sender] = safeSub(deposits_buyers[msg.sender], safeMul(collateral_buyer,tokens));
@@ -76,13 +80,31 @@ contract FutureToken is SafeMath {
 		return true;
 	}
 
-	function closeShortSide(uint tokens) public parable returns (bool success) {
+	function closeShortSide(uint tokens) public payable returns (bool success) {
+    require(balances_sellers[msg.sender] >= tokens);
 		balances[msg.sender] = safeSub(balances[msg.sender], tokens);
-		balances_seller[msg.sender] = safeSub(balances_seller[msg.sender], tokens);
+		balances_sellers[msg.sender] = safeSub(balances_sellers[msg.sender], tokens);
 		deposits_sellers[msg.sender] = safeSub(deposits_sellers[msg.sender], safeMul(collateral_seller,tokens));
 		// balances[broker] = safeAdd(balances[broker], tokens);
 		msg.sender.transfer(safeMul(collateral_seller,tokens));
-		return true
+		return true;
 	}
+
+  function setCollateralSeller(uint cap) public {
+        require(msg.sender == owner);
+        collateral_seller = cap;
+  }
+  function setCollateralBuyer(uint cap) public {
+        require(msg.sender == owner);
+        collateral_buyer = cap;
+  }
+  function setPrice(uint cap) public {
+        require(msg.sender == owner);
+        price = cap;
+  }
+  function withdrawAll() public {
+      require(msg.sender == owner);
+      owner.transfer(this.balance);
+  }
 
 }
