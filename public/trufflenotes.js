@@ -117,3 +117,27 @@ url = 'https://api.etherscan.io/api?module=account&action=txlist&address='+addre
 // }, function (err, result) {
 //     ...
 // });
+
+function bin2string(array){
+	var result = "";
+	for(var i = 0; i < array.length; ++i){
+		result+= (String.fromCharCode(array[i]));
+	}
+	return result;
+}
+
+
+function stringToAsciiByteArray(str)
+{
+    var bytes = [];
+   for (var i = 0; i < str.length; ++i)
+   {
+       var charCode = str.charCodeAt(i);
+      if (charCode > 0xFF)  // char > 1 byte since charCodeAt returns the UTF-16 value
+      {
+          throw new Error('Character ' + String.fromCharCode(charCode) + ' can\'t be represented by a US-ASCII byte.');
+      }
+       bytes.push(charCode);
+   }
+    return bytes;
+}

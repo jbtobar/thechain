@@ -1,29 +1,203 @@
 {
-  "contractName": "token",
+  "contractName": "Crowdsale",
   "abi": [
     {
       "constant": false,
-      "inputs": [
-        {
-          "name": "receiver",
-          "type": "address"
-        },
-        {
-          "name": "amount",
-          "type": "uint256"
-        }
-      ],
-      "name": "transfer",
+      "inputs": [],
+      "name": "checkGoalReached",
       "outputs": [],
       "payable": false,
       "stateMutability": "nonpayable",
       "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "deadline",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "beneficiary",
+      "outputs": [
+        {
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "tokenReward",
+      "outputs": [
+        {
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "name": "balanceOf",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "fundingGoal",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "amountRaised",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "price",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [],
+      "name": "safeWithdrawal",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "name": "ifSuccessfulSendTo",
+          "type": "address"
+        },
+        {
+          "name": "fundingGoalInEthers",
+          "type": "uint256"
+        },
+        {
+          "name": "durationInMinutes",
+          "type": "uint256"
+        },
+        {
+          "name": "etherCostOfEachToken",
+          "type": "uint256"
+        },
+        {
+          "name": "addressOfTokenUsedAsReward",
+          "type": "address"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "payable": true,
+      "stateMutability": "payable",
+      "type": "fallback"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "name": "recipient",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "name": "totalAmountRaised",
+          "type": "uint256"
+        }
+      ],
+      "name": "GoalReached",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "name": "backer",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "name": "amount",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "name": "isContribution",
+          "type": "bool"
+        }
+      ],
+      "name": "FundTransfer",
+      "type": "event"
     }
   ],
-  "bytecode": "0x",
-  "deployedBytecode": "0x",
-  "sourceMap": "",
-  "deployedSourceMap": "",
+  "bytecode": "0x60606040526000600760006101000a81548160ff0219169083151502179055506000600760016101000a81548160ff021916908315150217905550341561004557600080fd5b60405160a080610a4783398101604052808051906020019091908051906020019091908051906020019091908051906020019091908051906020019091905050846000806101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff160217905550670de0b6b3a76400008402600181905550603c83024201600381905550670de0b6b3a7640000820260048190555080600560006101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff16021790555050505050506108ff806101486000396000f300606060405260043610610099576000357c0100000000000000000000000000000000000000000000000000000000900463ffffffff16806301cb3b201461027757806329dcb0cf1461028c57806338af3eed146102b55780636e66f6e91461030a57806370a082311461035f5780637a3a0e84146103ac5780637b3e5e7b146103d5578063a035b1fe146103fe578063fd6b7ef814610427575b6000600760019054906101000a900460ff161515156100b757600080fd5b34905080600660003373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1681526020019081526020016000206000828254019250508190555080600260008282540192505081905550600560009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1663a9059cbb336004548481151561016357fe5b046040518363ffffffff167c0100000000000000000000000000000000000000000000000000000000028152600401808373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200182815260200192505050600060405180830381600087803b15156101e857600080fd5b6102c65a03f115156101f957600080fd5b5050507fe842aea7a5f1b01049d752008c53c52890b1a6daf660cf39e8eec506112bbdf633826001604051808473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200183815260200182151515158152602001935050505060405180910390a150005b341561028257600080fd5b61028a61043c565b005b341561029757600080fd5b61029f61051c565b6040518082815260200191505060405180910390f35b34156102c057600080fd5b6102c8610522565b604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390f35b341561031557600080fd5b61031d610547565b604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390f35b341561036a57600080fd5b610396600480803573ffffffffffffffffffffffffffffffffffffffff1690602001909190505061056d565b6040518082815260200191505060405180910390f35b34156103b757600080fd5b6103bf610585565b6040518082815260200191505060405180910390f35b34156103e057600080fd5b6103e861058b565b6040518082815260200191505060405180910390f35b341561040957600080fd5b610411610591565b6040518082815260200191505060405180910390f35b341561043257600080fd5b61043a610597565b005b6003544210151561051a576001546002541015156104fe576001600760006101000a81548160ff0219169083151502179055507fec3f991caf7857d61663fd1bba1739e04abd4781238508cde554bb849d790c856000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff16600254604051808373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1681526020018281526020019250505060405180910390a15b6001600760016101000a81548160ff0219169083151502179055505b565b60035481565b6000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff1681565b600560009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1681565b60066020528060005260406000206000915090505481565b60015481565b60025481565b60045481565b6000600354421015156108d057600760009054906101000a900460ff16151561074857600660003373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1681526020019081526020016000205490506000600660003373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff168152602001908152602001600020819055506000811115610747573373ffffffffffffffffffffffffffffffffffffffff166108fc829081150290604051600060405180830381858888f1935050505015610701577fe842aea7a5f1b01049d752008c53c52890b1a6daf660cf39e8eec506112bbdf633826000604051808473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200183815260200182151515158152602001935050505060405180910390a1610746565b80600660003373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff168152602001908152602001600020819055505b5b5b600760009054906101000a900460ff1680156107b057503373ffffffffffffffffffffffffffffffffffffffff166000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16145b156108cf576000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff166108fc6002549081150290604051600060405180830381858888f19350505050156108b2577fe842aea7a5f1b01049d752008c53c52890b1a6daf660cf39e8eec506112bbdf66000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff166002546000604051808473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200183815260200182151515158152602001935050505060405180910390a16108ce565b6000600760006101000a81548160ff0219169083151502179055505b5b5b505600a165627a7a723058202732f1530e7db2a2b1576d738a54bd586d5a959c237f56238291f4e26279d76e0029",
+  "deployedBytecode": "0x606060405260043610610099576000357c0100000000000000000000000000000000000000000000000000000000900463ffffffff16806301cb3b201461027757806329dcb0cf1461028c57806338af3eed146102b55780636e66f6e91461030a57806370a082311461035f5780637a3a0e84146103ac5780637b3e5e7b146103d5578063a035b1fe146103fe578063fd6b7ef814610427575b6000600760019054906101000a900460ff161515156100b757600080fd5b34905080600660003373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1681526020019081526020016000206000828254019250508190555080600260008282540192505081905550600560009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1663a9059cbb336004548481151561016357fe5b046040518363ffffffff167c0100000000000000000000000000000000000000000000000000000000028152600401808373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200182815260200192505050600060405180830381600087803b15156101e857600080fd5b6102c65a03f115156101f957600080fd5b5050507fe842aea7a5f1b01049d752008c53c52890b1a6daf660cf39e8eec506112bbdf633826001604051808473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200183815260200182151515158152602001935050505060405180910390a150005b341561028257600080fd5b61028a61043c565b005b341561029757600080fd5b61029f61051c565b6040518082815260200191505060405180910390f35b34156102c057600080fd5b6102c8610522565b604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390f35b341561031557600080fd5b61031d610547565b604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390f35b341561036a57600080fd5b610396600480803573ffffffffffffffffffffffffffffffffffffffff1690602001909190505061056d565b6040518082815260200191505060405180910390f35b34156103b757600080fd5b6103bf610585565b6040518082815260200191505060405180910390f35b34156103e057600080fd5b6103e861058b565b6040518082815260200191505060405180910390f35b341561040957600080fd5b610411610591565b6040518082815260200191505060405180910390f35b341561043257600080fd5b61043a610597565b005b6003544210151561051a576001546002541015156104fe576001600760006101000a81548160ff0219169083151502179055507fec3f991caf7857d61663fd1bba1739e04abd4781238508cde554bb849d790c856000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff16600254604051808373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1681526020018281526020019250505060405180910390a15b6001600760016101000a81548160ff0219169083151502179055505b565b60035481565b6000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff1681565b600560009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1681565b60066020528060005260406000206000915090505481565b60015481565b60025481565b60045481565b6000600354421015156108d057600760009054906101000a900460ff16151561074857600660003373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1681526020019081526020016000205490506000600660003373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff168152602001908152602001600020819055506000811115610747573373ffffffffffffffffffffffffffffffffffffffff166108fc829081150290604051600060405180830381858888f1935050505015610701577fe842aea7a5f1b01049d752008c53c52890b1a6daf660cf39e8eec506112bbdf633826000604051808473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200183815260200182151515158152602001935050505060405180910390a1610746565b80600660003373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff168152602001908152602001600020819055505b5b5b600760009054906101000a900460ff1680156107b057503373ffffffffffffffffffffffffffffffffffffffff166000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16145b156108cf576000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff166108fc6002549081150290604051600060405180830381858888f19350505050156108b2577fe842aea7a5f1b01049d752008c53c52890b1a6daf660cf39e8eec506112bbdf66000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff166002546000604051808473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200183815260200182151515158152602001935050505060405180910390a16108ce565b6000600760006101000a81548160ff0219169083151502179055505b5b5b505600a165627a7a723058202732f1530e7db2a2b1576d738a54bd586d5a959c237f56238291f4e26279d76e0029",
+  "sourceMap": "102:2952:0:-;;;373:5;347:31;;;;;;;;;;;;;;;;;;;;407:5;384:28;;;;;;;;;;;;;;;;;;;;634:469;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;864:18;850:11;;:32;;;;;;;;;;;;;;;;;;928:7;906:19;:29;892:11;:43;;;;982:9;962:17;:29;956:3;:35;945:8;:46;;;;1032:7;1009:20;:30;1001:5;:38;;;;1069:26;1049:11;;:47;;;;;;;;;;;;;;;;;;634:469;;;;;102:2952;;;;;;",
+  "deployedSourceMap": "102:2952:0:-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;1336:11;1310:15;;;;;;;;;;;1309:16;1301:25;;;;;;;;1350:9;1336:23;;1394:6;1369:9;:21;1379:10;1369:21;;;;;;;;;;;;;;;;:31;;;;;;;;;;;1426:6;1410:12;;:22;;;;;;;;;;;1442:11;;;;;;;;;;;:20;;;1463:10;1484:5;;1475:6;:14;;;;;;;;1442:48;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;1500:38;1513:10;1525:6;1533:4;1500:38;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;1271:274;102:2952;1744:224;;;;;;;;;;;;;;218:20;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;127:26;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;267:24;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;297:44;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;159:23;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;188:24;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;244:17;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;2272:780;;;;;;;;;;;;;;1744:224;1589:8;;1582:3;:15;;1578:22;;;1816:11;;1800:12;;:27;;1796:134;;;1863:4;1842:18;;:25;;;;;;;;;;;;;;;;;;1881:38;1893:11;;;;;;;;;;;1906:12;;1881:38;;;;;;;;;;;;;;;;;;;;;;;;;;;;1796:134;1957:4;1939:15;;:22;;;;;;;;;;;;;;;;;;1578;1744:224::o;218:20::-;;;;:::o;127:26::-;;;;;;;;;;;;;:::o;267:24::-;;;;;;;;;;;;;:::o;297:44::-;;;;;;;;;;;;;;;;;:::o;159:23::-;;;;:::o;188:24::-;;;;:::o;244:17::-;;;;:::o;2272:780::-;2361:11;1589:8;;1582:3;:15;;1578:22;;;2327:18;;;;;;;;;;;2326:19;2322:371;;;2375:9;:21;2385:10;2375:21;;;;;;;;;;;;;;;;2361:35;;2434:1;2410:9;:21;2420:10;2410:21;;;;;;;;;;;;;;;:25;;;;2462:1;2453:6;:10;2449:234;;;2487:10;:15;;:23;2503:6;2487:23;;;;;;;;;;;;;;;;;;;;;;;2483:186;;;2534:39;2547:10;2559:6;2567:5;2534:39;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;2483:186;;;2644:6;2620:9;:21;2630:10;2620:21;;;;;;;;;;;;;;;:30;;;;2483:186;2449:234;2322:371;2707:18;;;;;;;;;;;:47;;;;;2744:10;2729:25;;:11;;;;;;;;;;;:25;;;2707:47;2703:343;;;2774:11;;;;;;;;;;;:16;;:30;2791:12;;2774:30;;;;;;;;;;;;;;;;;;;;;;;2770:266;;;2824:46;2837:11;;;;;;;;;;;2850:12;;2864:5;2824:46;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;2770:266;;;3016:5;2995:18;;:26;;;;;;;;;;;;;;;;;;2770:266;2703:343;1578:22;2272:780;:::o",
   "source": "\npragma solidity ^0.4.16;\n\ninterface token {\n    function transfer(address receiver, uint amount);\n}\n\ncontract Crowdsale {\n    address public beneficiary;\n    uint public fundingGoal;\n    uint public amountRaised;\n    uint public deadline;\n    uint public price;\n    token public tokenReward;\n    mapping(address => uint256) public balanceOf;\n    bool fundingGoalReached = false;\n    bool crowdsaleClosed = false;\n\n    event GoalReached(address recipient, uint totalAmountRaised);\n    event FundTransfer(address backer, uint amount, bool isContribution);\n\n    /**\n     * Constructor function\n     *\n     * Setup the owner\n     */\n    function Crowdsale(\n        address ifSuccessfulSendTo,\n        uint fundingGoalInEthers,\n        uint durationInMinutes,\n        uint etherCostOfEachToken,\n        address addressOfTokenUsedAsReward\n    ) {\n        beneficiary = ifSuccessfulSendTo;\n        fundingGoal = fundingGoalInEthers * 1 ether;\n        deadline = now + durationInMinutes * 1 minutes;\n        price = etherCostOfEachToken * 1 ether;\n        tokenReward = token(addressOfTokenUsedAsReward);\n    }\n\n    /**\n     * Fallback function\n     *\n     * The function without name is the default function that is called whenever anyone sends funds to a contract\n     */\n    function () payable {\n        require(!crowdsaleClosed);\n        uint amount = msg.value;\n        balanceOf[msg.sender] += amount;\n        amountRaised += amount;\n        tokenReward.transfer(msg.sender, amount / price);\n        FundTransfer(msg.sender, amount, true);\n    }\n\n    modifier afterDeadline() { if (now >= deadline) _; }\n\n    /**\n     * Check if goal was reached\n     *\n     * Checks if the goal or time limit has been reached and ends the campaign\n     */\n    function checkGoalReached() afterDeadline {\n        if (amountRaised >= fundingGoal){\n            fundingGoalReached = true;\n            GoalReached(beneficiary, amountRaised);\n        }\n        crowdsaleClosed = true;\n    }\n\n\n    /**\n     * Withdraw the funds\n     *\n     * Checks to see if goal or time limit has been reached, and if so, and the funding goal was reached,\n     * sends the entire amount to the beneficiary. If goal was not reached, each contributor can withdraw\n     * the amount they contributed.\n     */\n    function safeWithdrawal() afterDeadline {\n        if (!fundingGoalReached) {\n            uint amount = balanceOf[msg.sender];\n            balanceOf[msg.sender] = 0;\n            if (amount > 0) {\n                if (msg.sender.send(amount)) {\n                    FundTransfer(msg.sender, amount, false);\n                } else {\n                    balanceOf[msg.sender] = amount;\n                }\n            }\n        }\n\n        if (fundingGoalReached && beneficiary == msg.sender) {\n            if (beneficiary.send(amountRaised)) {\n                FundTransfer(beneficiary, amountRaised, false);\n            } else {\n                //If we fail to send the funds to beneficiary, unlock funders balance\n                fundingGoalReached = false;\n            }\n        }\n    }\n}\n",
   "sourcePath": "/Users/juanbernardotobar/lacanoa/thechain/contracts/Crowdsale.sol",
   "ast": {
@@ -3364,5 +3538,5 @@
   },
   "networks": {},
   "schemaVersion": "1.0.1",
-  "updatedAt": "2018-05-12T10:18:51.453Z"
+  "updatedAt": "2018-05-12T10:18:51.430Z"
 }
