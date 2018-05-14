@@ -27,6 +27,7 @@
     "express": "^4.16.3",
     "pg": "^7.4.1",
     "socket.io": "^2.1.0",
+    "stripe": "^5.9.0",
     "testnet-faucet": "^1.0.4",
     "truffle-hdwallet-provider": "0.0.5",
     "waves-api": "^0.24.2",

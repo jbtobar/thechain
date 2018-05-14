@@ -22,6 +22,61 @@
   </head>
 
   <body>
+    <div id="StripeModal" class="modal">
+      <div id="modal_content" class="modal-content">
+        <span class="close" id="StripeModalClose" onclick="CloseStripeModal(this)">&times;</span>
+        <div id="StripeModalDiv">
+          <p></p>
+          <script src="https://checkout.stripe.com/checkout.js"></script>
+
+<button id="customButton">Purchase</button>
+
+<script>
+var handler = StripeCheckout.configure({
+  key: 'pk_test_rxtQ6XHmy9n5wqZ9dMVLbI7g',
+  image: 'https://stripe.com/img/documentation/checkout/marketplace.png',
+  locale: 'auto',
+  token: function(token) {
+    // You can access the token ID with `token.id`.
+    // Get the token ID to your server-side code for use.
+    $.post('payment',$(token).serializeArray()).then(function(data){
+      window.mona = data
+      console.log('stripe payment')
+      return false
+    })
+  }
+});
+
+document.getElementById('customButton').addEventListener('click', function(e) {
+  // Open Checkout with further options:
+  handler.open({
+    name: 'Moskvant',
+    description: '2 widgets',
+    amount: 2000
+  });
+  e.preventDefault();
+});
+
+// Close Checkout on page navigation:
+window.addEventListener('popstate', function() {
+  handler.close();
+});
+</script>
+          <!-- <form action="/payment" method="POST" onsubmit="return stripePayment(this)">
+            <script
+          src="https://checkout.stripe.com/checkout.js" class="stripe-button"
+          data-key="pk_test_rxtQ6XHmy9n5wqZ9dMVLbI7g"
+          data-amount="999"
+          data-name="Moskvant"
+          data-description="Example charge"
+          data-image="https://stripe.com/img/documentation/checkout/marketplace.png"
+          data-locale="auto">
+          </script>
+        </form> -->
+        </div>
+      </div>
+    </div>
+
     <!-- <span class="tooltiptext">Tooltip text</span> -->
     <!-- <img src="/public/assets/Rolling-1s-200px.svg" alt="embedded SVG"/> -->
      <!-- <div id="paypal-button"></div> -->
@@ -64,7 +119,7 @@
         <div id="myModal" class="modal">
 
           <!-- Modal content -->
-          <div class="modal-content">
+          <div class="modal-content" id='settings_modal'>
             <span class="close" id="myBtnClose">&times;</span>
             <p id="show_pass_input" onclick="securityconfirm(this)">
               Update Settings
@@ -113,7 +168,7 @@
           <form action="/" method="post" onsubmit="return false" id="ContractsMenu">
           </form>
           <div id='slide_1'></div>
-          <div id='slide_2'>
+          <div id='slide_2' style='display: none;'>
             <div id='slide_2_buttons'>
               <span id='new_contracts_button' class="close" style="float:none" onclick="ContractActions(this)">New</span>
               <span id='active_contracts_button' class="close" style="float:none" onclick="ContractActions(this)">Active</span>
@@ -134,7 +189,7 @@
                 <!-- <td><input name='contract_brokerage' class="ghost-input nopad" type='button' value='Brokerage'></input></td> -->
                 <!-- <td><input class="ghost-input nopad" type='button'></input></td> -->
               </tr>
-              <form action="/" method="post" id='contract_creation_form' onsubmit="return makeEscrow(this)">
+              <form action="/" method="post" id='contract_creation_form' onsubmit="return makeEscrow(this)" style="display: none;">
                 <table>
                   <tr>
                     <td><input class="ghost-input nopad">Value</input></td>

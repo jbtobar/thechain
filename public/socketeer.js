@@ -111,6 +111,8 @@ socket.on('notification_with_data',function(data){
   d3.select('#GeneralModalDiv').append('p').text(data.message)
   window.nwd = data
   openModal()
+  Balancia()
+  // THIS BOTTOM ONE IS TO LOAD THE PODS OF RUB AND USD
   loadBalance(data)
 })
 socket.on('btctx',function(data){

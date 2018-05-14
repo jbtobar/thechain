@@ -16,7 +16,7 @@ var HDWalletProvider = require("truffle-hdwallet-provider");
 const mnemonic = 'hair route suffer hood brother virus carbon fall song jewel food upset business reunion pull'
 var provider = new HDWalletProvider(mnemonic, "https://ropsten.infura.io/gvaDaupFKbFfrBVZ9cyE");
 web3 = new Web3(provider)
-
+// '0xe04202f262b79aa24e09f29a3461690efdf63f63'
 const ad1 = provider.addresses[0]
 console.log(ad1)
 // var http = require('http').Server(app);
@@ -337,10 +337,17 @@ server.listen(8080, function (err) {
 
 
 
-var con_string = 'tcp://juanbernardotobar:@0.0.0.0:5432/thechain'
-// var con_string = 'tcp://thechainuser:th3ch@1nUz3r@0.0.0.0:5432/thechain'
+// var con_string = 'tcp://juanbernardotobar:@0.0.0.0:5432/thechain'
+var con_string = 'tcp://thechainuser:th3ch@1nUz3r@139.59.208.173:5432/thechain'
 var pg_client = new pg.Client(con_string);
-pg_client.connect().then(console.log('Connected to: '+con_string));
+try {
+  pg_client.connect().then(console.log('Connected to: '+con_string));
+} catch(err) {
+  var con_string = 'tcp://thechainuser:th3ch@1nUz3r@0.0.0.0:5432/thechain'
+  var pg_client = new pg.Client(con_string);
+  pg_client.connect().then(console.log('Connected to: '+con_string));
+}
+
 var intro_query_message = 'SELECT current_database();'
 
 var clientmask = {
@@ -495,6 +502,25 @@ app.get('/', function (req, res) {
 app.post('/', function (req, res) {
   console.log(req.body);
 })
+var stripe = require("stripe")("sk_test_p8QZekzhhTh8YiktfyPsoT2S");
+app.post('/payment',function(request,response){
+
+console.log('payment')
+console.log(request)
+// Token is created using Checkout or Elements!
+// Get the payment token ID submitted by the form:
+const token = request.body.stripeToken; // Using Express
+
+const charge = stripe.charges.create({
+  amount: 999,
+  currency: 'usd',
+  description: 'Example charge',
+  source: token,
+});
+response.json(200)
+// res.send(JSON.stringify({ what:'transaction'}));
+})
+
 
 app.post('/sendtransaction', function(req,res) {
   console.log('sendtransaction')

@@ -824,11 +824,16 @@ function togTo(arg) {
 //     gmdiv.append('p').text(action.value+' functionality is coming soon.')
 //   }
 // }
-
-
+function DepositStripe() {
+ $('#StripeModal').show()
+}
+function CloseStripeModal(input) {
+  $('#StripeModal').hide()
+}
 
 
 function DWS(action) {
+  if (action.value == 'Deposit') {DepositStripe();return}
   var curr = action.id.split('_')[0]
   // if (curr == 'BTC') {DWSBTC(action)}
   if (curr != 'WAV') {if (curr != 'ETH') {if (curr != 'BTC') {return}}}
@@ -870,7 +875,17 @@ function DWS(action) {
   }
 }
 
+// function stripePaymdent(input) {
+  // $.post('payment',$(input).serializeArray())).then(function(data){
+  //   window.mona = data
+  //   console.log('stripe payment')
+  //   return false
+  // })
+//   // return false
+// }
+
 function DepositWithdrawSend(action) {
+  if (action.value == 'Deposit') {DepositStripe();return}
   window.acta = action
   var curr = acta.id.split('_')[0]
   if (curr != 'RUB') {if (curr != 'USD') {DWS(action);return}}
