@@ -4,6 +4,8 @@ This is the repository of the webapp MAIA.
 
 MAIA is a brokerage service on the blockchain. It offers a crypto wallet as well as an ecosystem to interact with other users through blockchain contracts.
 
+### MAIA v0.1 is live for testing purposes
+
 ## Introduction
 
 By registering an account at the MAIA platform, a wallet containing addresses for the bitcoin, waves, and ethereum blockcahins is generated for you. You have full control over this wallet, meaning you are the only person with the private keys to access it. IMPORTANT: If the private key is lost, the wallet is lost.
