@@ -4,6 +4,8 @@ This is the repository of the webapp MAIA.
 
 MAIA is a brokerage service on the blockchain. It offers a crypto wallet as well as an ecosystem to interact with other users through blockchain contracts.
 
+[Contribution guidelines for this project](public/functions.js)
+
 ## Introduction
 
 A couple of years ago I was interested in trading options on the US market. I was unable to open a brokerage account because I was not a US citizen. I then set out on a path to build my own options trading platform and brokerage service. This is the result.
