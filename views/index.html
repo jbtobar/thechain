@@ -168,7 +168,7 @@ window.addEventListener('popstate', function() {
           <form action="/" method="post" onsubmit="return false" id="ContractsMenu">
           </form>
           <div id='slide_1'></div>
-          <div id='slide_2'>
+          <div id='slide_2' style='display: none;'>
             <div id='slide_2_buttons'>
               <span id='new_contracts_button' class="close" style="float:none" onclick="ContractActions(this)">New</span>
               <span id='active_contracts_button' class="close" style="float:none" onclick="ContractActions(this)">Active</span>
@@ -189,7 +189,7 @@ window.addEventListener('popstate', function() {
                 <!-- <td><input name='contract_brokerage' class="ghost-input nopad" type='button' value='Brokerage'></input></td> -->
                 <!-- <td><input class="ghost-input nopad" type='button'></input></td> -->
               </tr>
-              <form action="/" method="post" id='contract_creation_form' onsubmit="return makeEscrow(this)">
+              <form action="/" method="post" id='contract_creation_form' onsubmit="return makeEscrow(this)" style="display: none;">
                 <table>
                   <tr>
                     <td><input class="ghost-input nopad">Value</input></td>
