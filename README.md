@@ -3,7 +3,7 @@
 This is the repository of the webapp MAIA.
 
 MAIA is a brokerage service on the blockchain. It offers a crypto wallet as well as an ecosystem to interact with other users through blockchain contracts.
-
+[somethings](public/functions.js)
 
 ## Introduction
 
