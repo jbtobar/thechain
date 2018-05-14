@@ -100,6 +100,19 @@ p {
 .ghost-label-bottom {
   margin-top: 0px;
 }
+.ghost-label-left {
+  float:left;
+  padding-left: 10%;
+  width: 30%;
+}
+.ghost-label-right {
+  float: left;
+  width: 70%;
+  color: #E64A19;
+}
+.ghosty {
+  /* width:20%; */
+}
 input#name1 {
   border-bottom:1px solid #ddd;
 }
@@ -107,8 +120,10 @@ input#name1:focus {
   border-bottom:1px solid #000000;
 }
 #transactionTable, td {
-    max-width: 100px;
+    /* max-width: 200px; */
+    padding:13px;
     overflow-x: auto;
+    text-overflow: ellipsis;
 }
 #confetti_button {
   position:fixed;
@@ -116,9 +131,57 @@ input#name1:focus {
   right:0px;
   width:100px;
 }
-
-
-
+.bwd_l {
+  float:left;
+  width:45%;
+}
+.bwd_r {
+  text-align: center;
+  float:right;
+  width:20%;
+}
+.bwd_rs {
+  text-align: center;
+  float:right;
+  width:15%;
+}
+.main_page {
+  height: 500px;
+  overflow-x: scroll;
+}
+.txconfclass, p {
+    padding: 0;
+    /* margin: 0; */
+}
+#loading_svg {
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 10%;
+  display: block;
+}
+#my_organizations_page {
+  margin-top: 5%;
+}
+.org-cell {
+    background: rgba(144,144,144,0.3);
+    margin: 10pt;
+}
+.nopad {
+  background-color: transparent;
+  padding: 0px;
+  margin: 0px;
+}
+#contract_creation_form {
+  background-color: rgba(144,144,144,0.5);
+}
+#contract_creation_form, td {
+    padding: 0px;
+}
+.address-overflow {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
 
 /* The Modal (background) */
 .modal {
@@ -151,6 +214,14 @@ input#name1:focus {
     font-weight: bold;
 }
 
+.org_toggle {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+  padding-right: 50px;
+
+}
 .close:hover,
 .close:focus {
     color: black;
@@ -165,6 +236,260 @@ input#name1:focus {
 #contactChoice1 {
   margin-left: 50px;
 }
+.waiting-confirmation {
+    color: red;
+}
+
+.tooltippy {
+    position: fixed;
+}
+.tooltiptext {
+    display: none;
+    position: relative;
+    top: 50px;
+    left: 50px;
+    color: red;
+}
+.contract-pod {
+    background-color: aquamarine;
+    margin: 10px;
+}
+#settings_modal {
+  width: 500px;
+}
+
+
+
+
+
+
+
+
+
+.example.example1 {
+  background-color: #6772e5;
+}
+
+.example.example1 * {
+  font-family: Roboto, Open Sans, Segoe UI, sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.example.example1 fieldset {
+  margin: 0 15px 20px;
+  padding: 0;
+  border-style: none;
+  background-color: #7795f8;
+  box-shadow: 0 6px 9px rgba(50, 50, 93, 0.06), 0 2px 5px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 #829fff;
+  border-radius: 4px;
+}
+
+.example.example1 .row {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-align: center;
+  align-items: center;
+  margin-left: 15px;
+}
+
+.example.example1 .row + .row {
+  border-top: 1px solid #819efc;
+}
+
+.example.example1 label {
+  width: 15%;
+  min-width: 70px;
+  padding: 11px 0;
+  color: #c4f0ff;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.example.example1 input, .example.example1 button {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  outline: none;
+  border-style: none;
+}
+
+.example.example1 input:-webkit-autofill {
+  -webkit-text-fill-color: #fce883;
+  transition: background-color 100000000s;
+  -webkit-animation: 1ms void-animation-out;
+}
+
+.example.example1 .StripeElement--webkit-autofill {
+  background: transparent !important;
+}
+
+.example.example1 .StripeElement {
+  width: 100%;
+  padding: 11px 15px 11px 0;
+}
+
+.example.example1 input {
+  width: 100%;
+  padding: 11px 15px 11px 0;
+  color: #fff;
+  background-color: transparent;
+  -webkit-animation: 1ms void-animation-out;
+}
+
+.example.example1 input::-webkit-input-placeholder {
+  color: #87bbfd;
+}
+
+.example.example1 input::-moz-placeholder {
+  color: #87bbfd;
+}
+
+.example.example1 input:-ms-input-placeholder {
+  color: #87bbfd;
+}
+
+.example.example1 button {
+  display: block;
+  width: calc(100% - 30px);
+  height: 40px;
+  margin: 40px 15px 0;
+  background-color: #f6a4eb;
+  box-shadow: 0 6px 9px rgba(50, 50, 93, 0.06), 0 2px 5px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 #ffb9f6;
+  border-radius: 4px;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.example.example1 button:active {
+  background-color: #d782d9;
+  box-shadow: 0 6px 9px rgba(50, 50, 93, 0.06), 0 2px 5px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 #e298d8;
+}
+
+.example.example1 .error svg .base {
+  fill: #fff;
+}
+
+.example.example1 .error svg .glyph {
+  fill: #6772e5;
+}
+
+.example.example1 .error .message {
+  color: #fff;
+}
+
+.example.example1 .success .icon .border {
+  stroke: #87bbfd;
+}
+
+.example.example1 .success .icon .checkmark {
+  stroke: #fff;
+}
+
+.example.example1 .success .title {
+  color: #fff;
+}
+
+.example.example1 .success .message {
+  color: #9cdbff;
+}
+
+.example.example1 .success .reset path {
+  fill: #fff;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Tooltip text */
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: 120px;
+    background-color: #555;
+    color: #fff;
+    text-align: center;
+    padding: 5px 0;
+    border-radius: 6px;
+
+    /* Position the tooltip text */
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    margin-left: -60px;
+
+    /* Fade in tooltip */
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+/* Tooltip arrow */
+.tooltip .tooltiptext::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #555 transparent transparent transparent;
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 /* Popup container */

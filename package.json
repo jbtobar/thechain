@@ -23,9 +23,13 @@
   "dependencies": {
     "bitcoinjs-lib": "^3.3.2",
     "body-parser": "^1.18.2",
+    "d3": "^5.2.0",
     "express": "^4.16.3",
     "pg": "^7.4.1",
+    "socket.io": "^2.1.0",
+    "stripe": "^5.9.0",
     "testnet-faucet": "^1.0.4",
+    "truffle-hdwallet-provider": "0.0.5",
     "waves-api": "^0.24.2",
     "web3": "^1.0.0-beta.34"
   }

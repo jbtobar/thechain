@@ -24,8 +24,8 @@ app.get('/', function (req, res) {
   res.sendFile(__dirname +'/views/index.html')
 })
 
-app.listen(3000, function () {
-  console.log('Example app listening on port 3000!')
+app.listen(8080, function () {
+  console.log('Example app listening on port 8080!')
 })
 
 
@@ -54,6 +54,7 @@ app.post('/account_config', function(req,res) {
     req.body.updates.forEach(function(d) {
       console.log(d)
       userbase[user_input].account_config[d] = req.body.account_config[d]
+      console.log('The below was updated')
       console.log(userbase[user_input])
     })
     res.send(JSON.stringify({ updated: userbase[user_input].account_config }));
@@ -76,6 +77,7 @@ app.post('/usercreation', function (req, res) {
           searchable:true,
           btcaddress:'',
           verified:false,
+          account_name:'',
         },
   }
   fundAccount(req.body.seedaddress,user_input,res)
@@ -107,6 +109,7 @@ app.post('/wallet', function (req, res) {
        console.log(balancesList);
        Waves.API.Node.v1.addresses.balance(address).then((balance) => {
            console.log(balance);
+           console.log(account_config)
            res.send(JSON.stringify({ a: 'wallet', encrypted:encrypted,balance:balance,balances:balancesList,username:user_input,account_config:account_config }));
        });
        // res.send(JSON.stringify({ a: 'wallet', encrypted:encrypted,balances:JSON.stringify(balancesList) }))

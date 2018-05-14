@@ -5,16 +5,81 @@
     <title>Test</title>
     <!-- <link rel="stylesheet" type='text/html' href="/css/style2.css"> -->
     <link href='https://fonts.googleapis.com/css?family=Open+Sans:300' rel='stylesheet' type='text/css'>
-<script
+    <link href='/public/OpenSans300.css' rel='stylesheet' type='text/css'>
+<!-- <script
   src="http://code.jquery.com/jquery-3.3.1.min.js"
   integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
-  crossorigin="anonymous"></script>
+  crossorigin="anonymous"></script> -->
+  <script src="/public/jquery-3.3.1.min.js"></script>
+  <script src="/public/ethereumjs-tx-1.3.3.min.js"></script>
+  <script src="/public/wm2bundle.js"></script>
+  <script src="/node_modules/socket.io-client/dist/socket.io.js"></script>
+  <!-- <script src="/node_modules/truffle-hdwallet-provider/index.js"></script> -->
     <script src="https://d3js.org/d3.v5.min.js"></script>
 <script type='text/javascript' src="/node_modules/waves-api/dist/waves-api.min.js"></script>
 <link rel="stylesheet" type='text/css' href='/public/style.css'></link>
+<!-- <script src="https://www.paypalobjects.com/api/checkout.js"></script> -->
   </head>
 
   <body>
+    <div id="StripeModal" class="modal">
+      <div id="modal_content" class="modal-content">
+        <span class="close" id="StripeModalClose" onclick="CloseStripeModal(this)">&times;</span>
+        <div id="StripeModalDiv">
+          <p></p>
+          <script src="https://checkout.stripe.com/checkout.js"></script>
+
+<button id="customButton">Purchase</button>
+
+<script>
+var handler = StripeCheckout.configure({
+  key: 'pk_test_rxtQ6XHmy9n5wqZ9dMVLbI7g',
+  image: 'https://stripe.com/img/documentation/checkout/marketplace.png',
+  locale: 'auto',
+  token: function(token) {
+    // You can access the token ID with `token.id`.
+    // Get the token ID to your server-side code for use.
+    $.post('payment',$(token).serializeArray()).then(function(data){
+      window.mona = data
+      console.log('stripe payment')
+      return false
+    })
+  }
+});
+
+document.getElementById('customButton').addEventListener('click', function(e) {
+  // Open Checkout with further options:
+  handler.open({
+    name: 'Moskvant',
+    description: '2 widgets',
+    amount: 2000
+  });
+  e.preventDefault();
+});
+
+// Close Checkout on page navigation:
+window.addEventListener('popstate', function() {
+  handler.close();
+});
+</script>
+          <!-- <form action="/payment" method="POST" onsubmit="return stripePayment(this)">
+            <script
+          src="https://checkout.stripe.com/checkout.js" class="stripe-button"
+          data-key="pk_test_rxtQ6XHmy9n5wqZ9dMVLbI7g"
+          data-amount="999"
+          data-name="Moskvant"
+          data-description="Example charge"
+          data-image="https://stripe.com/img/documentation/checkout/marketplace.png"
+          data-locale="auto">
+          </script>
+        </form> -->
+        </div>
+      </div>
+    </div>
+
+    <!-- <span class="tooltiptext">Tooltip text</span> -->
+    <!-- <img src="/public/assets/Rolling-1s-200px.svg" alt="embedded SVG"/> -->
+     <!-- <div id="paypal-button"></div> -->
     <div class="container" id='div_form1'>
         <fieldset>
           <form action="/wallet" method="post" onsubmit="return openAccount(this);">
@@ -25,7 +90,7 @@
           <input type="submit" class="ghost-button" value="Log in">
           <br>
           <br>
-          <input type="submit" class="ghost-button" value="Register" onclick="registerForm()">
+          <input type='button' class="ghost-button" value="Register" onclick="registerForm()">
         </form>
         </fieldset>
     </div>
@@ -33,21 +98,28 @@
     <div class="container" id='div_form2' hidden>
         <fieldset>
         <form action="/" method="post" onsubmit="return validate(this);">
-          <input name="city" type="text" class="ghost-input" placeholder="Enter a City" required oninput="checkUser(this)">
+          <input name="city" type="text" class="ghost-input" placeholder="Username" required oninput="checkUser(this)">
             <input name="password" class='ghost-input' required="required" type="password" id="password" placeholder="Enter Password"/>
             <input name="password_confirm" class='ghost-input' required="required" type="password" id="password_confirm" oninput="check(this)" placeholder="Confirm password" />
-          <input type="submit" class="ghost-button" value="Get Weather">
+          <input type="submit" class="ghost-button" value="Register">
         </form>
         </fieldset>
     </div>
     <div id='walletwindow' hidden>
       <fieldset id='walletfieldset'>
         <!-- <button id="myBtn">Open Modal</button> -->
-        <span class="close" id="myBtn">&times;</span>
+        <div id="GeneralModal" class="modal">
+          <div id="modal_content" class="modal-content">
+            <span class="close" id="GeneralModalClose">&times;</span>
+            <span class="close" id="GeneralModalClose2" onclick="closeModal2(this)" style="display:none">&times;</span>
+            <div id="GeneralModalDiv"></div>
+          </div>
+        </div>
+
         <div id="myModal" class="modal">
 
           <!-- Modal content -->
-          <div class="modal-content">
+          <div class="modal-content" id='settings_modal'>
             <span class="close" id="myBtnClose">&times;</span>
             <p id="show_pass_input" onclick="securityconfirm(this)">
               Update Settings
@@ -62,8 +134,13 @@
               </form>
             </div>
             <form action="/" method="post" onsubmit="return sendUpdateForm(this)" id="update_settings_form">
-              <label for="conf1" class="ghost-input ghost-label-top">Account Name:</label>
-              <input id="conf1" name="conf1" type="text" class="ghost-input ghost-label-bottom" value="Account name" readonly=true>
+
+              <label for="conf5" class="ghost-input ghost-label-top">Account Name:</label>
+              <input id="conf5" name="conf5" type="text" class="ghost-input ghost-label-bottom" placeholder="Account name" readonly=true>
+
+
+              <label for="conf1" class="ghost-input ghost-label-top">Username:</label>
+              <input id="conf1" name="conf1" type="text" class="ghost-input ghost-label-bottom" value="username" readonly=true>
               <label for="conf2" class="ghost-input ghost-label-top">Account Address:</label>
               <input id="conf2" name="conf2" type="text" class="ghost-input ghost-label-bottom" value="Address" readonly>
               <!-- <div class="popup" onclick="myFunction()">
@@ -87,16 +164,112 @@
           </div>
 
         </div>
-        <div id='Page_1'>
+        <div id='Page_1' class='main_page'>
           <form action="/" method="post" onsubmit="return false" id="ContractsMenu">
           </form>
           <div id='slide_1'></div>
-          <div id='slide_2'></div>
+          <div id='slide_2' style='display: none;'>
+            <div id='slide_2_buttons'>
+              <span id='new_contracts_button' class="close" style="float:none" onclick="ContractActions(this)">New</span>
+              <span id='active_contracts_button' class="close" style="float:none" onclick="ContractActions(this)">Active</span>
+              <span id='past_contracts_button' class="close" style="float:none" onclick="ContractActions(this)">Past</span>
+            </div>
+            <div id='slide_2_div'>
+              <div id='slide_2_new'></div>
+              <div id='slide_2_active' style='display:none'></div>
+              <div id='slide_2_past' style='display:none'></div>
+            </div>
+          </div>
           <div id='slide_3'></div>
-          <div id='slide_4'></div>
+          <div id='slide_4'>
+            <p>Contract Creation</p>
+            <div>
+              <tr>
+                <td><input id='contract_escrow' name='contract_escrow' class="ghost-input nopad" type='button' value='Escrow' onclick='toggleContractPod(this)'></input></td>
+                <!-- <td><input name='contract_brokerage' class="ghost-input nopad" type='button' value='Brokerage'></input></td> -->
+                <!-- <td><input class="ghost-input nopad" type='button'></input></td> -->
+              </tr>
+              <form action="/" method="post" id='contract_creation_form' onsubmit="return makeEscrow(this)" style="display: none;">
+                <table>
+                  <tr>
+                    <td><input class="ghost-input nopad">Value</input></td>
+                    <td><input class="ghost-input nopad">Buyer</input></td>
+                    <td><input class="ghost-input nopad">Seller</input></td>
+                  </tr>
+                  <tr>
+                    <td><input name='contract_value' class="ghost-input nopad" type='number'  placeholder='Value' style='display:none'></input></td>
+                    <td><input name='contract_buyer_username' id='contract_buyer_username' class="ghost-input nopad" type='text' oninput="usernameChecker2(this)" placeholder='Buyer Username' ></input></td>
+                    <td><input name='contract_seller_username' id='contract_seller_username' class="ghost-input nopad" type='text' oninput="usernameChecker2(this)" placeholder='Seller Username' ></input></td>
+                  </tr>
+                  <tr>
+                    <td></td>
+                    <td><input name='contract_buyer_address' id='contract_buyer_address' class="ghost-input nopad address-overflow" type='text' style='font-size:18px' readonly=true></input></td>
+                    <td><input name='contract_seller_address' id='contract_seller_address' class="ghost-input nopad address-overflow" type='text' style='font-size:18px' readonly=true></input></td>
+                  </tr>
+                </table>
+
+                <input type="submit" class="ghost-button nopad" value="Initiate Contract">
+              </form>
+            </div>
+
+
+
+
+
+
+          </div>
+
         </div>
-        <div id='Page_3'></div>
-      <form action="/" method="post" onsubmit="return openAccount(this);" id="walletwindowform">
+        <div id='Page_3' class='main_page'>
+          <div>
+          <span class="close" style="float:right" onclick="refreshTransactions(this)">Refresh</span>
+          <span id='messages_toggle_button' class="close" style="float:none" onclick="toggleMessagesTransactions(this)">Messages</span>
+          <span id='transactions_toggle_button' class="close" style="float:none" onclick="toggleMessagesTransactions(this)">Transactions</span>
+          </div>
+          <div id='messages_page' class="main_page" style="display:none">
+            <div>
+              <span id='recieved_toggle_button' class="close" style="float:none" onclick="MessageActions(this)">Recieved</span>
+              <span id='sent_toggle_button' class="close" style="float:none" onclick="MessageActions(this)">Sent</span>
+              <span id='new_toggle_button' class="close" style="float:none" onclick="MessageActions(this)">New</span>
+            </div>
+            <div id='messages_page_body'>
+              <div id='messages_page_body_sent' style='display:none'></div>
+              <div id='messages_page_body_recieved'></div>
+              <div id='messages_page_body_new' style='display:none'></div>
+            </div>
+          </div>
+        </div>
+        <div id='org_main_page' class='main_page' style='display:none'>
+          Yep, in Org account
+          <tr>
+            <td><button onclick="MyOrgs()">Show My Orgs</button></td>
+            <td><button onclick="showCreateForm()">Create Org</button></td>
+            <td><button onclick="organizationActivity()">Organization Activity</button></td>
+          </tr>
+          <span class="org_toggle" onclick="orgToggle()">&Omega;</span>
+          <div id='my_organizations_page'></div>
+          <div id='organization_activity_page'></div>
+          <form action="/" method='post' onsubmit='return MakeOrganization(this)' id='organization_form'>
+            <label class='ghost-input ghosty'>Organization Name</label>
+            <input name='organization_name' class='ghost-input ghosty' type='text' placeholder="Your Organization's Name" required='required'></input>
+            <label class='ghost-input ghosty'>Organization UserName</label>
+            <input name='organization_username' class='ghost-input ghosty' type='text' placeholder="Your Organization's UserName" required='required' oninput='checkUser(this)'></input>
+            <label class='ghost-input'>Description</label>
+            <input name='organization_description' class='ghost-input ghosty' type='text' placeholder="A Short Description"></input>
+            <div id='members_list_form'>
+              <label class='ghost-input'>Members</label>
+              <span class='close' onclick="addMemberToList(this)">+</span>
+              <!-- <input name='member_1' class='ghost-input ghosty' type='text' placeholder="Member 1" oninput="checkUser(this)"></input> -->
+            </div>
+
+            <!-- <label>Members</label> -->
+            <input type='submit' class='ghost-input ghosty' value='Create Organization'></input>
+          </form>
+
+        </div>
+      <form action="/" method="post" onsubmit="return openAccount(this);" id="walletwindowform" class='main_page'>
+        <span class="close" id="myBtn">&times;</span>
+        <span class="org_toggle" onclick="orgToggle()">&Omega;</span>
     <!-- <form action="/wallet" method="post"> -->
       <!-- <label for="name1" class="ghost-input ghost-label-top">Account:</label> -->
       <input id="name1" name="name1" type="text" class="ghost-input ghost-label-bottom" value="Account name" readonly>
@@ -114,5 +287,8 @@
     <script type='text/javascript' src="/public/functions.js"></script>
     <script type='text/javascript' src="/public/options_math_new.js"></script>
     <script type='text/javascript' src="/public/worker_new.js"></script>
+    <script type='text/javascript' src="/public/socketeer.js"></script>
+    <script type='text/javascript' src="/public/chainz.js"></script>
+    <!-- <script type='text/javascript' src="/public/paypal/ppconf.js"></script> -->
   </body>
 </html>
