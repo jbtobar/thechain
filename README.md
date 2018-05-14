@@ -4,15 +4,30 @@ This is the repository of the webapp MAIA.
 
 MAIA is a brokerage service on the blockchain. It offers a crypto wallet as well as an ecosystem to interact with other users through blockchain contracts.
 
-### MAIA v0.1 is live for testing purposes
 
 ## Introduction
+
+A couple of years ago I was interested in trading options on the US market. I was unable to open a brokerage account because I was not a US citizen. I then set out on a path to build my own options trading platform and brokerage service. This is the result.
+
+This service leverages blockchain technology to solve real problems people are dealing with around the world. The majority of business and personal transaction around the globe are conducted in fiat money, however, the benefits of blockchain technology are achieved through cryptoassets. The service allows users to store their fiat money as a cryptoasset in the blockchain and peform all their usual transactions with it. The user can have confidence that these cryptoassets can easily be redeemed back to fiat.
+
+## Features
+
+* One Wallet for multiple cryptocurrencies and tokens (BTC \ ETH \ WAV)
+* Easily store fiat (USB and RUB) as a USD or RUB denomiated cryptoasset to conduct business as usual, avoid volatile crypto prices
+* Simple UI to view asset balances, make transacions, and interact with smart contracts
+* Initiate Escrow contracts with other users
+* Trade options and futures via a dedicated trading platform
+
 
 By registering an account at the MAIA platform, a wallet containing addresses for the bitcoin, waves, and ethereum blockcahins is generated for you. You have full control over this wallet, meaning you are the only person with the private keys to access it. IMPORTANT: If the private key is lost, the wallet is lost.
 
 This one private key allows you to unlock three wallets: a bitcoin, a waves, and an ethereum wallet. After receiving your private key, you will be directed to the MAIA User Interface where you can view you balances and send assets to other users. You can find other users in the platform via the username, or send to an address.
 
 Through the platform, you then have access to brokered contracts on the ethereum blockchain. At the moment 3 types of contracts are offered: Escrow contract, Pegger Contract, Futures/Options Contract.
+
+
+
 
 ##### Escrow contract
 Example Problem: A salesman in Azerbaijan wishes to export tomatoes to a buyer in Germany. The buyer in Germany does not want to pay until reception of the goods, but the seller wants to have some assurance that the buyer will indeed pay upon reception of goods.
