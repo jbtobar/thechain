@@ -340,7 +340,14 @@ server.listen(8080, function (err) {
 var con_string = 'tcp://juanbernardotobar:@0.0.0.0:5432/thechain'
 // var con_string = 'tcp://thechainuser:th3ch@1nUz3r@0.0.0.0:5432/thechain'
 var pg_client = new pg.Client(con_string);
-pg_client.connect().then(console.log('Connected to: '+con_string));
+try {
+  pg_client.connect().then(console.log('Connected to: '+con_string));
+} catch(err) {
+  var con_string = 'tcp://thechainuser:th3ch@1nUz3r@0.0.0.0:5432/thechain'
+  var pg_client = new pg.Client(con_string);
+  pg_client.connect().then(console.log('Connected to: '+con_string));
+}
+
 var intro_query_message = 'SELECT current_database();'
 
 var clientmask = {
