@@ -16,8 +16,6 @@ password : test12345
 
 ## Introduction
 
-A couple of years ago I was interested in trading options on the US market. I was unable to open a brokerage account because I was not a US citizen. I then set out on a path to build my own options trading platform and brokerage service. This is the result.
-
 This service leverages blockchain technology to solve real problems people are dealing with around the world. The majority of business and personal transaction around the globe are conducted in fiat money, however, the benefits of blockchain technology are achieved through cryptoassets. The service allows users to store their fiat money as a cryptoasset in the blockchain and peform all their usual transactions with it. The user can have confidence that these cryptoassets can easily be redeemed back to fiat.
 
 ## Features
