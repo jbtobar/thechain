@@ -4,6 +4,13 @@ This is the repository of the webapp MAIA.
 
 MAIA is a brokerage service on the blockchain. It offers a crypto wallet as well as an ecosystem to interact with other users through blockchain contracts.
 
+#### For Testing
+Feel free to access [MAIA](https://maia.moskvant.com) and register a new user, and the Options Trading Platform at [MOSKVANT](https://moskvant.com) with the following credentials:
+'''
+username : testuser
+password : test12345
+'''
+
 
 ## Introduction
 
@@ -19,14 +26,13 @@ This service leverages blockchain technology to solve real problems people are d
 * Initiate Escrow contracts with other users
 * Trade options and futures via a dedicated trading platform
 
+## Getting Started
 
 By registering an account at the MAIA platform, a wallet containing addresses for the bitcoin, waves, and ethereum blockcahins is generated for you. You have full control over this wallet, meaning you are the only person with the private keys to access it. IMPORTANT: If the private key is lost, the wallet is lost.
 
 This one private key allows you to unlock three wallets: a bitcoin, a waves, and an ethereum wallet. After receiving your private key, you will be directed to the MAIA User Interface where you can view you balances and send assets to other users. You can find other users in the platform via the username, or send to an address.
 
 Through the platform, you then have access to brokered contracts on the ethereum blockchain. At the moment 3 types of contracts are offered: Escrow contract, Pegger Contract, Futures/Options Contract.
-
-
 
 
 ##### Escrow contract
@@ -55,8 +61,7 @@ This address points to a server hosted by DigitalOcean, and it returns the follo
 * views/index.html
 
 This file invokes, among others, the following core javascript files:
-* functions.js
-* socketeer.js
+
 * bundle.js
 
 The bundle.js file is the file used to browserify the npm module HDWalletProvider. This is what allows the user to connect to the ethereum blockchain.
@@ -127,8 +132,34 @@ We have a Monte-Carlo simulator to assist decision-making by generating random p
 The user can view statistics regarding the entire MOEX derivatives market or for a specific underlying. There are options to view data as pie charts, bar graphs, and mixed views.
 
 
+## The Code
+
+Below are the key code files for MAIA. To look at the condebase for the Options Platform, take a look at the public github repository [here](https://github.com/lacanoa/DEX).
+
+* [Server Script](server_transition.js) - This is the Javascript Code that runs the server.
+
+* [Database Configuration](thechaindb.sql)
+* [DB Notes](public/thechaindb_script.js)
+
+* [Smart Contract Tests](FTtest.js)
+* [Smart Contract Test Notes](notes/test_notes.js)
+
+* [Smart Contract deployment notes](public/truffle_notes.js)
+* [Smart Contract deployment configuration](truffle-config.js)
+
+* [Escrow contract](contracts/Escrow.sol) - Solidity File
+* [Pegger contract](contracts/RTSToken.sol) - Solidity File
+* [Options contract](contracts/FutureToken.sol) - Solidity File
+
+* [Escrow contract abi](build/contracts/Escrow.json) - JSON File
+* [Pegger contract abi](build/contracts/RTSToken.json) - JSON File
+* [Options contract abi](build/contracts/FutureToken.json) - JSON File
 
 
+* [HTML Home Page](views/index.html) - Client Side
+* [BitcoinJS notes](public/btc_gen.js) - Client Side
+* [Client Script](public/functions.js) - Main Javascript client-side script
+* [Socket.io Handler](public/socketeer.js) - Client Side
 
 
 ## Technology Stack
