@@ -136,7 +136,7 @@ The user can view statistics regarding the entire MOEX derivatives market or for
 
 ## The Code
 
-Below are the key code files for MAIA. To look at the condebase for the Options Platform, take a look at the public github repository [here](https://github.com/lacanoa/DEX).
+Below are the key code files for MAIA. To look at the codebase for the Options Platform, take a look at the public github repository [here](https://lacanoa.github.io/DEX/).
 
 * [Server Script](server_transition.js) - This is the Javascript Code that runs the server.
 
