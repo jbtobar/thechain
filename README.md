@@ -3,7 +3,7 @@
 This is the repository of the webapp MAIA.
 
 MAIA is a brokerage service on the blockchain. It offers a crypto wallet as well as an ecosystem to interact with other users through blockchain contracts.
-<<<<<<< HEAD
+
 
 #### For Testing
 Feel free to access [MAIA](https://maia.moskvant.com) and register a new user, and the Options Trading Platform at [MOSKVANT](https://moskvant.com) with the following credentials:
