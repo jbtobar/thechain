@@ -7,14 +7,12 @@ MAIA is a brokerage service on the blockchain. It offers a crypto wallet as well
 
 #### For Testing
 Feel free to access [MAIA](https://maia.moskvant.com) and register a new user, and the Options Trading Platform at [MOSKVANT](https://moskvant.com) with the following credentials:
-'''
+```
 username : testuser
 password : test12345
-'''
+```
 
-=======
-[somethings](public/functions.js)
->>>>>>> 28971ce8d359b06a4e42c8725a7b31b39a65f8e5
+
 
 ## Introduction
 
